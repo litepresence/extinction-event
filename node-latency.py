@@ -1,4 +1,3 @@
-```python
 # Python3
 #
 # Returns list of live tested nodes sorted by latency
