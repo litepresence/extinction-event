@@ -7,7 +7,7 @@
 def nodes(timeout=3, pings=10):  # Public Nodes List
 
     # timeout is seconds to ping until abort per websocket
-    # pings is number of websockets to ping  until abort (0 none, 999 all)
+    # pings is number of websockets to satisfy until abort (0 none, 999 all)
 
     from multiprocessing import Process, Value, Array
     from bitshares.blockchain import Blockchain
@@ -55,7 +55,7 @@ def nodes(timeout=3, pings=10):  # Public Nodes List
     url += '/raw/YCsHRwgS'
     urls.append(url)
 
-    # searched selected sites for Bitshares nodes
+    # search selected sites for Bitshares nodes
     validated = []
     for u in urls:
         try:
