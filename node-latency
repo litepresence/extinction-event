@@ -1,3 +1,4 @@
+```python
 # Python3
 #
 # Returns list of live tested nodes sorted by latency
@@ -146,3 +147,4 @@ def nodes(timeout=3, pings=10):  # Public Nodes List
     return ret
     
 nodes()
+```
