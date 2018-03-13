@@ -1,6 +1,6 @@
 # Python3
 #
-# Returns list of live tested nodes sorted by latency
+# Returns list of live tested Bitshares nodes sorted by latency
 #
 # (BTS) litepresence1
 
@@ -146,4 +146,3 @@ def nodes(timeout=3, pings=10):  # Public Nodes List
     return ret
     
 nodes()
-```
