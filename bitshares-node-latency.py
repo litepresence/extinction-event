@@ -5,11 +5,15 @@
 # (BTS) litepresence1
 
 
-def nodes(timeout=5, pings=999999, 
-        noprint=False, include=False, exclude=False, suffix=False):
+def nodes(timeout=5, pings=999999, crop=10, noprint=False, 
+        include=False, exclude=False, suffix=False, master=False):
 
-    # timeout is seconds to ping until abort per websocket
-    # pings is number of websockets to ping  until skip (0 none, 999 all)
+    # timeout : seconds to ping until abort per node
+    # pings   : number of good nodes to find until satisfied (0 none, 999 all)
+    # suffix  : checks each node for no suffix plus with /ws or /wss
+    # noprint : disables printing, only returns list of good nodes
+    # master  : check only nodes listed in bitshares/ui/master
+    # crop    : return only best nodes
 
     from multiprocessing import Process, Value, Array
     from bitshares.blockchain import Blockchain
@@ -20,7 +24,7 @@ def nodes(timeout=5, pings=999999,
     import sys
     import os
 
-    # include and exclude custom nodes
+    # include and exclude custom nodes, strip /ws & /wss extensions first
     included, excluded = [], []
     if include:
         included = []
@@ -47,16 +51,17 @@ def nodes(timeout=5, pings=999999,
         for i in range(len(v)):
             if v[i].endswith('/wss'):
                 v[i] = v[i][:-4]
-        x_for = ['wss://relinked.com',
-                 'wss://bitshares.crypto.fans',
-                 'wss://this.uptick.rocks']
+        # these are known to require /ws extension
+        ws = ['wss://relinked.com',
+              'wss://bitshares.crypto.fans',
+              'wss://this.uptick.rocks']
         if suffix:
             wss = [(i+'/wss') for i in v]
             ws = [(i+'/ws') for i in v]
             v = v+wss+ws
         else:
             for i in range(len(v)):
-                if v[i] in x_for:
+                if v[i] in ws:
                     v[i] += '/ws'
                 else:
                     v[i] += '/wss'
@@ -67,16 +72,11 @@ def nodes(timeout=5, pings=999999,
         try:
             start = time.time()
             chain = Blockchain(
-                bitshares_instance=BitShares(
-                    n,
-                    num_retries=0),
-                mode='head')
+                bitshares_instance=BitShares(n, num_retries=0), mode='head')
             ping_latency = time.time() - start
             current_block = chain.get_current_block_num()
             blocktimestamp = abs(
-                chain.block_timestamp(
-                    current_block) +
-                utc_offset)
+                chain.block_timestamp(current_block) + utc_offset)
             block_latency = time.time() - blocktimestamp
             if block_latency < (ping_latency + 4):
                 num.value = ping_latency
@@ -95,6 +95,7 @@ def nodes(timeout=5, pings=999999,
         if noprint:
             sys.stdout = sys.__stdout__
 
+    # gather list of nodes from github
     blockPrint()
     begin = time.time()
     utc_offset = (datetime.fromtimestamp(begin) -
@@ -104,15 +105,16 @@ def nodes(timeout=5, pings=999999,
     urls = []
     # scrape from github
     git = 'https://raw.githubusercontent.com'
-    url = git + '/bitshares/bitshares-ui/staging/app/api/apiConfig.js'
-    urls.append(url)
     url = git + '/bitshares/bitshares-ui/master/app/api/apiConfig.js'
     urls.append(url)
-    url = git + '/CryptoBridge/cryptobridge-ui/'
-    url += 'e5214ad63a41bd6de1333fd98d717b37e1a52f77/app/api/apiConfig.js'
-    urls.append(url)
-    url = git + '/litepresence/extinction-event/master/bitshares-nodes.py'
-    urls.append(url)
+    if not master:
+        url = git + '/bitshares/bitshares-ui/staging/app/api/apiConfig.js'
+        urls.append(url)
+        url = git + '/CryptoBridge/cryptobridge-ui/'
+        url += 'e5214ad63a41bd6de1333fd98d717b37e1a52f77/app/api/apiConfig.js'
+        urls.append(url)
+        url = git + '/litepresence/extinction-event/master/bitshares-nodes.py'
+        urls.append(url)
 
     # searched selected sites for Bitshares nodes
     validated = [] + included
@@ -127,23 +129,23 @@ def nodes(timeout=5, pings=999999,
                 attempts = 0
             except:
                 print(('failed to connect to %s' % u))
-                attempts += 1
+                attempts -= 1
                 pass
 
+    # remove known bad nodes from test
     if len(excluded):
         excluded = sorted(excluded)
         print(('remove %s known bad nodes' % len(excluded)))
         validated = [i for i in validated if i not in excluded]
-
     validated = sorted(list(set(validate(parse(clean(validated))))))
 
+    # attempt to contact each websocket
     print ('=====================================')
     print(('found %s total nodes - no duplicates' % len(validated)))
     print ('=====================================')
     print (validated)
     pinging = min(pings, len(validated))
-
-    if pinging:  # attempt to contact each websocket
+    if pinging:  
         print ('=====================================')
         enablePrint()
         print(('%s searching for %s nodes; timeout %s sec; est %.1f minutes' % (
@@ -151,9 +153,9 @@ def nodes(timeout=5, pings=999999,
         blockPrint()
         print ('=====================================')
         pinged, timed, down, stale, expired = [], [], [], [], []
-        # use multiprocessing module to enforce timeout
         for n in validated:
             if len(pinged) < pinging:
+                # use multiprocessing module to enforce timeout
                 num = Value('d', 999999)
                 arr = Array('i', list(range(0)))
                 p = Process(target=ping, args=(n, num, arr))
@@ -164,24 +166,26 @@ def nodes(timeout=5, pings=999999,
                     p.join()
                     if num.value == 111111: # head block is stale
                         stale.append(n)
-                    if num.value == 222222: # websocket connect failed
+                    if num.value == 222222: # connect failed
                         down.append(n)
                     if num.value == 999999: # timeout reached
                         expired.append(n)
                 else:
-                    pinged.append(n)        # websocket connect success
-                    timed.append(num.value) # websocket connect time
+                    pinged.append(n)        # connect success
+                    timed.append(num.value) # connect success time
                 print(('ping:', ('%.2f' % num.value), n))
+
         # sort websockets by latency
         pinged = [x for _, x in sorted(zip(timed, pinged))]
         timed = sorted(timed)
         unknown = sorted(
             list(set(validated).difference(pinged + down + stale + expired)))
+
+        # report outcome
         print('')
         print((len(pinged), 'of', len(validated),
                'nodes are active with latency less than', timeout))
         print(('fastest node', pinged[0], 'with latency', ('%.2f' % timed[0])))
-
         if len(excluded):
             print('')
             print ('EXCLUDED nodes:')
@@ -214,14 +218,14 @@ def nodes(timeout=5, pings=999999,
                 print(('TTTT', expired[i]))
         if len(pinged):
             print ('')
-            print ('UP nodes:')
+            print ('GOOD nodes:')
             print ('')
             for i in range(len(pinged)):
                 print((('%.2f' % timed[i]), pinged[i]))
 
-        ret = pinged
+        ret = pinged[-crop:]
     else:
-        ret = validated
+        ret = validated[-crop:]
 
     print ('')
     print (ret)
