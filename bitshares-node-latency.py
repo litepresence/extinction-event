@@ -5,8 +5,8 @@
 # (BTS) litepresence1
 
 
-def nodes(timeout=5, pings=999999, crop=10, noprint=False, 
-        include=False, exclude=False, suffix=False, master=False):
+def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
+          include=False, exclude=False, suffix=True, master=False):
 
     # timeout : seconds to ping until abort per node
     # pings   : number of good nodes to find until satisfied (0 none, 999 all)
@@ -24,7 +24,7 @@ def nodes(timeout=5, pings=999999, crop=10, noprint=False,
     import sys
     import os
 
-    # include and exclude custom nodes, strip /ws & /wss extensions first
+    # include and exclude custom nodes
     included, excluded = [], []
     if include:
         included = []
@@ -56,9 +56,9 @@ def nodes(timeout=5, pings=999999, crop=10, noprint=False,
               'wss://bitshares.crypto.fans',
               'wss://this.uptick.rocks']
         if suffix:
-            wss = [(i+'/wss') for i in v]
-            ws = [(i+'/ws') for i in v]
-            v = v+wss+ws
+            wss = [(i + '/wss') for i in v]
+            ws = [(i + '/ws') for i in v]
+            v = v + wss + ws
         else:
             for i in range(len(v)):
                 if v[i] in ws:
@@ -137,6 +137,7 @@ def nodes(timeout=5, pings=999999, crop=10, noprint=False,
         excluded = sorted(excluded)
         print(('remove %s known bad nodes' % len(excluded)))
         validated = [i for i in validated if i not in excluded]
+
     validated = sorted(list(set(validate(parse(clean(validated))))))
 
     # attempt to contact each websocket
@@ -145,7 +146,7 @@ def nodes(timeout=5, pings=999999, crop=10, noprint=False,
     print ('=====================================')
     print (validated)
     pinging = min(pings, len(validated))
-    if pinging:  
+    if pinging:
         print ('=====================================')
         enablePrint()
         print(('%s searching for %s nodes; timeout %s sec; est %.1f minutes' % (
@@ -164,15 +165,15 @@ def nodes(timeout=5, pings=999999, crop=10, noprint=False,
                 if p.is_alive() or (num.value > timeout):
                     p.terminate()
                     p.join()
-                    if num.value == 111111: # head block is stale
+                    if num.value == 111111:  # head block is stale
                         stale.append(n)
-                    if num.value == 222222: # connect failed
+                    if num.value == 222222:  # connect failed
                         down.append(n)
-                    if num.value == 999999: # timeout reached
+                    if num.value == 999999:  # timeout reached
                         expired.append(n)
                 else:
                     pinged.append(n)        # connect success
-                    timed.append(num.value) # connect success time
+                    timed.append(num.value)  # connect success time
                 print(('ping:', ('%.2f' % num.value), n))
 
         # sort websockets by latency
@@ -232,6 +233,13 @@ def nodes(timeout=5, pings=999999, crop=10, noprint=False,
     print ('')
     enablePrint()
     print(('elapsed', ('%.2f' % (time.time() - begin))))
-    return ret
+    return (ret)
+    if write:
+        with open('nodes.txt', 'w+') as file:
+            file.write(str(ret))
+            print (ret)
 
-nodes()
+
+while 1:
+    nodes(timeout=5, pings=999, crop=5, noprint=True, write=True,
+          include=False, exclude=False, suffix=False, master=False)
