@@ -14,6 +14,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     # noprint : disables printing, only returns list of good nodes
     # master  : check only nodes listed in bitshares/ui/master
     # crop    : return only best nodes
+    # write   : maintains an output file nodes.txt with list of best nodes
 
     from multiprocessing import Process, Value, Array
     from bitshares.blockchain import Blockchain
