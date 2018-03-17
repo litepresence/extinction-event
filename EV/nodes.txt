@@ -1,0 +1,1 @@
+['wss://bitshares.openledger.info/wss', 'wss://eu.nodes.bitshares.works/wss', 'wss://node.market.rudex.org/wss', 'wss://sg.nodes.bitshares.ws/wss', 'wss://dex.rnglab.org/wss', 'wss://api.bts.blckchnd.com/wss', 'wss://api-ru.bts.blckchnd.com/wss', 'wss://b.mrx.im/wss', 'wss://ap-northeast-1.bts.crypto-bridge.org/wss', 'wss://sg.nodes.bitshares.works/wss']
