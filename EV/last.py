@@ -66,6 +66,7 @@ while 1:
 
     start = time.time()
     redundant_last = []
+    nodes_used = []
     for i in range(len(node_list)):
         if len(redundant_last) < 5:
             ret = 'No data from node: '
@@ -73,15 +74,18 @@ while 1:
                 market(node_list[i])
                 ret = satoshi(dex('last'))
                 redundant_last.append(ret)
+                nodes_used.append(node_list[i])
             except:
                 pass
             #print (ret, node_list[i])
-    #print (node_list)
+    #print (nodes_used)
     #print (redundant_last)
+    #print (nodes_used[-1])
+    #print (redundant_last[-1])
 
     msg = ''
     if len(set(redundant_last)) ==1:
-        last = redundant_last[0]
+        last = redundant_last[-1]
         msg += 'common'
     else:
         try:
@@ -105,7 +109,7 @@ while 1:
             file.write(str(last))
             file.write('?!? BLACKLIST - LAST ?!? ')
             file.write(str(redundant_last))
-            file.write(str(node_list))
+            file.write(str(nodes_used))
 
 
     last = satoshi(last)
@@ -116,4 +120,3 @@ while 1:
 
     with open('last.txt', 'w+') as file:
         file.write(str(last))
-
