@@ -1,3 +1,5 @@
+5 NODE VERIFIED LAST PRICE
+
 nodes.py and last.py should be run in seperate terminals
 
 nodes.py creates file nodes.txt
