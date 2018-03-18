@@ -1,122 +1,104 @@
 # creates output file last.txt of dex price
 
 # reads file nodes.txt to get list of latency sorted nodes from nodes.py
-# contacts 5 different nodes 
+# contacts 5 different nodes
 # if all same returns price
 # else tries to return mode of price
 # except if no mode returns median of price
-# however latest less than 2% away from mode or median, 
+# however latest less than 2% away from mode or median,
 # returns latest price instead
-
-# use inconjuction with nodes.py which maintains list of high latency nodes.txt
-
-# if data spread too wide appends report to file blacklist.txt
-
+# use in conjuction with nodes.py which maintains list of low latency nodes.txt
+# if data relative range too wide appends report to file blacklist.txt
 # typical elapsed 30 seconds per loop
 
-# (BTS) litepresence1
+' (BTS) litepresence1 '
 
+# unlicensed - WTFPL v0 March 1765
 
 from bitshares import BitShares
 from bitshares.market import Market
-import ast
-from statistics import mean,median,mode
+from statistics import mean, median, mode
+from ast import literal_eval as literal
 import time
 
 BitCURRENCY = 'USD'
 BitASSET = 'BTS'
 BitPAIR = BitASSET + ":" + BitCURRENCY
-SATOSHI = 0.00000001
-ANTISAT = 1 / SATOSHI
 
+def dex_last(market):  # returns latest price on given market(node)
+    return float(market.ticker()['latest'])
 
-def dex(  # Public AND Private API Bitshares
-        command, amount=ANTISAT, price=None,
-        depth=1, expiration=ANTISAT):
+def market(n):  # returns market class using node "n"
+    return Market(BitPAIR, bitshares_instance=BitShares(n, num_retries=0))
 
-    if command == 'last':
-
-        # the most recent transation in this MARKET
-        #print(('Bitshares API', command))
-        raw = MARKET.ticker()['latest']
-        price = float(raw)
-        # print (price)
-        return price
-
-def market(n):
-    global MARKET
-    MARKET = Market(BitPAIR, bitshares_instance=BitShares(n, num_retries=0))
-
-def satoshi(n):
+def satoshi(n):  # format prices to satoshi type
     return float('%.8f' % float(n))
 
-def clock():
+def clock():  # 24 hour clock formatted HH:MM:SS
     return str(time.ctime())[11:19]
-    
 
-while 1:
+while True:
 
-    with open('nodes.txt','r') as f:
-        node_list = f.read()
-    node_list = list(ast.literal_eval(node_list))
-    # ensure works w/ bad node
-    node_list.append('wss://some.shitty.node/wss') 
+    try:
+        # fetch list of good nodes from file maintained by nodes.py
+        with open('nodes.txt', 'r') as f:
+            node_list = f.read()
+        node_list = list(literal(node_list))
 
+        # fetch last price from 5 dex nodes
+        start = time.time()
+        last_list = []
+        nodes_used = []
+        for i in range(len(node_list)):
+            if len(last_list) < 5:
+                ret = 'No data from node: '
+                try:
+                    m = market(node_list[i])
+                    ret = satoshi(dex_last(m))
+                    last_list.append(ret)
+                    nodes_used.append(node_list[i])
+                except:
+                    pass
 
-
-    start = time.time()
-    redundant_last = []
-    nodes_used = []
-    for i in range(len(node_list)):
-        if len(redundant_last) < 5:
-            ret = 'No data from node: '
+        # check last list and return best last price with message
+        msg = ''
+        if len(set(last_list)) == 1:
+            last = last_list[-1]
+            msg += 'common'
+        else:
             try:
-                market(node_list[i])
-                ret = satoshi(dex('last'))
-                redundant_last.append(ret)
-                nodes_used.append(node_list[i])
+                last = mode(last_list)
+                msg += 'mode'
             except:
-                pass
-            #print (ret, node_list[i])
-    #print (nodes_used)
-    #print (redundant_last)
-    #print (nodes_used[-1])
-    #print (redundant_last[-1])
+                last = median(last_list)
+                msg += 'median'
+            # calculate relative range
+            rrange = (max(last_list) - min(last_list)) / mean(last_list)
+            # override median or mode with latest if less than 2% difference
+            if rrange < 0.02:
+                last = last_list[-1]
+                msg = 'latest (' + msg + ')'
+            else:
+                # create blacklist.txt if data is rrange too wide
+                print('?!? BLACKLIST - LAST ?!? ' + str(last))
+                print(str(last_list))
+                print(str(nodes_used))
+                with open('blacklist.txt', 'a+') as file:
+                    file.write("\n" + '?!? BLACKLIST - LAST ?!? ' + str(last))
+                    file.write("\n" + str(last_list))
+                    file.write("\n" + str(nodes_used))
 
-    msg = ''
-    if len(set(redundant_last)) ==1:
-        last = redundant_last[-1]
-        msg += 'common'
-    else:
-        try:
-            last = mode(redundant_last)
-            msg += 'mode'
-        except:
-            last = median(redundant_last)
-            msg += 'median'
-    if (abs(last-redundant_last[-1])/last < 0.02) and (msg != 'common'):
-        last = redundant_last[-1]
-        msg = 'latest (' + msg + ')'
+        # maintain a log of last price, note relative range and statistics type
+        last = satoshi(last)
+        elapsed = '%.1f' % (time.time() - start)
+        print (('%.8f' % last), clock(), 'elapsed: ', elapsed,
+               'nodes: ', len(last_list), 'type: ', ('%.3f' % rrange), msg)
 
-    # create blacklist.txt if data is spread too wide
-    spread = (max(redundant_last) - min(redundant_last)) / mean(redundant_last)
-    if spread > 0.02:
-        print(str(last))
-        print('?!? BLACKLIST - LAST ?!? ')
-        print(str(redundant_last))
-        print(str(node_list))
-        with open('blacklist.txt', 'a+') as file:
+        # update communication file last.txt
+        with open('last.txt', 'w+') as file:
             file.write(str(last))
-            file.write('?!? BLACKLIST - LAST ?!? ')
-            file.write(str(redundant_last))
-            file.write(str(nodes_used))
 
-
-    last = satoshi(last)
-    elapsed = '%.1f' % (time.time()-start)
-    checked = len(redundant_last)
-    print (('%.8f' % last), clock(),'elapsed: ', elapsed, 
-            'nodes: ', checked, 'type: ', ('%.3f' % spread), msg)
-
-    with open('last.txt', 'w+') as file:
-        file.write(str(last))
+    # no matter what happens just keep attempting to update last price
+    except:
+        print ('error')
+        pass
