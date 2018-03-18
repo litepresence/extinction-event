@@ -73,6 +73,7 @@ while True:
 
         # check last list and return best last price with message
         msg = ''
+        rrange = (max(last_list) - min(last_list)) / mean(last_list)
         if len(set(last_list)) == 1:
             last = last_list[-1]
             msg += 'common'
@@ -84,7 +85,7 @@ while True:
                 last = median(last_list)
                 msg += 'median'
             # calculate relative range
-            rrange = (max(last_list) - min(last_list)) / mean(last_list)
+
             # override median or mode with latest if less than 2% difference
             if rrange < 0.02:
                 last = last_list[-1]
