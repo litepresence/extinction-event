@@ -5,10 +5,10 @@
 # if all same returns price
 # else tries to return mode of price
 # except if no mode returns median of price
-# however latest less than 2% away from mode or median,
+# however if relative range < 2% 
 # returns latest price instead
 # use in conjuction with nodes.py which maintains list of low latency nodes.txt
-# if data relative range too wide appends report to file blacklist.txt
+# if relative range > 2 % appends report to file blacklist.txt
 # typical elapsed 30 seconds per loop
 
 ' (BTS) litepresence1 '
