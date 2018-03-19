@@ -2,8 +2,17 @@
 #
 # Returns list of live tested nodes sorted by latency
 #
+
 # (BTS) litepresence1
 
+from multiprocessing import Process, Value, Array
+from bitshares.blockchain import Blockchain
+from bitshares import BitShares
+from datetime import datetime
+import requests
+import time
+import sys
+import os
 
 def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
           include=False, exclude=False, suffix=True, master=False):
@@ -16,14 +25,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     # crop    : return only best nodes
     # write   : maintains an output file nodes.txt with list of best nodes
 
-    from multiprocessing import Process, Value, Array
-    from bitshares.blockchain import Blockchain
-    from bitshares import BitShares
-    from datetime import datetime
-    import requests
-    import time
-    import sys
-    import os
+
 
     # include and exclude custom nodes
     included, excluded = [], []
@@ -239,14 +241,14 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     enablePrint()
     print(('elapsed', ('%.2f' % (time.time() - begin))))
 
-    if write:
-        written = 0
-        while not written:
+    if write and (len(ret) == crop):
+        opened = 0
+        while not opened:
             try:
                 with open('nodes.txt', 'w+') as file:
                     file.write(str(ret))
                     print (ret)
-                written = 1
+                opened = 1
             except:
                 pass
     return (ret)
@@ -256,6 +258,9 @@ while 1:
     try:
         nodes(timeout=5, pings=999, crop=10, noprint=True, write=True,
               include=False, exclude=False, suffix=False, master=False)
+
+        time.sleep(600)
     except:
         print('error')
         pass
+
