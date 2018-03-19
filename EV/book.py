@@ -3,7 +3,7 @@
 # 90% checks 5 nodes, seeks 3 the same
 # 4% if no 3 then gives matching 2
 # 3% if no matching 2 then gives columnwise median
-# 1! if anything goes wrong w/ median, renders statistical reconstruction 
+# <1% if anything goes wrong w/ median, renders statistical reconstruction 
 # averages 15 seconds per loop
 
 
@@ -66,8 +66,10 @@ def clock():  # 24 hour clock formatted HH:MM:SS
 
 def verify_book():
 
+    tally = {'three':0, 'mode':0, 'median':0, 'built':0}
     while True:
-            print('==========================================================')
+
+
             # try:
             # fetch list of good nodes from file maintained by nodes.py
             try:
@@ -106,7 +108,6 @@ def verify_book():
                                            for i in ret['bidp']]
                             return ret
                         if FUCK_BOOK:
-                            print ('intentionally ruining orderbook for dev')
                             ret = fuck_book()
                         #
                         #
@@ -122,6 +123,7 @@ def verify_book():
                         book = book_list[-1]
                         msg += 'triplicate book'
                         triplicate = 1
+                        tally['three']+=1
                         break
 
             if triplicate == 0:
@@ -130,6 +132,7 @@ def verify_book():
                 try:
                     book = literal(mode([str(i) for i in book_list]))
                     msg += 'mode book'
+                    tally['mode']+=1
                 except:
 
                     book = {i: list(np.median([x[i] for x in book_list], axis=0))
@@ -161,11 +164,13 @@ def verify_book():
                         (len(set(bidsort)) == len(bidsort)) and
                             (bidsort[0] < asksort[0])):
                             msg += '!!! MEDIAN BOOK !!!'
+                            tally['median']+=1
 
                     # if 0: pass # can be used to override MEDIAN and insist on
                     # RECONSTRUCTED
 
                     else:
+                        tally['built']+=1
                         msg += '!!! RECONSTRUCTED BOOK !!!'
                         # assure median comprehension did not reorganize book
                         # prices
@@ -229,6 +234,12 @@ def verify_book():
             print (clock(), 'elapsed: ', elapsed,
                    'nodes: ', len(book_list), 'type: ', ('%.3f' % rrange), msg)
             print (book)
+            print('==========================================================')
+            s=sum(tally.values())
+            ptally = {k:('%.2f' % (v/s)) for k,v in tally.items()}
+            #print (tally)
+            print (ptally)
+            print('==========================================================')
             # update communication file last.txt
             try:
                 opened = 0
@@ -246,6 +257,7 @@ def verify_book():
         #    print ('verify_book failed')
         #    pass
         # time.sleep(30)
+
 
 
 if __name__ == '__main__':
