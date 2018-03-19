@@ -55,6 +55,9 @@ BitPAIR = BitASSET + ":" + BitCURRENCY
 def satoshi(n):  
     return float('%.8f' % float(n))
 
+def blur(n):  # FOR DEV ONLY!!!!
+    return float('%.1f' % float(n))
+
 def dex_book(node, depth=3):  # returns latest price on given market(node)
 
     try:
@@ -64,8 +67,10 @@ def dex_book(node, depth=3):  # returns latest price on given market(node)
         bids = raw['bids']
         asks = raw['asks']
         bidp = [satoshi(bids[i]['price']) for i in range(len(bids))]
+        bidv = [blur(bids[i]['quote']) for i in range(len(bids))]
         askp = [satoshi(asks[i]['price']) for i in range(len(asks))]
-        book = {'bidp': bidp, 'askp': askp}
+        askv = [blur(asks[i]['quote']) for i in range(len(asks))]
+        book = {'bidp': bidp, 'bidv': bidv, 'askp': askp, 'askv': askv}
 
         if (sum(bidp) > sum(askp)) or (bidp[0] > askp[0]):
             print ('BIDS > ASKS ???????????????????????????')
