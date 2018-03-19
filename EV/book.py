@@ -1,9 +1,12 @@
 # creates output file book.txt of latest dex orderbook for given market
 
-# checks 5 nodes, seeks 3 the same
-# if no 3 then gives matching 2
-# if no matching 2 then gives columnwise median
-# if anything goes wrong w/ median, renders statistical reconstruction 
+# 90% checks 5 nodes, seeks 3 the same
+# 4% if no 3 then gives matching 2
+# 3% if no matching 2 then gives columnwise median
+# 1! if anything goes wrong w/ median, renders statistical reconstruction 
+# averages 15 seconds per loop
+
+
 
 # alpha testing
 
