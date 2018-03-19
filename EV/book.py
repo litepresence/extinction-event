@@ -133,7 +133,7 @@ def verify_book():
             try:
                 opened = 0
                 while not opened:
-                    with open('last.txt', 'w+') as file:
+                    with open('book.txt', 'w+') as file:
                         file.write(str(book))
                         opened = 1
             except Exception as e:
