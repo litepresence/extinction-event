@@ -14,6 +14,9 @@ import time
 import sys
 import os
 
+print('hllow')
+
+
 def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
           include=False, exclude=False, suffix=True, master=False):
 
@@ -24,7 +27,6 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     # master  : check only nodes listed in bitshares/ui/master
     # crop    : return only best nodes
     # write   : maintains an output file nodes.txt with list of best nodes
-
 
     # include and exclude custom nodes
     included, excluded = [], []
@@ -43,7 +45,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
         return [t for t in cleaned.split() if t.startswith('wss')]
 
     def validate(parsed):
-        v = [i for i in parsed if (('test' not in i) and ('fake' not in i))]
+        v = parsed
         for i in range(len(v)):
             if v[i].endswith('/'):
                 v[i] = v[i][:-1]
@@ -71,30 +73,31 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
 
     # ping the blockchain and return latency
     def ping(n, num, arr):
+
         try:
             start = time.time()
             chain = Blockchain(
                 bitshares_instance=BitShares(n, num_retries=0), mode='head')
+
+            # print(n,chain.rpc.chain_params["chain_id"])
             ping_latency = time.time() - start
             current_block = chain.get_current_block_num()
             blocktimestamp = abs(
-                chain.block_timestamp(current_block) )#+ utc_offset)
-
+                chain.block_timestamp(current_block))  # + utc_offset)
             block_latency = time.time() - blocktimestamp
-            #print (blocktimestamp)
-            #print (time.time())
-            #print (block_latency)
-            #print (ping_latency)
-            #print (time.ctime())
-            #print (utc_offset)
-
-            if block_latency < (ping_latency + 4):
-
-            
+            # print (blocktimestamp)
+            # print (time.time())
+            # print (block_latency)
+            # print (ping_latency)
+            # print (time.ctime())
+            # print (utc_offset)
+            if chain.get_network()['prefix'] != 'BTS':
+                num.value = 333333
+            elif block_latency < (ping_latency + 4):
                 num.value = ping_latency
             else:
                 num.value = 111111
-            num.value = ping_latency
+
         except:
             num.value = 222222
             pass
@@ -166,7 +169,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             time.ctime(), pinging, timeout, timeout * len(validated) / 60.0)))
         blockPrint()
         print ('=====================================')
-        pinged, timed, down, stale, expired = [], [], [], [], []
+        pinged, timed, down, stale, expired, testnet = [], [], [], [], [], []
         for n in validated:
             if len(pinged) < pinging:
                 # use multiprocessing module to enforce timeout
@@ -180,9 +183,11 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
                     p.join()
                     if num.value == 111111:  # head block is stale
                         stale.append(n)
-                    if num.value == 222222:  # connect failed
+                    elif num.value == 222222:  # connect failed
                         down.append(n)
-                    if num.value == 999999:  # timeout reached
+                    elif num.value == 333333:  # connect failed
+                        testnet.append(n)
+                    elif num.value == 999999:  # timeout reached
                         expired.append(n)
                 else:
                     pinged.append(n)        # connect success
@@ -193,7 +198,8 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
         pinged = [x for _, x in sorted(zip(timed, pinged))]
         timed = sorted(timed)
         unknown = sorted(
-            list(set(validated).difference(pinged + down + stale + expired)))
+            list(set(validated).difference(
+                pinged + down + stale + expired + testnet)))
 
         # report outcome
         print('')
@@ -212,6 +218,12 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             print('')
             for i in range(len(unknown)):
                 print(('????', unknown[i]))
+        if len(testnet):
+            print('')
+            print ('TESTNET nodes:')
+            print('')
+            for i in range(len(testnet)):
+                print(('TEST', testnet[i]))
         if len(down):
             print('')
             print ('DOWN nodes:')
@@ -237,7 +249,6 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             for i in range(len(pinged)):
                 print((('%.2f' % timed[i]), pinged[i]))
 
-
         ret = pinged[:crop]
         print (pinged[0])
         print (ret[0])
@@ -257,20 +268,19 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             try:
                 with open('nodes.txt', 'w+') as file:
                     file.write(str(ret))
-                    print (timed[0],ret)
+                    print (timed[0], ret)
                 opened = 1
             except:
                 pass
     return (ret)
 
 
-while 1:
+while True:
 
-        nodes(timeout=5, pings=999, crop=10, noprint=True, write=True,
+        nodes(timeout=5, pings=999, crop=10, noprint=False, write=True,
               include=False, exclude=False, suffix=False, master=False)
 
         time.sleep(600)
-        #except:
-        #print('error')
-        #pass
-
+        # except:
+        # print('error')
+        # pass
