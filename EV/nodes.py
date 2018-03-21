@@ -261,10 +261,15 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
 
 while True:
 
-        nodes(timeout=5, pings=999, crop=10, noprint=False, write=True,
-              include=False, exclude=False, suffix=False, master=False)
+        try:
 
-        time.sleep(600)
-        # except:
-        # print('error')
-        # pass
+            nodes(timeout=5, pings=999, crop=10, noprint=False, write=True,
+                  include=False, exclude=False, suffix=False, master=False)
+
+            time.sleep(600)
+
+        except Exception as ex:
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(ex).__name__, ex.args)
+            print (message)
+            pass
