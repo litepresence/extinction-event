@@ -17,6 +17,7 @@
  'wss://bitshares.openledger.info/wss', 
  'wss://bts.ai.la/wss', 
  'wss://bts.proxyhosts.info/wss', 
+ 'wss://bts-seoul.clockwork.gr',
  'wss://bts.transwiser.com/wss', 
  'wss://btsza.co.za:8091/wss', 
  'wss://dele-puppy.com/wss', 
