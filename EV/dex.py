@@ -28,7 +28,7 @@ from ast import literal_eval as literal
 import time
 
 
-ACCOUNT = Account("user85")
+ACCOUNT = Account("")
 PASS_PHRASE = ""
 BitCURRENCY = 'OPEN.BTC'
 BitASSET = 'BTS'
