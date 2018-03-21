@@ -1,1 +1,88 @@
-# list of strange outputs and respective node
+
+BLACKLIST last0.11085783
+[0.1097, 0.1097, 0.11209998, 0.11209998, 0.11085783]
+['wss://bts.proxyhosts.info/wss', 'wss://la.dexnode.net/wss', 'wss://bitshares.openledger.info/wss', 'wss://bitshares.nu/wss', 'wss://api.bts.blckchnd.com/wss']
+BLACKLIST last0.1222
+[0.1222, 0.1222, 0.1222, 0.11829115, 0.1136997]
+['wss://la.dexnode.net/wss', 'wss://us-west-1.bts.crypto-bridge.org/wss', 'wss://eu.nodes.bitshares.ws/wss', 'wss://this.uptick.rocks/ws', 'wss://node.market.rudex.org/wss']
+BLACKLIST last0.11254999
+[0.12059998, 0.12059998, 0.11254902, 0.11254999, 0.11254999]
+['wss://api-ru.bts.blckchnd.com/wss', 'wss://slovenia.bitshares.apasia.tech/wss', 'wss://ws.gdex.top/wss', 'wss://ws.winex.pro/wss', 'wss://ap-northeast-2.bts.crypto-bridge.org/wss']
+BLACKLIST last0.13034786
+[0.11350136, 0.13034786, 0.13034786, 0.13034786, 0.13034786]
+['wss://this.uptick.rocks/ws', 'wss://us.nodes.bitshares.works/wss', 'wss://eu.openledger.info/wss', 'wss://slovenia.bitshares.apasia.tech/wss', 'wss://node.market.rudex.org/wss']
+BLACKLIST last{'askv': [0.23034, 20.1307], 'bidv': [5.0, 314.99757], 'bidp': [0.11888, 0.11888], 'askp': [0.11895, 0.11947]}
+[{'askv': [0.23034, 20.1307], 'askp': [0.11895, 0.11947], 'bidv': [5.0, 314.99757], 'bidp': [0.11888, 0.11888]}, {'askv': [0.23034, 20.1307], 'askp': [0.11895, 0.11947], 'bidv': [5.0, 314.99757], 'bidp': [0.11888, 0.11888]}, {'askv': [0.00089, 466.47674], 'askp': [0.11236, 0.11977], 'bidv': [471.77694, 5.0], 'bidp': [0.11888, 0.11888]}]
+['wss://this.uptick.rocks/ws', 'wss://eu.nodes.bitshares.ws/wss', 'wss://eu-west-1.bts.crypto-bridge.org/wss']
+BLACKLIST last{'askv': [89.14876, 0.00089], 'bidv': [470.74279, 5.0], 'bidp': [0.11889, 0.11888], 'askp': [0.11921, 0.11236]}
+[{'askv': [0.00089, 466.47674], 'askp': [0.11236, 0.11977], 'bidv': [470.74279, 5.0], 'bidp': [0.11889, 0.11888]}, {'askv': [89.14876, 0.00089], 'askp': [0.11921, 0.11236], 'bidv': [470.74279, 5.0], 'bidp': [0.11889, 0.11888]}, {'askv': [89.14876, 0.00089], 'askp': [0.11921, 0.11236], 'bidv': [470.74279, 5.0], 'bidp': [0.11889, 0.11888]}]
+['wss://this.uptick.rocks/ws', 'wss://api.bts.blckchnd.com/wss', 'wss://eu-west-1.bts.crypto-bridge.org/wss']
+BLACKLIST last0.12157357
+[0.12157357, 0.12604312, 0.12604312, 0.12127055, 0.12127055]
+['wss://eu.nodes.bitshares.works/wss', 'wss://eu.openledger.info/wss', 'wss://la.dexnode.net/wss', 'wss://eu-central-1.bts.crypto-bridge.org/wss', 'wss://this.uptick.rocks/ws']
+BLACKLIST last 0.12076349 0.03201470539932976
+[0.12076349, 0.12076349, 0.12076349, 0.12467985, 0.12467985]
+['wss://bitshares.openledger.info/wss', 'wss://eu-central-1.bts.crypto-bridge.org/wss', 'wss://eu.nodes.bitshares.ws/wss', 'wss://eu.nodes.bitshares.works/wss', 'wss://eu.openledger.info/wss']
+BLACKLIST last{'askv': [159.95899, 424.58818000000002], 'askp': [0.12395, 0.12501999999999999], 'bidv': [160.47998999999999, 160.47998999999999], 'bidp': [0.12228, 0.12161]}
+[{'askv': [17.5522, 424.58818], 'askp': [0.12589, 0.126], 'bidv': [0.0008, 1.44424], 'bidp': [0.125, 0.12249]}, {'askv': [159.95899, 7.00455], 'askp': [0.12283, 0.12502], 'bidv': [160.47999, 580.96979], 'bidp': [0.12161, 0.12037]}, {'askv': [917.71429, 459.93291], 'askp': [0.12395, 0.12495], 'bidv': [1347.57666, 160.47999], 'bidp': [0.12228, 0.12161]}]
+['wss://api.bts.blckchnd.com/wss', 'wss://eu.openledger.info/wss', 'wss://eu.nodes.bitshares.ws/wss']
+BLACKLIST last 0.12395231 0.03480942075866703
+[0.12096286, 0.1252669, 0.12433287, 0.12395231, 0.12371425]
+['wss://api.bts.blckchnd.com/wss', 'wss://eu.openledger.info/wss', 'wss://eu.nodes.bitshares.ws/wss', 'wss://eu-west-1.bts.crypto-bridge.org/wss', 'wss://eu-central-1.bts.crypto-bridge.org/wss']
+BLACKLIST last{'askv': [1.61402, 123.69419000000001], 'askp': [0.121, 0.12127], 'bidv': [289.39882, 289.39882], 'bidp': [0.11681999999999999, 0.11624]}
+[{'askv': [1.61402, 577.22896], 'askp': [0.121, 0.12127], 'bidv': [401.28864, 21.86507], 'bidp': [0.11624, 0.11624]}, {'askv': [0.09265, 1.61402], 'askp': [0.11765, 0.121], 'bidv': [289.39882, 401.28864], 'bidp': [0.11682, 0.11624]}, {'askv': [543.57277, 123.69419], 'askp': [0.12127, 0.12127], 'bidv': [160.26439, 289.39882], 'bidp': [0.11921, 0.11682]}]
+['wss://bts.proxyhosts.info/wss', 'wss://bitshares.openledger.info/wss', 'wss://us.nodes.bitshares.ws/wss']
+BLACKLIST last{'askv': [0.31975999999999999, 431.88992000000002], 'askp': [0.11736000000000001, 0.12127], 'bidv': [289.39882, 472.03969000000001], 'bidp': [0.11711000000000001, 0.11681999999999999]}
+[{'askv': [0.58622, 958.83336], 'askp': [0.11736, 0.12127], 'bidv': [289.39882, 474.03435], 'bidp': [0.11682, 0.11653]}, {'askv': [0.00172, 123.69522], 'askp': [0.11628, 0.12127], 'bidv': [472.03969, 289.39882], 'bidp': [0.11711, 0.11682]}, {'askv': [0.31976, 431.88992], 'askp': [0.1204, 0.12126], 'bidv': [160.32899, 472.03969], 'bidp': [0.11921, 0.11711]}]
+['wss://bts.proxyhosts.info/wss', 'wss://bitshares.openledger.info/wss', 'wss://us.nodes.bitshares.ws/wss']
+BLACKLIST last{'askv': [0.00087000000000000001, 123.70283999999999], 'askp': [0.11905, 0.12126000000000001], 'bidv': [160.47998999999999, 469.69323000000003], 'bidp': [0.11862, 0.11828]}
+[{'askv': [0.00084, 431.88935], 'askp': [0.11905, 0.12126], 'bidv': [471.34566, 470.23433], 'bidp': [0.1177, 0.1174]}, {'askv': [5.16335, 123.70284], 'askp': [0.11981, 0.12126], 'bidv': [160.47999, 469.69323], 'bidp': [0.11862, 0.11828]}, {'askv': [0.00087, 123.70284], 'askp': [0.11494, 0.12126], 'bidv': [160.47999, 469.69323], 'bidp': [0.11862, 0.11828]}]
+['wss://bts.proxyhosts.info/wss', 'wss://bitshares.openledger.info/wss', 'wss://us.nodes.bitshares.ws/wss']
+BLACKLIST last 0.12091115 0.21640887975337272
+[0.14826375, 0.12091115, 0.12091115, 0.12091115, 0.12096855]
+['wss://api-ru.bts.blckchnd.com/wss', 'wss://ap-northeast-1.bts.crypto-bridge.org/wss', 'wss://b.mrx.im/wss', 'wss://ap-northeast-2.bts.crypto-bridge.org/wss', 'wss://bit.btsabc.org/wss']
+BLACKLIST last{'askv': [121.5553, 411.89407], 'askp': [0.1234, 0.1234], 'bidv': [217.19490999999999, 166.98706999999999], 'bidp': [0.12161, 0.11977]}
+[{'askv': [411.89407, 261.51751], 'askp': [0.1234, 0.1234], 'bidv': [217.19491, 663.22466], 'bidp': [0.12279, 0.12249]}, {'askv': [0.31064, 411.89407], 'askp': [0.11975, 0.1234], 'bidv': [464.77569, 40.24045], 'bidp': [0.11977, 0.1197]}, {'askv': [121.5553, 567.25806], 'askp': [0.1234, 0.1234], 'bidv': [159.60919, 166.98707], 'bidp': [0.12161, 0.11977]}]
+['wss://ap-northeast-1.bts.crypto-bridge.org/wss', 'wss://b.mrx.im/wss', 'wss://ap-northeast-2.bts.crypto-bridge.org/wss']
+BLACKLIST last{'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}
+[{'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}, {'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}, {'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}]
+['wss://sa-east-1.bts.crypto-bridge.org/wss', 'wss://bit.btsabc.org/wss', 'wss://sg.nodes.bitshares.works/wss']
+BLACKLIST last{'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}
+[{'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}, {'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}, {'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}]
+['wss://sa-east-1.bts.crypto-bridge.org/wss', 'wss://bit.btsabc.org/wss', 'wss://sg.nodes.bitshares.works/wss']
+BLACKLIST last{'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}
+[{'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}, {'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}, {'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056], 'bidp': [0.12346, 0.1228], 'bidv': [0.00081, 40.24045]}]
+['wss://sa-east-1.bts.crypto-bridge.org/wss', 'wss://bit.btsabc.org/wss', 'wss://sg.nodes.bitshares.works/wss']
+BLACKLIST last{'bidv': [0.00081, 40.24045], 'bidp': [0.12346, 0.1228], 'askp': [0.12309, 0.1231], 'askv': [19.67759, 411.9056]}
+[{'bidv': [0.00081, 40.24045], 'askp': [0.12309, 0.1231], 'bidp': [0.12346, 0.1228], 'askv': [19.67759, 411.9056]}, {'bidv': [0.00081, 40.24045], 'askp': [0.12309, 0.1231], 'bidp': [0.12346, 0.1228], 'askv': [19.67759, 411.9056]}, {'bidv': [2.42461, 40.24045], 'askp': [0.12309, 0.1231], 'bidp': [0.1227, 0.1226], 'askv': [19.67759, 411.9056]}]
+['wss://sa-east-1.bts.crypto-bridge.org/wss', 'wss://bit.btsabc.org/wss', 'wss://sg.nodes.bitshares.works/wss']
+BLACKLIST last 0.12464372 0.02222488173340022
+[0.12250025, 0.12464295, 0.12526615, 0.12519996, 0.12464372]
+['wss://bit.btsabc.org/wss', 'wss://ap-northeast-1.bts.crypto-bridge.org/wss', 'wss://sg.nodes.bitshares.works/wss', 'wss://ap-southeast-1.bts.crypto-bridge.org/wss', 'wss://ap-northeast-2.bts.crypto-bridge.org/wss']
+BLACKLIST last 0.12343895 0.02808880563061086
+[0.12343895, 0.12343895, 0.12248629, 0.12279249, 0.12]
+['wss://bts.proxyhosts.info/wss', 'wss://sa-east-1.bts.crypto-bridge.org/wss', 'wss://ap-northeast-2.bts.crypto-bridge.org/wss', 'wss://bit.btsabc.org/wss', 'wss://sg.nodes.bitshares.works/wss']
+BLACKLIST last 0.12371425 0.14951533674404285
+[0.12371425, 0.12371425, 0.12371425, 0.12371425, 0.1427816]
+['wss://bts.proxyhosts.info/wss', 'wss://sa-east-1.bts.crypto-bridge.org/wss', 'wss://ap-northeast-2.bts.crypto-bridge.org/wss', 'wss://bit.btsabc.org/wss', 'wss://sg.nodes.bitshares.works/wss']
+BLACKLIST last 0.12279261 0.027049570672882897
+[0.12279261, 0.12340556, 0.1201, 0.121877, 0.12284377]
+['wss://api-ru.bts.blckchnd.com/wss', 'wss://api.bts.blckchnd.com/wss', 'wss://b.mrx.im/wss', 'wss://ap-southeast-2.bts.crypto-bridge.org/wss', 'wss://sg.nodes.bitshares.works/wss']
+BLACKLIST last 0.12284377 0.026969879148855555
+[0.12329997, 0.1201, 0.12284377, 0.12187698, 0.12339852]
+['wss://api-ru.bts.blckchnd.com/wss', 'wss://api.bts.blckchnd.com/wss', 'wss://b.mrx.im/wss', 'wss://ap-southeast-2.bts.crypto-bridge.org/wss', 'wss://sg.nodes.bitshares.works/wss']
+BLACKLIST last 0.13940038 0.12312594446241978
+[0.13909408, 0.15667575, 0.13940038, 0.13940038, 0.13940038]
+['wss://b.mrx.im/wss', 'wss://bit.btsabc.org/wss', 'wss://sg.nodes.bitshares.ws/wss', 'wss://sg.nodes.bitshares.works/wss', 'wss://ws.winex.pro/wss']
+BLACKLIST last 0.15 0.020560759130146766
+[0.14694335, 0.15, 0.15, 0.14870002, 0.14767792]
+['wss://sg.nodes.bitshares.works/wss', 'wss://openledger.hk/wss', 'wss://ap-southeast-2.bts.crypto-bridge.org/wss', 'wss://bitshares-api.wancloud.io/wss', 'wss://ap-southeast-1.bts.crypto-bridge.org/wss']
+BLACKLIST last 0.15 0.02054818091701715
+[0.1469429, 0.1469429, 0.15, 0.15, 0.15]
+['wss://sg.nodes.bitshares.works/wss', 'wss://openledger.hk/wss', 'wss://ap-southeast-2.bts.crypto-bridge.org/wss', 'wss://bitshares-api.wancloud.io/wss', 'wss://ap-southeast-1.bts.crypto-bridge.org/wss']
+BLACKLIST last 0.15 0.02061897979012146
+[0.14697237, 0.1469433, 0.14731887, 0.15, 0.15]
+['wss://sg.nodes.bitshares.works/wss', 'wss://openledger.hk/wss', 'wss://ap-southeast-2.bts.crypto-bridge.org/wss', 'wss://bitshares-api.wancloud.io/wss', 'wss://ap-southeast-1.bts.crypto-bridge.org/wss']
+BLACKLIST last 0.14657698 0.07011053668366221
+[0.1472824, 0.13714286, 0.14657698, 0.14657652, 0.14730729]
+['wss://sg.nodes.bitshares.works/wss', 'wss://openledger.hk/wss', 'wss://ap-southeast-2.bts.crypto-bridge.org/wss', 'wss://bitshares-api.wancloud.io/wss', 'wss://ap-southeast-1.bts.crypto-bridge.org/wss']

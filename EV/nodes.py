@@ -26,7 +26,6 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     # write   : maintains an output file nodes.txt with list of best nodes
 
 
-
     # include and exclude custom nodes
     included, excluded = [], []
     if include:
@@ -79,12 +78,23 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             ping_latency = time.time() - start
             current_block = chain.get_current_block_num()
             blocktimestamp = abs(
-                chain.block_timestamp(current_block) + utc_offset)
+                chain.block_timestamp(current_block) )#+ utc_offset)
+
             block_latency = time.time() - blocktimestamp
+            #print (blocktimestamp)
+            #print (time.time())
+            #print (block_latency)
+            #print (ping_latency)
+            #print (time.ctime())
+            #print (utc_offset)
+
             if block_latency < (ping_latency + 4):
+
+            
                 num.value = ping_latency
             else:
                 num.value = 111111
+            num.value = ping_latency
         except:
             num.value = 222222
             pass
@@ -228,12 +238,12 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
                 print((('%.2f' % timed[i]), pinged[i]))
 
 
-        ret = pinged[-crop:]
+        ret = pinged[:crop]
         print (pinged[0])
         print (ret[0])
         print (timed[0])
     else:
-        ret = validated[-crop:]
+        ret = validated[:crop]
 
     print ('')
     print (ret)
@@ -247,7 +257,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             try:
                 with open('nodes.txt', 'w+') as file:
                     file.write(str(ret))
-                    print (ret)
+                    print (timed[0],ret)
                 opened = 1
             except:
                 pass
@@ -255,12 +265,12 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
 
 
 while 1:
-    try:
+
         nodes(timeout=5, pings=999, crop=10, noprint=True, write=True,
               include=False, exclude=False, suffix=False, master=False)
 
         time.sleep(600)
-    except:
-        print('error')
-        pass
+        #except:
+        #print('error')
+        #pass
 
