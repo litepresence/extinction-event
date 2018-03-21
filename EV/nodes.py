@@ -14,8 +14,7 @@ import time
 import sys
 import os
 
-print('hllow')
-
+ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 
 def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
           include=False, exclude=False, suffix=True, master=False):
@@ -72,6 +71,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
         return v
 
     # ping the blockchain and return latency
+            
     def ping(n, num, arr):
 
         try:
@@ -91,13 +91,13 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             # print (ping_latency)
             # print (time.ctime())
             # print (utc_offset)
-            if chain.get_network()['prefix'] != 'BTS':
+            # print (chain.get_network())
+            if chain.get_network()['chain_id'] != ID:
                 num.value = 333333
             elif block_latency < (ping_latency + 4):
                 num.value = ping_latency
             else:
                 num.value = 111111
-
         except:
             num.value = 222222
             pass
@@ -165,7 +165,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     if pinging:
         print ('=====================================')
         enablePrint()
-        print(('%s searching for %s nodes; timeout %s sec; est %.1f minutes' % (
+        print(('%s pinging %s nodes; timeout %s sec; est %.1f minutes' % (
             time.ctime(), pinging, timeout, timeout * len(validated) / 60.0)))
         blockPrint()
         print ('=====================================')
@@ -205,43 +205,26 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
         print('')
         print((len(pinged), 'of', len(validated),
                'nodes are active with latency less than', timeout))
+        print('')
         print(('fastest node', pinged[0], 'with latency', ('%.2f' % timed[0])))
         if len(excluded):
-            print('')
-            print ('EXCLUDED nodes:')
-            print('')
             for i in range(len(excluded)):
-                print(('XXXX', excluded[i]))
+                print(('EXCLUDED', excluded[i]))
         if len(unknown):
-            print('')
-            print ('UNTESTED nodes:')
-            print('')
             for i in range(len(unknown)):
-                print(('????', unknown[i]))
+                print(('UNTESTED', unknown[i]))
         if len(testnet):
-            print('')
-            print ('TESTNET nodes:')
-            print('')
             for i in range(len(testnet)):
-                print(('TEST', testnet[i]))
+                print(('TESTNET', testnet[i]))
+        if len(expired):
+            for i in range(len(expired)):
+                print(('TIMEOUT', expired[i]))
+        if len(stale):
+            for i in range(len(stale)):
+                print(('STALE', stale[i]))
         if len(down):
-            print('')
-            print ('DOWN nodes:')
-            print('')
             for i in range(len(down)):
                 print(('DOWN', down[i]))
-        if len(stale):
-            print('')
-            print ('STALE nodes:')
-            print('')
-            for i in range(len(stale)):
-                print(('SSSS', stale[i]))
-        if len(expired):
-            print('')
-            print ('TIMEOUT nodes:')
-            print('')
-            for i in range(len(expired)):
-                print(('TTTT', expired[i]))
         if len(pinged):
             print ('')
             print ('GOOD nodes:')
@@ -250,17 +233,18 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
                 print((('%.2f' % timed[i]), pinged[i]))
 
         ret = pinged[:crop]
-        print (pinged[0])
-        print (ret[0])
-        print (timed[0])
+        #print (pinged[0])
+        #print (ret[0])
+        #print (timed[0])
     else:
         ret = validated[:crop]
 
     print ('')
-    print (ret)
-    print ('')
     enablePrint()
-    print(('elapsed', ('%.2f' % (time.time() - begin))))
+    elapsed = time.time()-begin
+    print ('elapsed:', ('%.1f' % elapsed), 
+            'fastest:', ('%.3f' % timed[0]), ret[0])
+    print (ret)
 
     if write and (len(ret) == crop):
         opened = 0
@@ -268,7 +252,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             try:
                 with open('nodes.txt', 'w+') as file:
                     file.write(str(ret))
-                    print (timed[0], ret)
+
                 opened = 1
             except:
                 pass
