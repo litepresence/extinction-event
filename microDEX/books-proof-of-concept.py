@@ -7,6 +7,7 @@ from bitshares import BitShares
 from bitshares.market import Market
 from bitshares.account import Account
 from bitshares.blockchain import Blockchain
+from decimal import Decimal
 
 BitPAIR = 'BTS:OPEN.BTC'
 
@@ -18,9 +19,11 @@ n = ['wss://us.nodes.bitshares.works/wss',
 
 market = Market(BitPAIR, bitshares_instance=BitShares(n), mode='head')
 
-while 1:
 
+while 1:
+    call = Decimal(time.time())
     last = market.ticker()['latest']
+    elapsed = Decimal(time.time()) - call
     raw = market.orderbook(limit=25)
     bids = raw['bids']
     asks = raw['asks']
@@ -35,7 +38,7 @@ while 1:
     print('')
     print('litepresence - microDEX - proof of concept')
     print('')
-    print(time.ctime())
+    print(time.ctime(), elapsed)
     print('')
     print((sbidv[0]), (sbidp[0])[:10], (sbidp[0])[10:], 
             '              ',
@@ -45,4 +48,3 @@ while 1:
         print((sbidv[i]), (sbidp[i])[:10], (sbidp[i])[10:], 
                 '              ',
                 (saskp[i])[:10], (saskp[i])[10:],(saskv[i]))
-    time.sleep(1)
