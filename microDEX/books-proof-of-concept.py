@@ -9,18 +9,21 @@ from multiprocessing import Process
 
 BitPAIR = 'BTS:OPEN.BTC'
 
-n = ['wss://us.nodes.bitshares.works/wss',
-     'wss://eu-west-1.bts.crypto-bridge.org/wss',
-     'wss://eu.nodes.bitshares.ws/wss',
-     'wss://us-east-1.bts.crypto-bridge.org/wss']
-
-shuffle(n)
-
-market = Market(BitPAIR, bitshares_instance=BitShares(n), mode='head')
+nodes = ['wss://relinked.com/ws',
+        'wss://us.nodes.bitshares.ws/wss',
+        'wss://la.dexnode.net/wss',
+        'wss://this.uptick.rocks/ws',
+        'wss://eu.openledger.info/wss',
+        'wss://node.market.rudex.org/wss',
+        'wss://us.nodes.bitshares.works/wss',
+        'wss://eu.nodes.bitshares.ws/wss',
+        'wss://slovenia.bitshares.apasia.tech/wss',
+        'wss://us-east-1.bts.crypto-bridge.org/wss']
 
 def book(node=''):
 
     while 1:
+        market = Market(BitPAIR, bitshares_instance=BitShares(node), mode='head')
         call = Decimal(time.time())
         last = market.ticker()['latest']
         elapsed = Decimal(time.time()) - call
@@ -49,20 +52,13 @@ def book(node=''):
                     '              ',
                     (saskp[i])[:10], (saskp[i])[10:],(saskv[i]))
 
+p={}
+
+for n in range(len(nodes)):
+    node = str(nodes[n])
+    p[str(n)] = Process(target=book, args=(node,))
+    p[str(n)].daemon = False
+    p[str(n)].start()
 
 
-p0 = Process(target=book, args=(n[0],))
-p0.daemon = False
-p0.start()
 
-p1 = Process(target=book, args=(n[1],))
-p1.daemon = False
-p1.start()
-
-p2 = Process(target=book, args=(n[2],))
-p2.daemon = False
-p2.start()
-
-p3 = Process(target=book, args=(n[3],))
-p3.daemon = False
-p3.start()
