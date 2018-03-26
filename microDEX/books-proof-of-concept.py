@@ -1,11 +1,15 @@
+# Low Latency Live Bitshares DEX Orderbooks
+
+' (BTS) litpresence1 '
+
 import time
 from bitshares import BitShares
 from bitshares.market import Market
 from bitshares.account import Account
 from bitshares.blockchain import Blockchain
 from decimal import Decimal
-from random import shuffle
 from multiprocessing import Process
+import numpy as np
 
 BitPAIR = 'BTS:OPEN.BTC'
 
@@ -23,42 +27,51 @@ nodes = ['wss://relinked.com/ws',
 def book(node=''):
 
     while 1:
+        time.sleep(1)
         market = Market(BitPAIR, bitshares_instance=BitShares(node), mode='head')
         call = Decimal(time.time())
         last = market.ticker()['latest']
+        slast = '%.16f' % last
         elapsed = Decimal(time.time()) - call
-        raw = market.orderbook(limit=25)
+        raw = market.orderbook(limit=40)
         bids = raw['bids']
         asks = raw['asks']
         sbidp = [('%.16f' % bids[i]['price']) for i in range(len(bids))]
-        sbidv = [(str(bids[i]['quote'])).rjust(20, ' ') for i in range(len(bids))]
         saskp = [('%.16f' % asks[i]['price']) for i in range(len(asks))]
-        saskv = [(str(asks[i]['quote'])).ljust(20, ' ') for i in range(len(asks))]
+        sbidv = [('%.2f' %float(bids[i]['quote'])).rjust(12, ' ') for i in range(len(bids))]
+        saskv = [('%.2f' %float(asks[i]['quote'])).rjust(12, ' ') for i in range(len(asks))]
+        bidv = [float(bids[i]['quote']) for i in range(len(bids))]
+        askv = [float(asks[i]['quote']) for i in range(len(asks))]
+        cbidv = list(np.cumsum(bidv))
+        caskv = list(np.cumsum(askv))
+        cbidv = [('%.2f' % i).rjust(12, ' ') for i in cbidv]
+        caskv = [('%.2f' % i).rjust(12, ' ') for i in caskv]
+
         print("\033c")
-        print(BitPAIR, node)
-        print('')
-        print(last)
         print('')
         print('litepresence - microDEX - proof of concept')
         print('')
-        print(time.ctime(), elapsed)
+        print(time.ctime(),)
+        print('                            ',
+                ('%.17f' % elapsed),'   ', node)
         print('')
-        print((sbidv[0]), (sbidp[0])[:10], (sbidp[0])[10:], 
-                '              ',
+        print('                        LAST',slast[:10],slast[10:],'   ',BitPAIR)
+        print('')
+        print('            ',sbidv[0],'  ',(sbidp[0])[:10], (sbidp[0])[10:], 
+                '   ',
                 (saskp[0])[:10], (saskp[0])[10:],(saskv[0]))
-        print('')
+        print('                                           ',
+              'BIDS',
+              '   ',
+              'ASKS')
         for i in range(1, len(sbidp)):    
-            print((sbidv[i]), (sbidp[i])[:10], (sbidp[i])[10:], 
-                    '              ',
-                    (saskp[i])[:10], (saskp[i])[10:],(saskv[i]))
-
+            print(cbidv[i], sbidv[i],'  ',(sbidp[i])[:10], (sbidp[i])[10:], 
+                    '   ',
+                    (saskp[i])[:10], (saskp[i])[10:],saskv[i],caskv[i])
 p={}
-
 for n in range(len(nodes)):
     node = str(nodes[n])
     p[str(n)] = Process(target=book, args=(node,))
     p[str(n)].daemon = False
     p[str(n)].start()
-
-
 
