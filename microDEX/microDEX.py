@@ -1,5 +1,5 @@
 
-# microDEX v0.00000001  - low latency minimalist UI
+# microDEX v0.00000002  - low latency minimalist UI
 
 ' (BTS) litpresence1'
 
@@ -26,26 +26,13 @@ nodes = ['wss://relinked.com/ws', 'wss://dexnode.net/wss', 'wss://la.dexnode.net
 BitCURRENCY = 'OPEN.BTC'
 BitASSET = 'BTS'
 
-def launch():
 
-    nodes = ['wss://relinked.com/ws', 'wss://dexnode.net/wss', 'wss://la.dexnode.net/wss', 'wss://api.bts.blckchnd.com/wss', 'wss://eu.openledger.info/wss', 'wss://us.nodes.bitshares.ws/wss', 'wss://us.nodes.bitshares.works/wss', 'wss://this.uptick.rocks/ws', 'wss://bitshares.nu/wss', 'wss://eu.nodes.bitshares.works/wss']
-    p={}
-    n=1
-    while 1:
-        shuffle(nodes)
-        node = str(nodes[0])
-        p[str(n)] = Process(target=book, args=(node,n))
-        p[str(n)].daemon = False
-        p[str(n)].start()
-        n+=1
-        if n > 8: time.sleep(15)
 
-def book(node='',n=''):
+def book(node='',x=None, y=None):
 
-    now = begin = time.time()
-    while now < (begin + 60):
+    begin = time.time()
+    while time.time() < (begin+60):
         try:
-            now = time.time()
             # update data fields
             time.sleep(1)
             ACCOUNT.refresh()
@@ -97,9 +84,9 @@ def book(node='',n=''):
 
             # display orderbooks
             print("\033c")
-            print(time.ctime(),'   ',int(time.time()))
+            print(time.ctime(),'            ',int(time.time()),'   ',x,y)
             print('                            ',
-                    ('%.17f' % elapsed),'   ', n, node)
+                    ('%.17f' % elapsed),'   ', node)
             print('')
             print('                        LAST',slast[:10],slast[10:],'   ',BitPAIR)
             print('')
@@ -275,9 +262,33 @@ print('')
 print('Connecting to DEX, please wait...')
 print('')
 
-# multinode orderbooks
-l = Process(target=launch)
-l.start()
+
+def launch(x):
+
+    nodes = ['wss://relinked.com/ws', 'wss://dexnode.net/wss', 'wss://la.dexnode.net/wss', 'wss://api.bts.blckchnd.com/wss', 'wss://eu.openledger.info/wss', 'wss://us.nodes.bitshares.ws/wss', 'wss://us.nodes.bitshares.works/wss', 'wss://this.uptick.rocks/ws', 'wss://bitshares.nu/wss', 'wss://eu.nodes.bitshares.works/wss']
+    p={}
+    y=0
+    while 1:
+        try:
+            y+=1
+            timeout = y*10
+            if timeout > 60:
+                timeout = 60
+            shuffle(nodes)
+            node = str(nodes[0])
+            p[str(y)] = Process(target=book, args=(node,x,y))
+            p[str(y)].daemon = False
+            p[str(y)].start()
+            p[str(y)].join(timeout)
+            
+        except:
+            pass
+
+l = {}
+for x in range(1,7):
+    # multinode orderbooks
+    l[str(x)] = Process(target=launch, args=(x,))
+    l[str(x)].start()
 
 # busybox
 master = Tk()
