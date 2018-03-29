@@ -1,5 +1,5 @@
 
-VERSION = 'microDEX v0.00000004 - low latency minimalist UI'
+VERSION = 'microDEX v0.00000003 - low latency minimalist UI'
 
 ' (BTS) litpresence1 '
 
@@ -528,7 +528,7 @@ def dex_buy():
         price = sell_price.get()
         amount = sell_amount.get()
         if price == '':
-            price=ANTISAT
+            price=2*float(MARKET.ticker()['latest'])
             sprice = 'MARKET RATE'
         if amount == '':
             amount = ANTISAT
@@ -606,7 +606,7 @@ def dex_sell():
         price = sell_price.get()
         amount = sell_amount.get()
         if price == '':
-            price = SATOSHI
+            price = 0.5*float(MARKET.ticker()['latest'])
             sprice = 'MARKET RATE'
         if amount == '':
             amount = ANTISAT
