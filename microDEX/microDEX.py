@@ -508,76 +508,54 @@ def dex_withdraw():
 
 def dex_buy():
 
-    def buy(price, amount):
+    def buy():
+
         confirm.destroy()
-        attempt = 1
-        while attempt:
-            try:
-                details = (MARKET.buy(price, amount))
-                print (details)
-                attempt = 0
-            except:
-                zprint(("buy attempt %s failed" % attempt))
-                attempt += 1
-                if attempt > 10:
-                    zprint('buy aborted')
-                    return
-                pass
-    if MARKET.bitshares.wallet.unlocked():
+        price = decimal(buy_price.get())
+        amount = decimal(buy_amount.get())
+        if price is None:
+            price = ANTISAT
         zprint('BUY')
-        price = sell_price.get()
-        amount = sell_amount.get()
-        if price == '':
-            price=2*float(MARKET.ticker()['latest'])
-            sprice = 'MARKET RATE'
-        if amount == '':
-            amount = ANTISAT
+        print(('buying', amount, 'at', price))
+        attempt = 1
+        currency = float(ACCOUNT.balance(BitCURRENCY))
+        if amount > (0.998) * currency * float(price):
+            amount = (0.998) * currency * float(price)
+        if amount > 0:
+            while attempt:
+                try:
+                    details = (MARKET.buy(price, amount))
+                    print (details)
+                    attempt = 0
+                except:
+                    zprint(("buy attempt %s failed" % attempt))
+                    attempt += 1
+                    if attempt > 10:
+                        zprint('buy aborted')
+                        return
+                    pass
+        else:
+            zprint('no currency to spend')
+
+    if MARKET.bitshares.wallet.unlocked():
         confirm = Tk()
-        try:
-            price = float(price)
-            amount= float(amount)
-            if price != ANTISAT:
-                sprice= '%.16f' % price
-            currency = float(ACCOUNT.balance(BitCURRENCY))
-            if amount > (0.998) * currency * float(price):
-                amount = (0.998) * currency * float(price)
-            samount = str(amount)
-            sorder = str('CONFIRM BUY ' + samount + ' ' + BitASSET + ' @ '+ sprice)
-            if amount > 0:
-                confirm.title(sorder)
-                Button(
-                    confirm,
-                    text='CONFIRM',
-                    command= lambda:buy(price,amount)).grid(
-                    row=1,
-                    column=0,
-                    pady=8)
-                Button(
-                    confirm,
-                    text='INVALIDATE',
-                    command=confirm.destroy).grid(
-                    row=2,
-                    column=0,
-                    pady=8)
-            else:
-                confirm.title('NO CURRENCY TO BUY')
-                Button(
-                    confirm,
-                    text='OK',
-                    command=confirm.destroy).grid(
-                    row=2,
-                    column=0,
-                    pady=8)
-        except:
-            confirm.title('INVALID BUY ORDER')
-            Button(
-                confirm,
-                text='OK',
-                command=confirm.destroy).grid(
-                row=2,
-                column=0,
-                pady=8)
-        confirm.geometry('500x100+800+150')
+        confirm.title('')
+        Label(confirm, text='CONFIRM BUY').grid(row=0, column=0)
+        Button(
+            confirm,
+            text='CONFIRM',
+            command=buy).grid(
+            row=1,
+            column=0,
+            pady=8)
+        Button(
+            confirm,
+            text='INVALIDATE',
+            command=confirm.destroy).grid(
+            row=2,
+            column=0,
+            pady=8)
+        confirm.geometry('150x150+900+250')
         confirm.lift()
         confirm.call('wm', 'attributes', '.', '-topmost', True)
     else:
@@ -586,77 +564,54 @@ def dex_buy():
 
 def dex_sell():
 
-    def sell(price, amount):
-        confirm.destroy()
-        attempt = 1
-        while attempt:
-            try:
-                details = (MARKET.sell(price, amount))
-                print (details)
-                attempt = 0
-            except:
-                zprint(("sell attempt %s failed" % attempt))
-                attempt += 1
-                if attempt > 10:
-                    zprint('sell aborted')
-                    return
-                pass
-    if MARKET.bitshares.wallet.unlocked():
-        zprint('SELL')
-        price = sell_price.get()
-        amount = sell_amount.get()
-        if price == '':
-            price = 0.5*float(MARKET.ticker()['latest'])
-            sprice = 'MARKET RATE'
-        if amount == '':
-            amount = ANTISAT
-        confirm = Tk()
-        try:
-            price = float(price)
-            amount = float(amount)
-            if price != SATOSHI:
-                sprice= '%.16f' % price
-            assets = float(ACCOUNT.balance(BitASSET))
-            if amount > (0.998*assets):
-                amount = 0.998 * assets
-            samount=str(amount)
-            sorder = str('CONFIRM SELL ' + samount + ' ' + BitASSET + ' @ '+ sprice)
+    def sell():
 
-            if amount > 0:
-                confirm.title(sorder)
-                Button(
-                    confirm,
-                    text='CONFIRM',
-                    command= lambda:sell(price,amount)).grid(
-                    row=1,
-                    column=0,
-                    pady=8)
-                Button(
-                    confirm,
-                    text='INVALIDATE',
-                    command=confirm.destroy).grid(
-                    row=2,
-                    column=0,
-                    pady=8)
-            else:
-                confirm.title('NO ASSETS TO SELL')
-                Button(
-                    confirm,
-                    text='OK',
-                    command=confirm.destroy).grid(
-                    row=2,
-                    column=0,
-                    pady=8)
-        except:
-            confirm.title('INVALID SELL ORDER')
-            Button(
-                confirm,
-                text='OK',
-                command=confirm.destroy).grid(
-                row=2,
-                column=0,
-                pady=8)
-        confirm.geometry('500x100+800+150')
+        confirm.destroy()
+        price = decimal(sell_price.get())
+        amount = decimal(sell_amount.get())
+        if price is None:
+            price = SATOSHI
+        zprint('SELL')
+        print(('selling', amount, 'at', price))
+        attempt = 1
+        assets = float(ACCOUNT.balance(BitASSET))
+        if amount > 0.998 * assets:
+            amount = 0.998 * assets
+        if amount > 0:
+            while attempt:
+                try:
+                    details = (MARKET.sell(price, amount))
+                    print (details)
+                    attempt = 0
+                except:
+                    zprint(("sell attempt %s failed" % attempt))
+                    attempt += 1
+                    if attempt > 10:
+                        zprint('sell aborted')
+                        return
+                    pass
+        else:
+            zprint('no assets to sell')
+
+    if MARKET.bitshares.wallet.unlocked():
+        confirm = Tk()
+        confirm.title('')
+        Label(confirm, text='CONFIRM SELL').grid(row=0, column=0)
+        Button(
+            confirm,
+            text='CONFIRM',
+            command=sell).grid(
+            row=1,
+            column=0,
+            pady=8)
+        Button(
+            confirm,
+            text='INVALIDATE',
+            command=confirm.destroy).grid(
+            row=2,
+            column=0,
+            pady=8)
+        confirm.geometry('150x150+900+250')
         confirm.lift()
         confirm.call('wm', 'attributes', '.', '-topmost', True)
     else:
@@ -666,9 +621,10 @@ def dex_sell():
 def dex_cancel():
 
     def cancel():
+
         confirm.destroy()
-        zprint('CANCEL')
         orders = MARKET.accountopenorders()
+        zprint('CANCEL')
         print((len(orders), 'open orders to cancel'))
         if len(orders):
             attempt = 1
@@ -690,7 +646,8 @@ def dex_cancel():
 
     if MARKET.bitshares.wallet.unlocked():
         confirm = Tk()
-        confirm.title('CONFIRM CANCEL ALL')
+        confirm.title('')
+        Label(confirm, text='CONFIRM CANCEL ALL').grid(row=0, column=0)
         Button(
             confirm,
             text='CONFIRM',
@@ -705,7 +662,7 @@ def dex_cancel():
             row=2,
             column=0,
             pady=8)
-        confirm.geometry('500x100+800+150')
+        confirm.geometry('150x150+900+250')
         confirm.lift()
         confirm.call('wm', 'attributes', '.', '-topmost', True)
     else:
@@ -750,7 +707,6 @@ def launch(a):
             pass
 
 servers = Process(target=nodes_loop)
-servers.daemon = True
 servers.start()
 
 
@@ -763,31 +719,23 @@ print(VERSION)
 print('=================================================')
 print('')
 print('')
-try:
-    ACCOUNT = Account((input('           Account: ')).strip())
-except Exception as ex:
-    print (type(ex).__name__)
-    sys.exit()
+ACCOUNT = Account(input('           Account: '))
 print('')
 print('      Welcome Back: %s' % ACCOUNT)
 print('')
 print(' Default MARKET is: %s' % BitPAIR)
 print('')
 print('Input new MARKET below or press ENTER to skip')
-print('e.g. BTS:USD, OPEN.BTC:CNY, OPEN.LTC:OPEN.BTC')
 print('')
-BitPAIR = (input('  Change MARKET to: ') or BitPAIR).strip()
+BitPAIR = (input('  Change MARKET to: ') or BitPAIR)
+
 BitASSET = BitPAIR.split(':')[0]
 BitCURRENCY = BitPAIR.split(':')[1]
-try:
-    MARKET = Market(BitPAIR, bitshares_instance=BitShares(nodes), mode='head')
-except Exception as ex:
-    print (type(ex).__name__)
-    sys.exit()
+MARKET = Market(BitPAIR, bitshares_instance=BitShares(nodes), mode='head')
 print('')
 print('Enter PASS PHRASE below to unlock your wallet or press ENTER to skip')
 print('')
-PASS_PHRASE = (getpass(prompt='       Pass Phrase: ')).strip()
+PASS_PHRASE = getpass(prompt='       Pass Phrase: ')
 if PASS_PHRASE != '':
     try:
         MARKET.bitshares.wallet.unlock(PASS_PHRASE)
