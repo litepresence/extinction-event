@@ -1,5 +1,5 @@
 
-VERSION = 'microDEX v0.00000006 - low latency minimalist UI'
+VERSION = 'microDEX v0.00000007 - low latency minimalist UI'
 
 ' (BTS) litpresence1 '
 
@@ -451,18 +451,18 @@ def book(node='', a=None, b=None): #updates orderbook details
             print('')
             print(
                 '            ', sbidv[0], '  ', (
-                    sbidp[0])[:10], (sbidp[0])[10:],
+                    sbidp[0])[:10]+','+(sbidp[0])[10:],
                 '   ',
-                (saskp[0])[:10], (saskp[0])[10:], (saskv[0]))
+                (saskp[0])[:10]+','+(saskp[0])[10:], (saskv[0]))
             print('                                           ',
                   'BIDS',
                   '   ',
                   'ASKS')
             for i in range(1, len(sbidp)):
                 print(
-                    cbidv[i], sbidv[i], '  ', (sbidp[i])[:10], (sbidp[i])[10:],
+                    cbidv[i], sbidv[i], '  ', (sbidp[i])[:10]+','+(sbidp[i])[10:],
                     '   ',
-                    (saskp[i])[:10], (saskp[i])[10:], saskv[i], caskv[i])
+                    (saskp[i])[:10]+','+(saskp[i])[10:], saskv[i], caskv[i])
             print('')
             for o in orders:
                 print (o)
@@ -504,7 +504,11 @@ def dex_withdraw():
 def dex_buy():
 
     # update wallet unlock to low latency node
-    market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+    account = Account(USERNAME,
+                bitshares_instance=BitShares(nodes, num_retries=0))
+    market = Market(BitPAIR,
+                bitshares_instance=BitShares(nodes, num_retries=0),
+                mode='head')
     try:
         market.bitshares.wallet.unlock(PASS_PHRASE)
     except:
@@ -527,6 +531,7 @@ def dex_buy():
                 pass
 
     # interact with tkinter
+    confirm = Tk()
     if market.bitshares.wallet.unlocked():
         zprint('BUY')
         price = sell_price.get()
@@ -536,7 +541,6 @@ def dex_buy():
             sprice = 'market RATE'
         if amount == '':
             amount = ANTISAT
-        confirm = Tk()
         try:
             price = float(price)
             amount= float(amount)
@@ -581,23 +585,34 @@ def dex_buy():
                 row=2,
                 column=0,
                 pady=8)
-        confirm.geometry('500x100+800+150')
+        confirm.geometry('500x100+800+175')
         confirm.lift()
         confirm.call('wm', 'attributes', '.', '-topmost', True)
     else:
-        zprint('YOUR WALLET IS LOCKED')
-
-
+        confirm.title('YOUR WALLET IS LOCKED')
+        Button(
+            confirm,
+            text='OK',
+            command=confirm.destroy).grid(
+            row=2,
+            column=0,
+            pady=8)
+    confirm.geometry('500x100+800+175')
+    confirm.lift()
+    confirm.call('wm', 'attributes', '.', '-topmost', True)
 
 def dex_sell():
 
     # update wallet unlock to low latency node
-    market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+    account = Account(USERNAME,
+                bitshares_instance=BitShares(nodes, num_retries=0))
+    market = Market(BitPAIR,
+                bitshares_instance=BitShares(nodes, num_retries=0),
+                mode='head')
     try:
         market.bitshares.wallet.unlock(PASS_PHRASE)
     except:
         pass
-
     # attempt to sell 10X or until satisfied
     def sell(price, amount):
         confirm.destroy()
@@ -615,6 +630,7 @@ def dex_sell():
                     return
                 pass
     # interact with tkinter
+    confirm = Tk()
     if market.bitshares.wallet.unlocked():
         zprint('SELL')
         price = sell_price.get()
@@ -624,7 +640,6 @@ def dex_sell():
             sprice = 'market RATE'
         if amount == '':
             amount = ANTISAT
-        confirm = Tk()
         try:
             price = float(price)
             amount = float(amount)
@@ -670,22 +685,31 @@ def dex_sell():
                 row=2,
                 column=0,
                 pady=8)
-        confirm.geometry('500x100+800+150')
-        confirm.lift()
-        confirm.call('wm', 'attributes', '.', '-topmost', True)
     else:
-        zprint('YOUR WALLET IS LOCKED')
-
+        confirm.title('YOUR WALLET IS LOCKED')
+        Button(
+            confirm,
+            text='OK',
+            command=confirm.destroy).grid(
+            row=2,
+            column=0,
+            pady=8)
+    confirm.geometry('500x100+800+175')
+    confirm.lift()
+    confirm.call('wm', 'attributes', '.', '-topmost', True)
 
 def dex_cancel():
 
     # update wallet unlock to low latency node
-    market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+    account = Account(USERNAME,
+                bitshares_instance=BitShares(nodes, num_retries=0))
+    market = Market(BitPAIR,
+                bitshares_instance=BitShares(nodes, num_retries=0),
+                mode='head')
     try:
         market.bitshares.wallet.unlock(PASS_PHRASE)
     except:
         pass
-
     # attempt cancel all 10X or until satisfied
     def cancel():
         confirm.destroy()
@@ -709,31 +733,49 @@ def dex_cancel():
                         zprint('cancel aborted')
                         return
                     pass
-
     # interact with tkinter
-    if market.bitshares.wallet.unlocked():
-        confirm = Tk()
-        confirm.title('CONFIRM CANCEL ALL')
+    confirm = Tk()
+    if orders_list:
+        if market.bitshares.wallet.unlocked():
+            confirm.title('CONFIRM CANCEL ALL')
+            Button(
+                confirm,
+                text='CONFIRM',
+                command=cancel).grid(
+                row=1,
+                column=0,
+                pady=8)
+            Button(
+                confirm,
+                text='INVALIDATE',
+                command=confirm.destroy).grid(
+                row=2,
+                column=0,
+                pady=8)
+            confirm.geometry('500x100+800+175')
+            confirm.lift()
+            confirm.call('wm', 'attributes', '.', '-topmost', True)
+        else:
+            confirm.title('YOUR WALLET IS LOCKED')
+            Button(
+                confirm,
+                text='OK',
+                command=confirm.destroy).grid(
+                row=2,
+                column=0,
+                pady=8)
+    else:
+        confirm.title('NO OUTSTANDING ORDERS')
         Button(
             confirm,
-            text='CONFIRM',
-            command=cancel).grid(
-            row=1,
-            column=0,
-            pady=8)
-        Button(
-            confirm,
-            text='INVALIDATE',
+            text='OK',
             command=confirm.destroy).grid(
             row=2,
             column=0,
             pady=8)
-        confirm.geometry('500x100+800+150')
-        confirm.lift()
-        confirm.call('wm', 'attributes', '.', '-topmost', True)
-    else:
-        zprint('YOUR WALLET IS LOCKED')
-
+    confirm.geometry('500x100+800+175')
+    confirm.lift()
+    confirm.call('wm', 'attributes', '.', '-topmost', True)
 
 def dex_auth_gui():
 
@@ -741,7 +783,9 @@ def dex_auth_gui():
     global PASS_PHRASE
     PASS_PHRASE = str(login.get())
     login.delete(0, END)
-    market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+    market = Market(BitPAIR,
+                bitshares_instance=BitShares(nodes, num_retries=0),
+                mode='head')
     try:
         market.bitshares.wallet.unlock(PASS_PHRASE)
         lock.set('UNLOCKED')
@@ -752,9 +796,9 @@ def dex_auth_gui():
         lock.set('LOCKED')
         pass
 
-def launch(a):
+def launch_book(a):
 
-    # continually respawn child processes to update book
+    # continually respawn child processes to update order book
     nds = race_read('nodes.txt')
     if isinstance(nds, list):
         nodes = nds
@@ -772,7 +816,7 @@ def launch(a):
         except:
             pass
 
-# run nodes latency update as background process
+# run nodes latency test as background process
 servers = Process(target=nodes_loop)
 servers.daemon = True
 servers.start()
@@ -784,9 +828,9 @@ print('')
 print("")
 print("                                     ______   ________  ____  ____  ")
 print("                                    (_   _ `.(_   __  |(_  _)(_  _) ")
-print("     __  __  ____  ___  ____  _____   | | `. \ | |_ \_|  \ \  / /   ")
-print("    (  \/  )(_  _)/ __)(  _ \(  _  )  | |  | | |  _| _    > `' <    ")
-print("     )    (  _)(_( (__  )   / )(_)(  _| |_.' /_| |__/ | _/ /'`\ \_  ")
+print("     __  __  ____  ___  ____  _____   | | `. \ | |_ \_|  \ \__/ /   ")
+print("    (  \/  )(_  _)/ __)(  _ \(  _  )  | |  | | |  _) _    ) __ (    ")
+print("     )    (  _)(_( (__  )   / )(_)(  _| |_.' /_| |__/ | _/ /  \ \_  ")
 print("    (_/\/\_)(____)\___)(_)\_)(_____)(______.'(________|(____)(____) ")
 print('   =================================================================')
 print('           '+VERSION)
@@ -794,8 +838,16 @@ print('   =================================================================')
 print('')
 print('')
 
-USERNAME = input('           Account: ')
-account = Account(USERNAME, bitshares_instance=BitShares(nodes, num_retries=0))
+valid = 0
+
+while not valid:
+    try:
+        USERNAME = input('           Account: ')
+        account = Account(USERNAME, bitshares_instance=BitShares(nodes, num_retries=0))
+        valid = 1
+    except Exception as ex:
+        print (type(ex).__name__, 'try again...')
+        pass
 
 print('')
 print('      Welcome Back: %s' % account)
@@ -806,35 +858,54 @@ print('Input new market below or press ENTER to skip')
 print('e.g.: BTS:CNY, OPEN.LTC:OPEN.BTC, OPEN.BTC:USD')
 print('')
 
-BitPAIR = (input('  Change market to: ') or BitPAIR)
-BitASSET = BitPAIR.split(':')[0]
-BitCURRENCY = BitPAIR.split(':')[1]
-market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+valid = 0
+default = BitPAIR
+while not valid:
+    try:
+        BitPAIR = input('  Change market to: ') or default
+        BitASSET = BitPAIR.split(':')[0]
+        BitCURRENCY = BitPAIR.split(':')[1]
+        market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+        valid=1
+    except Exception as ex:
+        print (type(ex).__name__, 'try again...')
+        pass
 
 print('')
 print('Enter PASS PHRASE below to unlock your wallet or press ENTER to skip')
 print('')
 
-PASS_PHRASE = getpass(prompt='       Pass Phrase: ')
-if PASS_PHRASE != '':
+valid = 0
+default = ''
+while not valid:
     try:
-        market.bitshares.wallet.unlock(PASS_PHRASE)
+        PASS_PHRASE = getpass(prompt='       Pass Phrase: ') or default
+        if PASS_PHRASE != '':
+            market.bitshares.wallet.unlock(PASS_PHRASE)
+            print('')
+            print('AUTHENTICATED - YOUR WALLET IS UNLOCKED')
+            valid=1
+        else:
+            print('')
+            print('SKIP AUTHENTICATION - YOUR WALLET IS LOCKED')
+            valid=1
     except Exception as ex:
-        print (type(ex).__name__)
-        sys.exit()
+        print (type(ex).__name__, 'try again...')
+        pass
 
 print('')
 print('Connecting to the Bitshares Distributed Exchange, please wait...')
 print('')
 
-# begin several concurrent background processes of launch()
+# begin several concurrent background processes of launch_book()
 multinode = {}
 for a in range(CONNECTIONS):
-    multinode[str(a)] = Process(target=launch, args=(a,))
+    multinode[str(a)] = Process(target=launch_book, args=(a,))
     multinode[str(a)].start()
     time.sleep(1)
 
 # tkinter primary busybox
+time.sleep(5)
 master = Tk()
 lock = StringVar()
 lock.set('UNLOCKED')
@@ -846,6 +917,8 @@ Label(master, text="AMOUNT:").grid(row=1, column=0, sticky=E)
 Label(master, text="PRICE:").grid(row=0, column=2, sticky=E)
 Label(master, text="AMOUNT:").grid(row=1, column=2, sticky=E)
 Label(master, textvariable=lock).grid(row=6, column=2, sticky=W)
+Label(master, text="   *ORDERS TAKE A FEW SECONDS TO APPEAR; CLICK ONCE*"
+        ).grid(row=7, column=0, columnspan=4, sticky=W)
 buy_price = Entry(master)
 buy_amount = Entry(master)
 sell_price = Entry(master)
@@ -888,7 +961,7 @@ Button(
     column=0,
     sticky=E,
     pady=4)
-master.geometry('600x200+600+700')
+master.geometry('+550+700')
 master.lift()
 master.call('wm', 'attributes', '.', '-topmost', True)
 mainloop()
