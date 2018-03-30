@@ -1,5 +1,5 @@
 
-VERSION = 'microDEX v0.00000005 - low latency minimalist UI'
+VERSION = 'microDEX v0.00000006 - low latency minimalist UI'
 
 ' (BTS) litpresence1 '
 
@@ -367,30 +367,30 @@ def zprint(z): # prints 10X to flash orderbook
 
 def book(node='', a=None, b=None): #updates orderbook details
 
-    begin = time.time()
-    account = Account(USERNAME, bitshares_instance=BitShares(nodes, num_retries=0))
+    # create fresh websocket connections for this child instance
+    account = Account(USERNAME,
+                bitshares_instance=BitShares(nodes, num_retries=0))
     market = Market(BitPAIR,
-                    bitshares_instance=BitShares(nodes, num_retries=0),
-                    mode='head')
+                bitshares_instance=BitShares(nodes, num_retries=0),
+                mode='head')
+    begin = time.time()
     while time.time() < (begin + TIMEOUT):
         time.sleep(random())
         try:
-            # update data fields
-
-            trades = market.trades(limit=100)
-            last = float(trades[0]['price'])
             # add unix time to trades dictionary
+            trades = market.trades(limit=100)
             for t in range(len(trades)):
                 ts = time.strptime(str(trades[t]['time']), '%Y-%m-%d %H:%M:%S')
                 trades[t]['unix'] = int(time.mktime(ts))
             # last price
             # last = market.ticker()['latest']
+            last = float(trades[0]['price'])
             slast = '%.16f' % last
             # complete account balances
             call = decimal(time.time())
             raw = list(account.balances)
             elapsed = float(decimal(time.time()) - call)
-            if elapsed > 5:
+            if elapsed > 1:
                 continue
             elapsed ='%.17f' % elapsed
             cbalances = {}
@@ -436,7 +436,6 @@ def book(node='', a=None, b=None): #updates orderbook details
                                'price': ('%.16f' % price)})
             trades = trades[:10]
             stale = int(time.time() - float(trades[0]['unix']))
-
             # display orderbooks
             print("\033c")
             print(time.ctime(), '            ', int(time.time()), '   ', a, b)
@@ -782,8 +781,16 @@ servers.start()
 print("\033c")
 print('')
 print('')
-print(VERSION)
-print('=================================================')
+print("")
+print("                                     ______   ________  ____  ____  ")
+print("                                    (_   _ `.(_   __  |(_  _)(_  _) ")
+print("     __  __  ____  ___  ____  _____   | | `. \ | |_ \_|  \ \  / /   ")
+print("    (  \/  )(_  _)/ __)(  _ \(  _  )  | |  | | |  _| _    > `' <    ")
+print("     )    (  _)(_( (__  )   / )(_)(  _| |_.' /_| |__/ | _/ /'`\ \_  ")
+print("    (_/\/\_)(____)\___)(_)\_)(_____)(______.'(________|(____)(____) ")
+print('   =================================================================')
+print('           '+VERSION)
+print('   =================================================================')
 print('')
 print('')
 
@@ -820,10 +827,9 @@ print('')
 print('Connecting to the Bitshares Distributed Exchange, please wait...')
 print('')
 
-# begin several background processes of launch to validate book feeds
+# begin several concurrent background processes of launch()
 multinode = {}
 for a in range(CONNECTIONS):
-    # multinode orderbooks
     multinode[str(a)] = Process(target=launch, args=(a,))
     multinode[str(a)].start()
     time.sleep(1)
