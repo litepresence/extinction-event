@@ -1,5 +1,5 @@
 
-VERSION = 'microDEX v0.00000004 - low latency minimalist UI'
+VERSION = 'microDEX v0.00000005 - low latency minimalist UI'
 
 ' (BTS) litpresence1 '
 
@@ -8,13 +8,16 @@ import time
 import datetime
 import numpy as np
 from tkinter import *
-from random import shuffle
+from random import random, shuffle
 from getpass import getpass
 from ast import literal_eval as literal
 from bitshares.utils import *
 from dateutil.parser import parser
 from decimal import Decimal as decimal
-from multiprocessing import Process, active_children
+from multiprocessing import Process, active_children, Value, Array
+from datetime import datetime
+import requests
+import os
 
 from bitsharesbase import account
 from bitshares import BitShares
@@ -41,21 +44,13 @@ nodes = [
 
 BitCURRENCY = 'OPEN.BTC'
 BitASSET = 'BTS'
-TIMEOUT = 60
-
-from multiprocessing import Process, Value, Array
-from bitshares.blockchain import Blockchain
-from bitshares import BitShares
-from datetime import datetime
-import requests
-import time
-import sys
-import os
+TIMEOUT = 120
+CONNECTIONS = 6
+BitPAIR = BitASSET + ':' + BitCURRENCY
 
 ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 
-
-def nodes_process(
+def nodes_process( # sorts nodes for lowest latency
     timeout=20, pings=999999, crop=99, noprint=False, write=False,
         include=False, exclude=False, suffix=True, master=False):
 
@@ -299,13 +294,13 @@ def nodes_process(
     return (ret)
 
 
-def nodes_loop():
+def nodes_loop(): # repeats nodes process
 
     while True:
         try:
             nodes_process(
                 timeout=5, pings=999, crop=10, noprint=True, write=True,
-                include=True, exclude=False, suffix=False, master=False)
+                include=True, exclude=False, suffix=True, master=False)
             time.sleep(30)
 
         # no matter what happens just keep verifying book
@@ -314,7 +309,7 @@ def nodes_loop():
             pass
 
 
-def nodes_update():
+def nodes_update(): # single run of nodes process
 
     print('Acquiring low latency connection to Bitshares DEX' +
           ', this may take a few minutes...')
@@ -323,7 +318,7 @@ def nodes_update():
         while not updated:
             nodes_process(
                 timeout=5, pings=999, crop=10, noprint=False, write=True,
-                include=True, exclude=False, suffix=False, master=False)
+                include=True, exclude=False, suffix=True, master=False)
             updated = 1
 
     # not satisfied until verified once
@@ -365,24 +360,23 @@ def race_read(doc=''):  # Concurrent Read from File Operation
     return ret
 
 
-def zprint(z):
+def zprint(z): # prints 10X to flash orderbook
     for i in range(10):
         print(z)
 
 
-def book(node='', a=None, b=None):
+def book(node='', a=None, b=None): #updates orderbook details
 
-    if 0:  # x ==1:
-        plt.ion()
     begin = time.time()
-    while time.time() < (begin + 60):
+    account = Account(USERNAME, bitshares_instance=BitShares(nodes, num_retries=0))
+    market = Market(BitPAIR,
+                    bitshares_instance=BitShares(nodes, num_retries=0),
+                    mode='head')
+    while time.time() < (begin + TIMEOUT):
+        time.sleep(random())
         try:
             # update data fields
-            time.sleep(1)
-            ACCOUNT.refresh()
-            market = Market(BitPAIR,
-                            bitshares_instance=BitShares(node, num_retries=0),
-                            mode='head')
+
             trades = market.trades(limit=100)
             last = float(trades[0]['price'])
             # add unix time to trades dictionary
@@ -394,8 +388,11 @@ def book(node='', a=None, b=None):
             slast = '%.16f' % last
             # complete account balances
             call = decimal(time.time())
-            raw = list(ACCOUNT.balances)
-            elapsed = '%.17f' % float(decimal(time.time()) - call)
+            raw = list(account.balances)
+            elapsed = float(decimal(time.time()) - call)
+            if elapsed > 5:
+                continue
+            elapsed ='%.17f' % elapsed
             cbalances = {}
             for i in range(len(raw)):
                 cbalances[raw[i]['symbol']] = float(raw[i]['amount'])
@@ -415,9 +412,9 @@ def book(node='', a=None, b=None):
             caskv = list(np.cumsum(askv))
             cbidv = [('%.2f' % i).rjust(12, ' ') for i in cbidv]
             caskv = [('%.2f' % i).rjust(12, ' ') for i in caskv]
-            # dictionary of currency and assets in this MARKET
-            currency = float(ACCOUNT.balance(BitCURRENCY))
-            assets = float(ACCOUNT.balance(BitASSET))
+            # dictionary of currency and assets in this market
+            currency = float(account.balance(BitCURRENCY))
+            assets = float(account.balance(BitASSET))
             balances = {BitCURRENCY: currency, BitASSET: assets}
             # dictionary of open orders in traditional format:
             # orderNumber, orderType, market, amount, price
@@ -443,15 +440,15 @@ def book(node='', a=None, b=None):
             # display orderbooks
             print("\033c")
             print(time.ctime(), '            ', int(time.time()), '   ', a, b)
-            print('                            ',
-                 (elapsed), '   ', node)
+            print(  '                        PING',
+                    (elapsed), '   ', node)
             print('')
             print(
-                '                        LAST',
-                slast[:10],
-                slast[10:],
-                '   ',
-                BitPAIR)
+                    '                        LAST',
+                    slast[:10],
+                    slast[10:],
+                    '   ',
+                    BitPAIR)
             print('')
             print(
                 '            ', sbidv[0], '  ', (
@@ -476,7 +473,7 @@ def book(node='', a=None, b=None):
             print('%s BALANCE:' % BitPAIR)
             print (balances)
             print('')
-            print('MARKET HISTORY:              SECONDS STALE:', stale)
+            print('MARKET HISTORY:', stale, 'since last trade')
             for t in trades:
                 # print(t.items())
                 print(t['unix'],
@@ -486,7 +483,7 @@ def book(node='', a=None, b=None):
             print('')
             print('ctrl+shift+\ will EXIT to terminal')
             print('')
-            print('YOUR COMPLETE HOLDINGS')
+            print('COMPLETE HOLDINGS:')
             print(cbalances)
         except:
             pass
@@ -503,16 +500,23 @@ def dex_withdraw():
         amount=send_amount,
         asset=BTS,
         memo=None,
-        account=ACCOUNT)
+        account=account)
 
 def dex_buy():
 
+    # update wallet unlock to low latency node
+    market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+    try:
+        market.bitshares.wallet.unlock(PASS_PHRASE)
+    except:
+        pass
+    # attempt buy 10X or until satisfied
     def buy(price, amount):
         confirm.destroy()
         attempt = 1
         while attempt:
             try:
-                details = (MARKET.buy(price, amount))
+                details = (market.buy(price, amount))
                 print (details)
                 attempt = 0
             except:
@@ -522,13 +526,15 @@ def dex_buy():
                     zprint('buy aborted')
                     return
                 pass
-    if MARKET.bitshares.wallet.unlocked():
+
+    # interact with tkinter
+    if market.bitshares.wallet.unlocked():
         zprint('BUY')
         price = sell_price.get()
         amount = sell_amount.get()
         if price == '':
-            price=2*float(MARKET.ticker()['latest'])
-            sprice = 'MARKET RATE'
+            price=2*float(market.ticker()['latest'])
+            sprice = 'market RATE'
         if amount == '':
             amount = ANTISAT
         confirm = Tk()
@@ -537,7 +543,7 @@ def dex_buy():
             amount= float(amount)
             if price != ANTISAT:
                 sprice= '%.16f' % price
-            currency = float(ACCOUNT.balance(BitCURRENCY))
+            currency = float(account.balance(BitCURRENCY))
             if amount > (0.998) * currency * float(price):
                 amount = (0.998) * currency * float(price)
             samount = str(amount)
@@ -586,12 +592,20 @@ def dex_buy():
 
 def dex_sell():
 
+    # update wallet unlock to low latency node
+    market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+    try:
+        market.bitshares.wallet.unlock(PASS_PHRASE)
+    except:
+        pass
+
+    # attempt to sell 10X or until satisfied
     def sell(price, amount):
         confirm.destroy()
         attempt = 1
         while attempt:
             try:
-                details = (MARKET.sell(price, amount))
+                details = market.sell(price, amount)
                 print (details)
                 attempt = 0
             except:
@@ -601,13 +615,14 @@ def dex_sell():
                     zprint('sell aborted')
                     return
                 pass
-    if MARKET.bitshares.wallet.unlocked():
+    # interact with tkinter
+    if market.bitshares.wallet.unlocked():
         zprint('SELL')
         price = sell_price.get()
         amount = sell_amount.get()
         if price == '':
-            price = 0.5*float(MARKET.ticker()['latest'])
-            sprice = 'MARKET RATE'
+            price = 0.5*float(market.ticker()['latest'])
+            sprice = 'market RATE'
         if amount == '':
             amount = ANTISAT
         confirm = Tk()
@@ -616,7 +631,7 @@ def dex_sell():
             amount = float(amount)
             if price != SATOSHI:
                 sprice= '%.16f' % price
-            assets = float(ACCOUNT.balance(BitASSET))
+            assets = float(account.balance(BitASSET))
             if amount > (0.998*assets):
                 amount = 0.998 * assets
             samount=str(amount)
@@ -665,10 +680,17 @@ def dex_sell():
 
 def dex_cancel():
 
-    def cancel():
+    # update wallet unlock to low latency node
+    market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+    try:
+        market.bitshares.wallet.unlock(PASS_PHRASE)
+    except:
+        pass
 
+    # attempt cancel all 10X or until satisfied
+    def cancel():
         confirm.destroy()
-        orders = MARKET.accountopenorders()
+        orders = market.accountopenorders()
         zprint('CANCEL')
         print((len(orders), 'open orders to cancel'))
         if len(orders):
@@ -678,7 +700,7 @@ def dex_cancel():
                 order_list.append(order['id'])
             while attempt:
                 try:
-                    details = MARKET.cancel(order_list)
+                    details = market.cancel(order_list)
                     print (details)
                     attempt = 0
                 except:
@@ -689,10 +711,10 @@ def dex_cancel():
                         return
                     pass
 
-    if MARKET.bitshares.wallet.unlocked():
+    # interact with tkinter
+    if market.bitshares.wallet.unlocked():
         confirm = Tk()
-        confirm.title('')
-        Label(confirm, text='CONFIRM CANCEL ALL').grid(row=0, column=0)
+        confirm.title('CONFIRM CANCEL ALL')
         Button(
             confirm,
             text='CONFIRM',
@@ -707,7 +729,7 @@ def dex_cancel():
             row=2,
             column=0,
             pady=8)
-        confirm.geometry('150x150+900+250')
+        confirm.geometry('500x100+800+150')
         confirm.lift()
         confirm.call('wm', 'attributes', '.', '-topmost', True)
     else:
@@ -715,48 +737,48 @@ def dex_cancel():
 
 
 def dex_auth_gui():
-    global MARKET
+
+    # unlock wallet from gui
     global PASS_PHRASE
     PASS_PHRASE = str(login.get())
     login.delete(0, END)
+    market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
     try:
-        MARKET.bitshares.wallet.unlock(PASS_PHRASE)
+        market.bitshares.wallet.unlock(PASS_PHRASE)
         lock.set('UNLOCKED')
     except Exception as ex:
         if PASS_PHRASE != '':
             zprint(type(ex).__name__)
-        MARKET.bitshares.wallet.lock()
+        market.bitshares.wallet.lock()
         lock.set('LOCKED')
         pass
 
-
 def launch(a):
 
+    # continually respawn child processes to update book
     nds = race_read('nodes.txt')
     if isinstance(nds, list):
-        ns = nds
-    else:
-        ns = nodes
+        nodes = nds
     p = {}
     b = 0
     while True:
         try:
             b += 1
-            shuffle(ns)
-            n = str(ns[0])
+            shuffle(nodes)
+            n = str(nodes[0])
             p[str(b)] = Process(target=book, args=(n, a, b,))
             p[str(b)].daemon = True
             p[str(b)].start()
-            p[str(b)].join(TIMEOUT)
+            p[str(b)].join(TIMEOUT*0.5 + TIMEOUT*random())
         except:
             pass
 
+# run nodes latency update as background process
 servers = Process(target=nodes_loop)
+servers.daemon = True
 servers.start()
 
-
 # sign in
-BitPAIR = BitASSET + ':' + BitCURRENCY
 print("\033c")
 print('')
 print('')
@@ -764,45 +786,53 @@ print(VERSION)
 print('=================================================')
 print('')
 print('')
-ACCOUNT = Account(input('           Account: '))
-print('')
-print('      Welcome Back: %s' % ACCOUNT)
-print('')
-print(' Default MARKET is: %s' % BitPAIR)
-print('')
-print('Input new MARKET below or press ENTER to skip')
-print('')
-BitPAIR = (input('  Change MARKET to: ') or BitPAIR)
 
+USERNAME = input('           Account: ')
+account = Account(USERNAME, bitshares_instance=BitShares(nodes, num_retries=0))
+
+print('')
+print('      Welcome Back: %s' % account)
+print('')
+print(' Default market is: %s' % BitPAIR)
+print('')
+print('Input new market below or press ENTER to skip')
+print('e.g.: BTS:CNY, OPEN.LTC:OPEN.BTC, OPEN.BTC:USD')
+print('')
+
+BitPAIR = (input('  Change market to: ') or BitPAIR)
 BitASSET = BitPAIR.split(':')[0]
 BitCURRENCY = BitPAIR.split(':')[1]
-MARKET = Market(BitPAIR, bitshares_instance=BitShares(nodes), mode='head')
+market = Market(BitPAIR, bitshares_instance=BitShares(nodes, num_retries=0), mode='head')
+
 print('')
 print('Enter PASS PHRASE below to unlock your wallet or press ENTER to skip')
 print('')
+
 PASS_PHRASE = getpass(prompt='       Pass Phrase: ')
 if PASS_PHRASE != '':
     try:
-        MARKET.bitshares.wallet.unlock(PASS_PHRASE)
+        market.bitshares.wallet.unlock(PASS_PHRASE)
     except Exception as ex:
         print (type(ex).__name__)
         sys.exit()
+
 print('')
 print('Connecting to the Bitshares Distributed Exchange, please wait...')
 print('')
 
+# begin several background processes of launch to validate book feeds
 multinode = {}
-for a in range(1, 7):
+for a in range(CONNECTIONS):
     # multinode orderbooks
     multinode[str(a)] = Process(target=launch, args=(a,))
     multinode[str(a)].start()
+    time.sleep(1)
 
-
-# busybox
+# tkinter primary busybox
 master = Tk()
 lock = StringVar()
 lock.set('UNLOCKED')
-if MARKET.bitshares.wallet.locked():
+if market.bitshares.wallet.locked():
     lock.set('LOCKED')
 master.title(VERSION)
 Label(master, text="PRICE:").grid(row=0, column=0, sticky=E)
@@ -810,19 +840,16 @@ Label(master, text="AMOUNT:").grid(row=1, column=0, sticky=E)
 Label(master, text="PRICE:").grid(row=0, column=2, sticky=E)
 Label(master, text="AMOUNT:").grid(row=1, column=2, sticky=E)
 Label(master, textvariable=lock).grid(row=6, column=2, sticky=W)
-
 buy_price = Entry(master)
 buy_amount = Entry(master)
 sell_price = Entry(master)
 sell_amount = Entry(master)
 login = Entry(master)
-
 buy_price.grid(row=0, column=1)
 buy_amount.grid(row=1, column=1)
 sell_price.grid(row=0, column=3)
 sell_amount.grid(row=1, column=3)
 login.grid(row=6, column=1)
-
 Button(
     master,
     text='BUY',
@@ -856,7 +883,6 @@ Button(
     sticky=E,
     pady=4)
 master.geometry('600x200+600+700')
-
 master.lift()
 master.call('wm', 'attributes', '.', '-topmost', True)
 mainloop()
