@@ -1296,7 +1296,7 @@ def chartdata(pair, start, stop, period):  # Public API cryptocompare
             ret = requests.get(uri, params=params).json()
             d = ret['Data']
             clean_d2 = [i for i in d if i['close'] > 0]
-            clean_d = clean_d1 + clean_d2
+            clean_d = clean_d2 + clean_d1
             clean_d = [i for i in clean_d if i['time'] > start]
             print((len(clean_d),
                  (clean_d2[-1]['time'], clean_d1[0]['time']),
