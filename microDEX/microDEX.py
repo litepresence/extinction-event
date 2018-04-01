@@ -33,7 +33,6 @@ import matplotlib
 import matplotlib.cbook as cbook
 import matplotlib.dates as mdates
 
-DEV = True
 SATOSHI = 0.00000001
 ANTISAT = 1 / SATOSHI
 sys.stdout.write('\x1b]2;' + VERSION + '\x07')
@@ -1129,11 +1128,10 @@ def charts():
     Button(text='UPDATE CHART', command=draw_chart).pack()
     interface.after(1, draw_chart)
     interface.title('PLOT WIDGET: DO NOT CLOSE')
-    interface.geometry("%dx%d+0+0" % (0, 0))
+    interface.geometry("0x0+0+0")
     interface.mainloop()
 
 # run nodes latency test as background process
-BEGIN = int(time.time())
 servers = Process(target=nodes_loop)
 servers.daemon = True
 servers.start()
@@ -1218,6 +1216,7 @@ print('Connecting to the Bitshares Distributed Exchange, please wait...')
 print('')
 
 # begin several concurrent background processes of launch_book()
+BEGIN = int(time.time())
 multinode = {}
 for a in range(CONNECTIONS):
     multinode[str(a)] = Process(target=launch_book, args=(a,))
