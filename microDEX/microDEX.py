@@ -52,7 +52,8 @@ nodes = [
 BitCURRENCY = 'OPEN.BTC'
 BitASSET = 'BTS'
 TIMEOUT = 120
-CONNECTIONS = 6
+PAUSE = 0.2
+CONNECTIONS = 8
 BitPAIR = BitASSET + ':' + BitCURRENCY
 
 ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
@@ -394,7 +395,7 @@ def book(a=None, b=None):  # updates orderbook details
     node = nodes[0]
     begin = time.time()
     while time.time() < (begin + TIMEOUT):
-        time.sleep(random())
+        time.sleep(PAUSE)
         try:
             # add unix time to trades dictionary
             trades = market.trades(limit=100)
@@ -462,7 +463,8 @@ def book(a=None, b=None):  # updates orderbook details
             # display orderbooks
             print("\033c")
             print(time.ctime(), '                            RUN TIME',
-                (int(time.time())-BEGIN), 'EPOCH', b, 'PROCESS', a)
+                (int(time.time())-BEGIN),
+                'EPOCH', b, 'PROCESS', a, '/', CONNECTIONS)
             print('                        PING',
                  (elapsed), '   ', node)
             print('')
@@ -832,6 +834,7 @@ def launch_book(a):
             p[str(b)].start()
             p[str(b)].join(TIMEOUT * 0.5 + TIMEOUT * random())
         except:
+            print('book failed', a , b)
             pass
 
 def float_sma(array, period):  # floating point periods accepted
@@ -1221,7 +1224,7 @@ multinode = {}
 for a in range(CONNECTIONS):
     multinode[str(a)] = Process(target=launch_book, args=(a,))
     multinode[str(a)].start()
-    time.sleep(0.1)
+    time.sleep(PAUSE)
 
 # begin live charts
 try:
