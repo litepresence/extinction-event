@@ -1,5 +1,5 @@
 
-VERSION = 'microDEX v0.00000009 - low latency minimalist UI'
+VERSION = 'microDEX v0.00000010 - low latency minimalist UI'
 
 ' (BTS) litpresence1 '
 
@@ -33,7 +33,7 @@ import matplotlib
 import matplotlib.cbook as cbook
 import matplotlib.dates as mdates
 
-
+DEV = True
 SATOSHI = 0.00000001
 ANTISAT = 1 / SATOSHI
 sys.stdout.write('\x1b]2;' + VERSION + '\x07')
@@ -57,7 +57,6 @@ CONNECTIONS = 6
 BitPAIR = BitASSET + ':' + BitCURRENCY
 
 ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
-
 
 def nodes_process(  # sorts nodes for lowest latency
     timeout=20, pings=999999, crop=99, noprint=False, write=False,
@@ -294,7 +293,6 @@ def nodes_process(  # sorts nodes for lowest latency
         race_write(doc='nodes.txt', text=str(ret))
     return (ret)
 
-
 def nodes_loop():  # repeats nodes process
 
     while True:
@@ -308,7 +306,6 @@ def nodes_loop():  # repeats nodes process
         except Exception as e:
             print (type(e).__name__, e.args, e)
             pass
-
 
 def nodes_update():  # single run of nodes process
 
@@ -331,7 +328,6 @@ def nodes_update():  # single run of nodes process
     print('DEX CONNECTION ESTABLISHED - will refresh every 10 minutes')
     print('')
 
-
 def race_write(doc='', text=''):  # Concurrent Write to File Operation
 
     opened = 0
@@ -344,7 +340,6 @@ def race_write(doc='', text=''):  # Concurrent Write to File Operation
                 print (e, type(e).__name__, e.args)
                 print (str(doc) + ' RACE WRITE, try again...')
                 pass
-
 
 def race_read(doc=''):  # Concurrent Read from File Operation
 
@@ -360,7 +355,6 @@ def race_read(doc=''):  # Concurrent Read from File Operation
             pass
     return ret
 
-
 def zprint(z):  # prints 10X to flash orderbook
     OFFSET = '                                                      '
     z = '\n' + OFFSET + z
@@ -370,15 +364,34 @@ def zprint(z):  # prints 10X to flash orderbook
         for i in range(50):
             print(z)
 
+def reconnect(BitPAIR, USERNAME, PASS_PHRASE):
 
-def book(nodes, a=None, b=None):  # updates orderbook details
+    # create fresh websocket connection
+    connected = 0
+    while not connected:
+        nds = race_read('nodes.txt')
+        if isinstance(nds, list):
+            nodes = nds
+        shuffle(nodes)
+        try:
+            account = Account(USERNAME,
+                              bitshares_instance=BitShares(nodes, num_retries=0))
+            market = Market(BitPAIR,
+                            bitshares_instance=BitShares(nodes, num_retries=0),
+                            mode='head')
+            connected = 1
+        except:
+            pass
+    try:
+        market.bitshares.wallet.unlock(PASS_PHRASE)
+    except:
+        pass
+    #zprint('CONNECTED')
+    return account, market, nodes
 
-    # create fresh websocket connections for this child instance
-    account = Account(USERNAME,
-                      bitshares_instance=BitShares(nodes, num_retries=0))
-    market = Market(BitPAIR,
-                    bitshares_instance=BitShares(nodes, num_retries=0),
-                    mode='head')
+def book(a=None, b=None):  # updates orderbook details
+
+    account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
     node = nodes[0]
     begin = time.time()
     while time.time() < (begin + TIMEOUT):
@@ -449,7 +462,8 @@ def book(nodes, a=None, b=None):  # updates orderbook details
             stale = int(time.time() - float(trades[0]['unix']))
             # display orderbooks
             print("\033c")
-            print(time.ctime(), '            ', int(time.time()), '   ', a, b)
+            print(time.ctime(), '                            RUN TIME',
+                (int(time.time())-BEGIN), 'EPOCH', b, 'PROCESS', a)
             print('                        PING',
                  (elapsed), '   ', node)
             print('')
@@ -497,8 +511,8 @@ def book(nodes, a=None, b=None):  # updates orderbook details
             print('COMPLETE HOLDINGS:')
             print(cbalances)
         except:
+            zprint('BOOK')
             pass
-
 
 def dex_withdraw():
 
@@ -513,19 +527,11 @@ def dex_withdraw():
         memo=None,
         account=account)
 
-
 def dex_buy():
 
     # update wallet unlock to low latency node
     zprint('BUY')
-    nds = race_read('nodes.txt')
-    if isinstance(nds, list):
-        nodes = nds
-    account = Account(USERNAME,
-                      bitshares_instance=BitShares(nodes, num_retries=0))
-    market = Market(BitPAIR,
-                    bitshares_instance=BitShares(nodes, num_retries=0),
-                    mode='head')
+    account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
     try:
         market.bitshares.wallet.unlock(PASS_PHRASE)
     except:
@@ -624,25 +630,13 @@ def dex_buy():
     confirm.lift()
     confirm.call('wm', 'attributes', '.', '-topmost', True)
 
-
 def dex_sell():
 
     # update wallet unlock to low latency node
     zprint('SELL')
-    nds = race_read('nodes.txt')
-    if isinstance(nds, list):
-        nodes = nds
-    account = Account(USERNAME,
-                      bitshares_instance=BitShares(nodes, num_retries=0))
-    market = Market(BitPAIR,
-                    bitshares_instance=BitShares(nodes, num_retries=0),
-                    mode='head')
-    try:
-        market.bitshares.wallet.unlock(PASS_PHRASE)
-    except:
-        pass
-    # attempt to sell 10X or until satisfied
+    account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
 
+    # attempt to sell 10X or until satisfied
     def sell(price, amount):
         confirm.destroy()
         zprint('CONFIRMED')
@@ -733,26 +727,13 @@ def dex_sell():
     confirm.lift()
     confirm.call('wm', 'attributes', '.', '-topmost', True)
 
-
 def dex_cancel():
 
     # update wallet unlock to low latency node
     zprint('CANCEL')
-    nds = race_read('nodes.txt')
-    if isinstance(nds, list):
-        nodes = nds
-    account = Account(USERNAME,
-                      bitshares_instance=BitShares(nodes, num_retries=0))
-    market = Market(BitPAIR,
-                    bitshares_instance=BitShares(nodes, num_retries=0),
-                    mode='head')
+    account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
     orders = market.accountopenorders()
-    try:
-        market.bitshares.wallet.unlock(PASS_PHRASE)
-    except:
-        pass
     # attempt cancel all 10X or until satisfied
-
     def cancel():
         confirm.destroy()
         zprint('CONFIRMED')
@@ -820,19 +801,13 @@ def dex_cancel():
     confirm.lift()
     confirm.call('wm', 'attributes', '.', '-topmost', True)
 
-
 def dex_auth_gui():
 
     # unlock wallet from gui
     global PASS_PHRASE
     PASS_PHRASE = str(login.get())
     login.delete(0, END)
-    nds = race_read('nodes.txt')
-    if isinstance(nds, list):
-        nodes = nds
-    market = Market(BitPAIR,
-                    bitshares_instance=BitShares(nodes, num_retries=0),
-                    mode='head')
+    account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
     try:
         market.bitshares.wallet.unlock(PASS_PHRASE)
         lock.set('UNLOCKED')
@@ -845,27 +820,20 @@ def dex_auth_gui():
         zprint('WALLET LOCKED')
         pass
 
-
 def launch_book(a):
 
     # continually respawn child processes to update order book
-    global nodes
     p = {}
     b = 0
     while True:
         try:
-            nds = race_read('nodes.txt')
-            if isinstance(nds, list):
-                nodes = nds
             b += 1
-            shuffle(nodes)
-            p[str(b)] = Process(target=book, args=(nodes, a, b,))
+            p[str(b)] = Process(target=book, args=(a, b,))
             p[str(b)].daemon = True
             p[str(b)].start()
             p[str(b)].join(TIMEOUT * 0.5 + TIMEOUT * random())
         except:
             pass
-
 
 def float_sma(array, period):  # floating point periods accepted
 
@@ -888,7 +856,6 @@ def float_sma(array, period):  # floating point periods accepted
         ceil = ceil[-depth:]
         ma = (floor_ratio * floor) + (ceil_ratio * ceil)
         return ma
-
 
 def chartdata(pair, start, stop, period):  # Public API cryptocompare
 
@@ -930,18 +897,12 @@ def chartdata(pair, start, stop, period):  # Public API cryptocompare
             clean_d2 = [i for i in d if i['close'] > 0]
             clean_d = clean_d2 + clean_d1
             clean_d = [i for i in clean_d if i['time'] > start]
-            '''
-            print((len(clean_d),
-                 (clean_d2[-1]['time'], clean_d1[0]['time']),
-                (clean_d1[0]['time'] - clean_d2[-1]['time'])))
-            print()
-            '''
+
         return clean_d
 
     else:
         print('invalid period')
         return None
-
 
 def live_candles(pair, candle, depth):  # Current HLOCV arrays
 
@@ -962,6 +923,12 @@ def live_candles(pair, candle, depth):  # Current HLOCV arrays
         d['open'].append(raw[i]['open'])
         d['close'].append(raw[i]['close'])
         d['volume'].append(raw[i]['volumefrom'])
+    # filter absurd wicks
+    for i in range(len(d['unix'])):
+        if d['high'][i] > 2*d['close'][i]:
+                d['high'][i] = 2*d['close'][i]
+        if d['low'][i] < 0.5*d['close'][i]:
+                d['low'][i] = 0.5*d['close'][i]
     d['unix'] = np.array(d['unix'][-depth:])
     d['high'] = np.array(d['high'][-depth:])
     d['low'] = np.array(d['low'][-depth:])
@@ -971,8 +938,7 @@ def live_candles(pair, candle, depth):  # Current HLOCV arrays
 
     return d
 
-
-def plot_format():
+def plot_format(log):
 
     warnings.filterwarnings("ignore", category=cbook.mplDeprecation)
     ax = plt.gca()
@@ -989,6 +955,10 @@ def plot_format():
     plt.minorticks_on
     plt.grid(b=True, which='major', color='0.2', linestyle='-')
     plt.grid(b=True, which='minor', color='0.2', linestyle='-')
+
+    if log == 1:
+        plt.ylabel('LOGARITHMIC PRICE SCALE')
+        plt.yscale('log')
     ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.yaxis.set_minor_formatter(matplotlib.ticker.ScalarFormatter())
     ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter("%.8f"))
@@ -996,120 +966,141 @@ def plot_format():
     plt.autoscale(enable=True, axis='y')
     plt.tight_layout()
 
+    if log == 1:
+        # force 'autoscale'
+        yd = []  # matrix of y values from all lines on plot
+        xd = []  # matrix of x values from all lines on plot
+        for n in range(len(plt.gca().get_lines())):
+            line = plt.gca().get_lines()[n]
+            yd.append((line.get_ydata()).tolist())
+            xd.append((line.get_xdata()).tolist())
+        yd = [item for sublist in yd for item in sublist]
+        ymin, ymax = np.min(yd), np.max(yd)
+        ax.set_ylim([0.95 * ymin, 1.05 * ymax])
+        xd = [item for sublist in xd for item in sublist]
+        xmin, xmax = np.min(xd), np.max(xd)
+        ax.set_xlim([xmin, xmax])
+        # add sub minor ticks
+        set_sub_formatter = []
+        sub_ticks = [10, 11, 12, 14, 16, 18, 22, 25, 35, 45]
+        sub_range = [-8, 8]
+        for i in sub_ticks:
+            for j in range(sub_range[0], sub_range[1]):
+                set_sub_formatter.append(i * 10 ** j)
+        k = []
+        for l in set_sub_formatter:
+            if ymin < l < ymax:
+                k.append(l)
+        ax.set_yticks(k)
+
+
+
     def timestamp(x, pos):
         return (datetime.fromtimestamp(x)).strftime('%m/%d %H:%M')
     ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(timestamp))
     plt.gcf().autofmt_xdate(rotation=30)
     plt.gcf().canvas.set_window_title('microDEX CHART')
 
-
 def charts():
 
     def draw_chart():
         zprint('UPDATING CHART DATA')
-        plt.cla
-        ax = plt.gca()
-        for l in ax.get_lines():
-                l.remove()
-        fig.patch.set_facecolor('0.15')
         ASSET = BitASSET.replace('OPEN.', '')
         CURRENCY = BitCURRENCY.replace('OPEN.', '')
         PAIR = ('%s_%s' % (CURRENCY, ASSET))
+        ret = live_candles(PAIR, 300, 1999)
+        cex_5m_x = ret['unix']
+        cex_5m_close = ret['close']
+        cex_5m_high = ret['high']
+        cex_5m_low = ret['low']
+        cex_5m_x = [(i + 150) for i in cex_5m_x]
         ret = live_candles(PAIR, 7200, 3999)
-        cex_2hx = ret['unix']
-        cex_2hclose = ret['close']
-        cex_2hhigh = ret['high']
-        cex_2hlow = ret['low']
-        plt.plot(
-            cex_2hx,
-            cex_2hhigh,
-            markersize=1,
-            marker='.',
-            color='magenta')
-        plt.plot(cex_2hx, cex_2hlow, markersize=1, marker='.', color='magenta')
-        plt.plot(
-            cex_2hx,
-            cex_2hclose,
-            markersize=1,
-            marker='.',
-            color='yellow')
-        ret = live_candles(PAIR, 300, 288)
-        cex_5mx = ret['unix']
-        cex_5mclose = ret['close']
-        cex_5mhigh = ret['high']
-        cex_5mlow = ret['low']
-        plt.plot(
-            cex_5mx,
-            cex_5mhigh,
-            markersize=1,
-            marker='.',
-            color='magenta')
-        plt.plot(cex_5mx, cex_5mlow, markersize=1, marker='.', color='magenta')
-        plt.plot(
-            cex_5mx,
-            cex_5mclose,
-            markersize=1,
-            marker='.',
-            color='yellow')
+        cex_2h_x = ret['unix']
+        cex_2h_close = ret['close']
+        cex_2h_high = ret['high']
+        cex_2h_low = ret['low']
+        cex_2h_x = [(i + 3600) for i in cex_2h_x]
         ret = live_candles(PAIR, 86400, 1000)
-        cex_dx = ret['unix']
-        cex_dclose = ret['close']
-        cex_dhigh = ret['high']
-        cex_dlow = ret['low']
-        crop = len(cex_dlow) - 90
-        cex_dx = cex_dx[-crop:-100]
-        cex_dclose = cex_dclose[-crop:-100]
-        cex_dhigh = cex_dhigh[-crop:-100]
-        cex_dlow = cex_dlow[-crop:-100]
-        cex_dx = [(i + 43400) for i in cex_dx]
-        plt.plot(cex_dx, cex_dhigh, markersize=1, marker='.', color='magenta')
-        plt.plot(cex_dx, cex_dlow, markersize=1, marker='.', color='magenta')
-        plt.plot(cex_dx, cex_dclose, markersize=1, marker='.', color='yellow')
+        cex_d_x = ret['unix']
+        cex_d_close = ret['close']
+        cex_d_high = ret['high']
+        cex_d_low = ret['low']
+        crop = len(cex_d_x) - 90
+        cex_d_x = cex_d_x[-crop:-50]
+        cex_d_close = cex_d_close[-crop:-50]
+        cex_d_high = cex_d_high[-crop:-50]
+        cex_d_low = cex_d_low[-crop:-50]
+        cex_d_x = [(i + 43400) for i in cex_d_x]
         try:
-            ma1_period = 12.0 * float(MA1.get())
-            ma2_period = 12.0 * float(MA2.get())
+            ma1_2h_period = 12.0 * float(MA1.get())
+            ma2_2h_period = 12.0 * float(MA2.get())
         except:
-            ma1_period = 120
-            ma2_period = 600
-        ma_1 = float_sma(cex_2hclose, ma1_period)
-        ma_2 = float_sma(cex_2hclose, ma2_period)
-        min_len = min(len(ma_1), len(ma_2))
-        ma_1 = ma_1[-min_len:]
-        ma_2 = ma_2[-min_len:]
-        ma_x = cex_2hx[-min_len:]
-        plt.plot(ma_x, ma_1, markersize=1, marker='.', color='pink')
-        plt.plot(ma_x, ma_2, markersize=1, marker='.', color='aqua')
-        ma1_period /= 12.0
-        ma2_period /= 12.0
-        if min(ma1_period, ma2_period) > 2:
+            ma1_2h_period = 120
+            ma2_2h_period = 600
+        ma1_2h = float_sma(cex_2h_close, ma1_2h_period)
+        ma2_2h = float_sma(cex_2h_close, ma2_2h_period)
+        min_len = min(len(ma1_2h), len(ma2_2h))
+        ma1_2h = ma1_2h[-min_len:]
+        ma2_2h = ma2_2h[-min_len:]
+        ma_x_2h = cex_2h_x[-min_len:]
+        ma_x_2h = [(i + 7200) for i in ma_x_2h]
+        ma1_d_period = ma1_2h_period /12.0
+        ma2_d_period = ma2_2h_period /12.0
+        if min(ma1_d_period, ma2_d_period) > 2:
+            ma1_d = float_sma(cex_d_close, ma1_d_period)
+            ma2_d = float_sma(cex_d_close, ma2_d_period)
+            min_len = min(len(ma1_d), len(ma2_d))
+            ma1_d = ma1_d[-min_len:]
+            ma2_d = ma2_d[-min_len:]
+            ma_x_d = cex_d_x[-min_len:]
+            ma_x_d = [(i + 86400) for i in ma_x_d]
 
-            ma_1 = float_sma(cex_dclose, ma1_period)
-            ma_2 = float_sma(cex_dclose, ma2_period)
-            min_len = min(len(ma_1), len(ma_2))
-            ma_1 = ma_1[-min_len:]
-            ma_2 = ma_2[-min_len:]
-            ma_x = cex_dx[-min_len:]
-            ma_x = [(i + 86400) for i in ma_x]
-            plt.plot(ma_x, ma_1, markersize=1, marker='.', color='pink')
-            plt.plot(ma_x, ma_2, markersize=1, marker='.', color='aqua')
-
-        nds = race_read('nodes.txt')
-        if isinstance(nds, list):
-            nodes = nds
-        market = Market(BitPAIR,
-                        bitshares_instance=BitShares(nodes, num_retries=0),
-                        mode='head')
+        account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
         trades = market.trades(limit=100)
         for t in range(len(trades)):
             ts = time.strptime(str(trades[t]['time']), '%Y-%m-%d %H:%M:%S')
             trades[t]['unix'] = int(time.mktime(ts))
-        dex_x = trades[t]['unix']
-        dex_y = float(trades[t]['price'])
+        dex_x, dex_y = [],[]
+        for t in range(len(trades)):
+            dex_x.append(float(trades[t]['unix']))
+            dex_y.append(float(trades[t]['price']))
+        plt.cla
+        ax = plt.gca()
+        log = int((scale.var).get())
+        for l in ax.get_lines():
+                l.remove()
+        fig.patch.set_facecolor('0.15')
+        plt.plot(cex_5m_x, cex_5m_high,
+            markersize=1, marker='.', color='magenta')
+        plt.plot(cex_5m_x, cex_5m_low,
+            markersize=1, marker='.', color='magenta')
+        plt.plot(cex_5m_x, cex_5m_close,
+            markersize=1, marker='.', color='yellow')
+        plt.plot(cex_2h_x, cex_2h_high,
+            markersize=1, marker='.', color='magenta')
+        plt.plot(cex_2h_x, cex_2h_low,
+            markersize=1, marker='.', color='magenta')
+        plt.plot(cex_2h_x, cex_2h_close,
+            markersize=1, marker='.', color='yellow')
+        plt.plot(cex_d_x, cex_d_high,
+            markersize=1, marker='.', color='magenta')
+        plt.plot(cex_d_x, cex_d_low,
+            markersize=1, marker='.', color='magenta')
+        plt.plot(cex_d_x, cex_d_close,
+            markersize=1, marker='.', color='yellow')
+        plt.plot(ma_x_2h, ma1_2h,
+            markersize=1, marker='.', color='pink')
+        plt.plot(ma_x_2h, ma2_2h,
+            markersize=1, marker='.', color='aqua')
+        if min(ma1_d_period, ma2_d_period) > 2:
+            plt.plot(ma_x_d, ma1_d,
+                markersize=1, marker='.', color='pink')
+            plt.plot(ma_x_d, ma2_d,
+                markersize=1, marker='.', color='aqua')
         plt.plot(dex_x, dex_y, markersize=6, marker='.', color='white')
-        plot_format()
+        interface.after(60000, draw_chart)        
+        plot_format(log)
         plt.show()
-        interface.after(60000, draw_chart)
-
     fig = plt.figure()
     interface = Tk()
     MA1 = Scale(
@@ -1126,21 +1117,26 @@ def charts():
         orient=HORIZONTAL,
         length=800,
         label='Moving Average 2')
+    v = IntVar()
+    scale = Checkbutton(text="LOG SCALE", variable=v)
+    scale.var = v
+    Label(interface, text="CHART UPDATE WIDGET, DO NOT CLOSE").grid(row=0, column=0)
     MA1.set(10)
     MA2.set(50)
     MA1.pack()
     MA2.pack()
+    scale.pack()
     Button(text='UPDATE CHART', command=draw_chart).pack()
-    interface.after(0, draw_chart)
-    interface.after(60000, draw_chart)
+    interface.after(1, draw_chart)
+    interface.title('PLOT WIDGET: DO NOT CLOSE')
+    interface.geometry("%dx%d+0+0" % (0, 0))
     interface.mainloop()
 
-
 # run nodes latency test as background process
+BEGIN = int(time.time())
 servers = Process(target=nodes_loop)
 servers.daemon = True
 servers.start()
-
 
 # sign in
 print("\033c")
@@ -1160,10 +1156,9 @@ print('')
 print('')
 
 valid = 0
-
 while not valid:
     try:
-        USERNAME = input('           Account: ')
+        USERNAME =input('           Account: ')
         account = Account(
             USERNAME,
             bitshares_instance=BitShares(
@@ -1173,7 +1168,6 @@ while not valid:
     except Exception as ex:
         print (type(ex).__name__, 'try again...')
         pass
-
 print('')
 print('      Welcome Back: %s' % account)
 print('')
@@ -1182,7 +1176,6 @@ print('')
 print('Input new Bitshares DEX market below or press ENTER to skip')
 print('e.g.: BTS:CNY, BTS:OPEN.BTC, OPEN.LTC:OPEN.BTC, OPEN.BTC:USD')
 print('')
-
 valid = 0
 default = BitPAIR
 while not valid:
@@ -1200,11 +1193,9 @@ while not valid:
     except Exception as ex:
         print (type(ex).__name__, 'try again...')
         pass
-
 print('')
 print('Enter PASS PHRASE below to unlock your wallet or press ENTER to skip')
 print('')
-
 valid = 0
 default = ''
 while not valid:
@@ -1222,7 +1213,6 @@ while not valid:
     except Exception as ex:
         print (type(ex).__name__, 'try again...')
         pass
-
 print('')
 print('Connecting to the Bitshares Distributed Exchange, please wait...')
 print('')
@@ -1242,8 +1232,15 @@ try:
 except:
     print('WARN: plotting only available for crypto altcoins')
 
+time.sleep(2)
+print("\033c")
+print('')
+print('')
+print('')
+print('initializing microDEX...')
+
 # tkinter primary busybox
-time.sleep(20)
+time.sleep(15)
 master = Tk()
 lock = StringVar()
 lock.set('UNLOCKED')
