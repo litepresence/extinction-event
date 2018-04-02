@@ -5,7 +5,7 @@
  'wss://ap-southeast-2.bts.crypto-bridge.org/wss', 
  'wss://api-ru.bts.blckchnd.com/wss', 
  'wss://api.bts.blckchnd.com/wss', 
- 'wss://api.bts.mobi',
+ 'wss://api.bts.mobi/wss',
  'wss://atlanta.bitshares.apasia.tech/ws',
  'wss://b.mrx.im/wss', 
  'wss://bit.btsabc.org/wss', 
