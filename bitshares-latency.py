@@ -157,32 +157,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
         print(('remove %s known bad nodes' % len(excluded)))
         validated = [i for i in validated if i not in excluded]
 
-    validated = ['wss://singapore.bitshares.apasia.tech/ws',
-            'wss://japan.bitshares.apasia.tech/ws',
-            'wss://seoul9.daostreet.com/ws',
-            'wss://us-la.bitshares.apasia.tech/ws',
-            'wss://scali10.daostreet.com/ws',
-            'wss://ncali5.daostreet.com/ws',
-            'wss://valley.bitshares.apasia.tech/ws',
-            'wss://seattle.bitshares.apasia.tech/ws',
-            'wss://new-york.bitshares.apasia.tech/ws',
-            'wss://miami.bitshares.apasia.tech/ws',
-            'wss://atlanta.bitshares.apasia.tech/ws',
-            'wss://chicago.bitshares.apasia.tech/ws',
-            'wss://dallas.bitshares.apasia.tech/ws',
-            'wss://ohio4.daostreet.com/ws',
-            'wss://virginia3.daostreet.com/ws',
-            'wss://oregon2.daostreet.com/ws',
-            'wss://slovenia.bitshares.apasia.tech/ws',
-            'wss://bitshares.nu/ws',
-            'wss://croatia.bitshares.apasia.tech/ws',
-            'wss://frankfurt8.daostreet.com/ws',
-            'wss://paris7.daostreet.com/ws',
-            'wss://france.bitshares.apasia.tech/ws',
-            'wss://australia.bitshares.apasia.tech/ws',
-            'wss://canada6.daostreet.com/ws',
-            'wss://capetown.bitshares.africa/ws',
-            'wss://za.bitshares.africa/ws',]
+    #validated = []
 
     validated = sorted(list(set(validate(parse(clean(validated))))))
 
