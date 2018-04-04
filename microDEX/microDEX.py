@@ -1,5 +1,5 @@
 
-VERSION = 'microDEX v0.00000010 - low latency minimalist UI'
+# microDEX low latency UI for Bitshares Decentralized Exchange
 
 ' (BTS) litpresence1 '
 
@@ -8,64 +8,74 @@ VERSION = 'microDEX v0.00000010 - low latency minimalist UI'
 import os
 import sys
 import time
+import warnings
 import requests
 import datetime
 import numpy as np
 from tkinter import *
 from getpass import getpass
 from datetime import datetime
-from dateutil.parser import parser
+import matplotlib.ticker as tkr
+import matplotlib.pyplot as plt
+import matplotlib.cbook as cbook
 from random import random, shuffle
 from decimal import Decimal as decimal
 from ast import literal_eval as literal
-from multiprocessing import Process, active_children, Value, Array
-
-from bitshares.utils import *
+from multiprocessing import Process, Value, Array
 from bitshares import BitShares
-from bitshares.wallet import Wallet
 from bitshares.market import Market
 from bitshares.account import Account
 from bitshares.blockchain import Blockchain
 
-import matplotlib.pyplot as plt
-import warnings
-import matplotlib
-import matplotlib.cbook as cbook
-import matplotlib.dates as mdates
+def version():
 
-SATOSHI = 0.00000001
-ANTISAT = 1 / SATOSHI
-sys.stdout.write('\x1b]2;' + VERSION + '\x07')
+    global VERSION
+    VERSION = 'microDEX v0.00000011 - low latency minimalist UI'
 
-nodes = [
-    'wss://relinked.com/ws',
-    'wss://dexnode.net/wss',
-    'wss://la.dexnode.net/wss',
-    'wss://api.bts.blckchnd.com/wss',
-    'wss://eu.openledger.info/wss',
-    'wss://us.nodes.bitshares.ws/wss',
-    'wss://us.nodes.bitshares.works/wss',
-    'wss://this.uptick.rocks/ws',
-    'wss://bitshares.nu/wss',
-    'wss://eu.nodes.bitshares.works/wss']
+def constants():
 
-BitCURRENCY = 'OPEN.BTC'
-BitASSET = 'BTS'
-TIMEOUT = 600
-PAUSE = 0.5
-CONNECTIONS = 8
-BitPAIR = BitASSET + ':' + BitCURRENCY
+    global BitCURRENCY, BitASSET, BitPAIR
+    global ID, SATOSHI, ANTISAT, nodes
 
-ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
+    # default market
+    BitCURRENCY = 'OPEN.BTC'
+    BitASSET = 'BTS'
+    BitPAIR = BitASSET + ':' + BitCURRENCY
+    # mainnet ID
+    ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
+    SATOSHI = 0.00000001
+    ANTISAT = 1 / SATOSHI
+    sys.stdout.write('\x1b]2;' + VERSION + '\x07')
+    # default nodes for first use; auto updates thereafter
+    nodes = [
+        'wss://relinked.com/ws',
+        'wss://dexnode.net/wss',
+        'wss://la.dexnode.net/wss',
+        'wss://api.bts.blckchnd.com/wss',
+        'wss://eu.openledger.info/wss',
+        'wss://us.nodes.bitshares.ws/wss',
+        'wss://us.nodes.bitshares.works/wss',
+        'wss://this.uptick.rocks/ws',
+        'wss://bitshares.nu/wss',
+        'wss://eu.nodes.bitshares.works/wss']
+
+def timing():
+
+    global TIMEOUT, LATENCY_TEST, PAUSE, CONNECTIONS, MASTER, DEV
+    TIMEOUT = 180
+    LATENCY_TEST = 600
+    PAUSE = 0.5
+    CONNECTIONS = 8
+    MASTER = 10
+    DEV = 0  # ALWAYS ZERO WHEN LIVE; SLOWS ANIMATION
 
 def nodes_process(  # sorts nodes for lowest latency
-    timeout=20, pings=999999, crop=99, noprint=False, write=False,
-        include=False, exclude=False, suffix=True, master=False):
+        timeout=5, pings=999, crop=10, write=True,
+        include=True, exclude=False, suffix=True, master=False):
 
     # timeout : seconds to ping until abort per node
     # pings   : number of good nodes to find until satisfied (0 none, 999 all)
     # suffix  : checks each node for no suffix plus with /ws or /wss
-    # noprint : disables printing, only returns list of good nodes
     # master  : check only nodes listed in bitshares/ui/master
     # crop    : return only best nodes
     # write   : maintains an output file nodes.txt with list of best nodes
@@ -73,8 +83,7 @@ def nodes_process(  # sorts nodes for lowest latency
     # include and exclude custom nodes
     included, excluded = [], []
     if include:
-        included = ['wss://bts-seoul.clockwork.gr']
-
+        included = []
     if exclude:
         excluded = []
 
@@ -114,53 +123,31 @@ def nodes_process(  # sorts nodes for lowest latency
         return v
 
     # ping the blockchain and return latency
-
     def ping(n, num, arr):
 
         try:
             start = time.time()
             chain = Blockchain(
                 bitshares_instance=BitShares(n, num_retries=0), mode='head')
-
-            # print(n,chain.rpc.chain_params["chain_id"])
             ping_latency = time.time() - start
             current_block = chain.get_current_block_num()
             blocktimestamp = abs(
                 chain.block_timestamp(current_block))  # + utc_offset)
             block_latency = time.time() - blocktimestamp
-            # print (blocktimestamp)
-            # print (time.time())
-            # print (block_latency)
-            # print (ping_latency)
-            # print (time.ctime())
-            # print (utc_offset)
-            # print (chain.get_network())
             if chain.get_network()['chain_id'] != ID:
-                num.value = 333333
+                num.value = 333333  # testnet
             elif block_latency < (ping_latency + 4):
                 num.value = ping_latency
             else:
-                num.value = 111111
+                num.value = 111111  # stale
         except:
-            num.value = 222222
+            num.value = 222222  # invalid
             pass
 
-    # Disable / Enable printing
-    def blockPrint():
-        if noprint:
-            sys.stdout = open(os.devnull, 'w')
-
-    def enablePrint():
-        if noprint:
-            sys.stdout = sys.__stdout__
-
     # gather list of nodes from github
-    blockPrint()
     begin = time.time()
     utc_offset = (datetime.fromtimestamp(begin) -
                   datetime.utcfromtimestamp(begin)).total_seconds()
-    print ('=====================================')
-    print(('found %s nodes stored in script' % len(included)))
     urls = []
     # scrape from github
     git = 'https://raw.githubusercontent.com'
@@ -183,35 +170,24 @@ def nodes_process(  # sorts nodes for lowest latency
             try:
                 raw = requests.get(u).text
                 v = validate(parse(clean(raw)))
-                print(('found %s nodes at %s' % (len(v), u[:65])))
                 validated += v
                 attempts = 0
-            except:
-                print(('failed to connect to %s' % u))
+            except Exception as e:
+                msg = '\n\n' + str(type(e).__name__, e.args, e, u)
+                race_append(doc='microDEX_log.txt', text=msg)
                 attempts -= 1
                 pass
 
     # remove known bad nodes from test
     if len(excluded):
         excluded = sorted(excluded)
-        print(('remove %s known bad nodes' % len(excluded)))
         validated = [i for i in validated if i not in excluded]
 
     validated = sorted(list(set(validate(parse(clean(validated))))))
 
     # attempt to contact each websocket
-    print ('=====================================')
-    print(('found %s total nodes - no duplicates' % len(validated)))
-    print ('=====================================')
-    print (validated)
     pinging = min(pings, len(validated))
     if pinging:
-        print ('=====================================')
-        enablePrint()
-        # print(('%s pinging %s nodes; timeout %s sec; est %.1f minutes' % (
-        #    time.ctime(), pinging, timeout, timeout * len(validated) / 60.0)))
-        blockPrint()
-        print ('=====================================')
         pinged, timed, down, stale, expired, testnet = [], [], [], [], [], []
         for n in validated:
             if len(pinged) < pinging:
@@ -219,6 +195,7 @@ def nodes_process(  # sorts nodes for lowest latency
                 num = Value('d', 999999)
                 arr = Array('i', list(range(0)))
                 p = Process(target=ping, args=(n, num, arr))
+                p.daemon = True
                 p.start()
                 p.join(timeout)
                 if p.is_alive() or (num.value > timeout):
@@ -235,7 +212,6 @@ def nodes_process(  # sorts nodes for lowest latency
                 else:
                     pinged.append(n)        # connect success
                     timed.append(num.value)  # connect success time
-                print(('ping:', ('%.2f' % num.value), n))
 
         # sort websockets by latency
         pinged = [x for _, x in sorted(zip(timed, pinged))]
@@ -244,89 +220,26 @@ def nodes_process(  # sorts nodes for lowest latency
             list(set(validated).difference(
                 pinged + down + stale + expired + testnet)))
 
-        # report outcome
-        print('')
-        print((len(pinged), 'of', len(validated),
-               'nodes are active with latency less than', timeout))
-        print('')
-        print(('fastest node', pinged[0], 'with latency', ('%.2f' % timed[0])))
-        if len(excluded):
-            for i in range(len(excluded)):
-                print(('EXCLUDED', excluded[i]))
-        if len(unknown):
-            for i in range(len(unknown)):
-                print(('UNTESTED', unknown[i]))
-        if len(testnet):
-            for i in range(len(testnet)):
-                print(('TESTNET', testnet[i]))
-        if len(expired):
-            for i in range(len(expired)):
-                print(('TIMEOUT', expired[i]))
-        if len(stale):
-            for i in range(len(stale)):
-                print(('STALE', stale[i]))
-        if len(down):
-            for i in range(len(down)):
-                print(('DOWN', down[i]))
-        if len(pinged):
-            print ('')
-            print ('GOOD nodes:')
-            print ('')
-            for i in range(len(pinged)):
-                print((('%.2f' % timed[i]), pinged[i]))
-
         ret = pinged[:crop]
-        # print (pinged[0])
-        # print (ret[0])
-        # print (timed[0])
     else:
         ret = validated[:crop]
 
-    print ('')
-    enablePrint()
     elapsed = time.time() - begin
-    # print ('elapsed:', ('%.1f' % elapsed),
-    #       'fastest:', ('%.3f' % timed[0]), ret[0])
-    # print (ret)
-
     if write and (len(ret) == crop):
         race_write(doc='nodes.txt', text=str(ret))
-    return (ret)
 
 def nodes_loop():  # repeats nodes process
 
     while True:
         try:
-            nodes_process(
-                timeout=5, pings=999, crop=10, noprint=True, write=True,
-                include=True, exclude=False, suffix=True, master=False)
-            time.sleep(30)
+            nodes_process()
+            time.sleep(600)
 
         # no matter what happens just keep verifying book
         except Exception as e:
-            print (type(e).__name__, e.args, e)
+            msg = '\n\n' + str(type(e).__name__) + str(e.args) + str(e)
+            race_append(doc='microDEX_log.txt', text=msg)
             pass
-
-def nodes_update():  # single run of nodes process
-
-    print('Acquiring low latency connection to Bitshares DEX' +
-          ', this may take a few minutes...')
-    updated = 0
-    try:
-        while not updated:
-            nodes_process(
-                timeout=5, pings=999, crop=10, noprint=False, write=True,
-                include=True, exclude=False, suffix=True, master=False)
-            updated = 1
-
-    # not satisfied until verified once
-    except Exception as e:
-        print (type(e).__name__, e.args, e)
-        pass
-
-    print('')
-    print('DEX CONNECTION ESTABLISHED - will refresh every 10 minutes')
-    print('')
 
 def race_write(doc='', text=''):  # Concurrent Write to File Operation
 
@@ -339,6 +252,19 @@ def race_write(doc='', text=''):  # Concurrent Write to File Operation
         except Exception as e:
                 print (e, type(e).__name__, e.args)
                 print (str(doc) + ' RACE WRITE, try again...')
+                pass
+
+def race_append(doc='', text=''):  # Concurrent Append to File Operation
+
+    opened = 0
+    while not opened:
+        try:
+            with open(doc, 'a+') as f:
+                f.write(str(text))
+                opened = 1
+        except Exception as e:
+                print (e, type(e).__name__, e.args)
+                print (str(doc) + ' RACE APPEND, try again...')
                 pass
 
 def race_read(doc=''):  # Concurrent Read from File Operation
@@ -357,7 +283,7 @@ def race_read(doc=''):  # Concurrent Read from File Operation
 
 def zprint(z):  # prints 10X to flash orderbook
     OFFSET = '                                                      '
-    z = '\n' + OFFSET + z
+    z = '\n\n' + OFFSET + str(z)
     for i in range(10):
         time.sleep(0.03)
         print("\033c")
@@ -369,16 +295,17 @@ def reconnect(BitPAIR, USERNAME, PASS_PHRASE):
     # create fresh websocket connection
     connected = 0
     while not connected:
+        # fetch fresh nodes list from subprocess and shuffle it
         nds = race_read('nodes.txt')
         if isinstance(nds, list):
             nodes = nds
         shuffle(nodes)
         try:
             account = Account(USERNAME,
-                              bitshares_instance=BitShares(nodes, num_retries=0))
+                bitshares_instance=BitShares(nodes, num_retries=0))
             market = Market(BitPAIR,
-                            bitshares_instance=BitShares(nodes, num_retries=0),
-                            mode='head')
+                bitshares_instance=BitShares(nodes, num_retries=0),
+                mode='head')
             connected = 1
         except:
             pass
@@ -386,16 +313,16 @@ def reconnect(BitPAIR, USERNAME, PASS_PHRASE):
         market.bitshares.wallet.unlock(PASS_PHRASE)
     except:
         pass
-    #zprint('CONNECTED')
     return account, market, nodes
 
-def book(a=None, b=None):  # updates orderbook details
+def book(a=None, b=None):  # updates orderbook data
 
     account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
     node = nodes[0]
     begin = time.time()
     while time.time() < (begin + TIMEOUT):
         time.sleep(PAUSE)
+        time.sleep(DEV)  # SLOWS ANIMATION FOR DEVELOPMENT
         try:
             # add unix time to trades dictionary
             trades = market.trades(limit=100)
@@ -463,8 +390,8 @@ def book(a=None, b=None):  # updates orderbook details
             # display orderbooks
             print("\033c")
             print(time.ctime(), '                            RUN TIME',
-                (int(time.time())-BEGIN),
-                'EPOCH', b, 'PROCESS', a, '/', CONNECTIONS)
+                 (int(time.time()) - BEGIN),
+                  'EPOCH', b, 'PROCESS', a, '/', CONNECTIONS)
             print('                        PING',
                  (elapsed), '   ', node)
             print('')
@@ -511,69 +438,78 @@ def book(a=None, b=None):  # updates orderbook details
             print('')
             print('COMPLETE HOLDINGS:')
             print(cbalances)
-        except:
-            zprint('BOOK')
+
+        except Exception as ex:
+            msg = ('\n\n' + str(time.ctime()) + ' ' + str(type(ex).__name__) +
+                   ' BOOK FAILED, RECONNECTING ' + str(node) +
+                   ' EPOCH ' + str(b) + ' PROCESS ' + str(a))
+            race_append(doc='microDEX_log.txt', text=msg)
+            account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
             pass
 
 def dex_withdraw():
 
+    # FIXME
     # undeveloped definition for withdrawals
-    from bitshares import BitShares
-    bitshares = BitShares()
-    bitshares.wallet.unlock("wallet-passphrase")
     bitshares.transfer(
-        to=send_to,
-        amount=send_amount,
-        asset=BTS,
+        to=None,
+        amount=None,
+        asset=None,
         memo=None,
-        account=account)
+        account=None)
 
 def dex_buy():
 
     # update wallet unlock to low latency node
     zprint('BUY')
     account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
-    try:
-        market.bitshares.wallet.unlock(PASS_PHRASE)
-    except:
-        pass
     # attempt buy 10X or until satisfied
 
-    def buy(price, amount):
+    def buy(price, amount, market):
         confirm.destroy()
         zprint('CONFIRMED')
         attempt = 1
         while attempt:
             try:
-                details = (market.buy(price, amount))
-                print (details)
+                msg = market.buy(price, amount)
+                msg = ('\n\n' + str(time.ctime()) + ' BUY ' +
+                       str(amount) + ' of ' + str(BitPAIR) + ' @ ' +
+                       str(price) + '\n' + str(msg))
+                print (msg)
                 attempt = 0
-            except:
-                zprint(("buy attempt %s failed" % attempt))
+            except Exception as ex:
+                msg = ('\n\n' + str(time.ctime()) + ' ' + str(attempt)
+                       + ' ' + str(type(ex).__name__) +
+                       ' BUY FAILED, RECONNECTING '
+                       + str(nodes[0]) + ' ' + str(price) + ' ' + str(amount))
+                zprint(msg)
+                race_append(doc='microDEX_log.txt', text=msg)
+                account, market, nodes = reconnect(
+                    BitPAIR, USERNAME, PASS_PHRASE)
                 attempt += 1
                 if attempt > 10:
-                    zprint('buy aborted')
+                    zprint('BUY ABORTED')
                     return
                 pass
+        race_append(doc='microDEX_log.txt', text=msg)
+
     # interact with tkinter
     confirm = Tk()
     if market.bitshares.wallet.unlocked():
         price = buy_price.get()
         amount = buy_amount.get()
         if price == '':
-            price = 2 * float(market.ticker()['latest'])
-            sprice = 'market RATE'
+            price = 1.1 * float(market.ticker()['latest'])
         if amount == '':
             amount = ANTISAT
         try:
-            price = float(price)
+            price = decimal(price)
             amount = float(amount)
-            if price != ANTISAT:
-                sprice = '%.16f' % price
             currency = float(account.balance(BitCURRENCY))
             if amount > (0.998) * currency / float(price):
                 amount = (0.998) * currency / float(price)
-            samount = str(amount)
+            sprice = str(price)[:16]
+            samount = str(amount)[:16]
             sorder = str(
                 'CONFIRM BUY ' +
                 samount +
@@ -586,7 +522,7 @@ def dex_buy():
                 Button(
                     confirm,
                     text='CONFIRM BUY',
-                    command=lambda: buy(price, amount)).grid(
+                    command=lambda: buy(price, amount, market)).grid(
                     row=1,
                     column=0,
                     pady=8)
@@ -636,43 +572,53 @@ def dex_sell():
     # update wallet unlock to low latency node
     zprint('SELL')
     account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
-
     # attempt to sell 10X or until satisfied
-    def sell(price, amount):
+
+    def sell(price, amount, market):
         confirm.destroy()
         zprint('CONFIRMED')
         attempt = 1
         while attempt:
             try:
-                details = market.sell(price, amount)
-                print (details)
+                msg = market.sell(price, amount)
+                msg = ('\n\n' + str(time.ctime()) + ' SELL ' +
+                       str(amount) + ' of ' + str(BitPAIR) + ' @ ' +
+                       str(price) + '\n' + str(msg))
+                print (msg)
                 attempt = 0
-            except:
-                zprint(("sell attempt %s failed" % attempt))
+            except Exception as ex:
+                msg = ('\n\n' + str(time.ctime()) + ' ' + str(attempt)
+                       + ' ' + str(type(ex).__name__) +
+                       ' SELL FAILED, RECONNECTING '
+                       + str(nodes[0]) + ' ' + str(price) + ' ' + str(amount))
+                zprint(msg)
+                race_append(doc='microDEX_log.txt', text=msg)
+                account, market, nodes = reconnect(
+                    BitPAIR, USERNAME, PASS_PHRASE)
                 attempt += 1
                 if attempt > 10:
-                    zprint('sell aborted')
+                    zprint('SELL ABORTED')
                     return
                 pass
+        race_append(doc='microDEX_log.txt', text=msg)
+
     # interact with tkinter
     confirm = Tk()
     if market.bitshares.wallet.unlocked():
         price = sell_price.get()
         amount = sell_amount.get()
         if price == '':
-            price = 0.5 * float(market.ticker()['latest'])
-            sprice = 'market RATE'
+            price = 0.9 * float(market.ticker()['latest'])
         if amount == '':
             amount = ANTISAT
         try:
-            price = float(price)
+            price = decimal(price)
             amount = float(amount)
-            if price != SATOSHI:
-                sprice = '%.16f' % price
             assets = float(account.balance(BitASSET))
             if amount > (0.998 * assets):
                 amount = 0.998 * assets
-            samount = str(amount)
+            sprice = str(price)[:16]
+            samount = str(amount)[:16]
             sorder = str(
                 'CONFIRM SELL ' +
                 samount +
@@ -686,7 +632,7 @@ def dex_sell():
                 Button(
                     confirm,
                     text='CONFIRM SELL',
-                    command=lambda: sell(price, amount)).grid(
+                    command=lambda: sell(price, amount, market)).grid(
                     row=1,
                     column=0,
                     pady=8)
@@ -735,7 +681,8 @@ def dex_cancel():
     account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
     orders = market.accountopenorders()
     # attempt cancel all 10X or until satisfied
-    def cancel():
+
+    def cancel(market):
         confirm.destroy()
         zprint('CONFIRMED')
         attempt = 1
@@ -744,16 +691,28 @@ def dex_cancel():
             order_list.append(order['id'])
         while attempt:
             try:
-                details = market.cancel(order_list)
-                print (details)
+                msg = market.cancel(order_list)
+                msg = ('\n\n' + str(time.ctime()) + ' CANCEL ' +
+                       str(order_list) + ' of ' + str(BitPAIR) +
+                       '\n' + str(msg))
+                print (msg)
                 attempt = 0
-            except:
-                zprint((attempt, 'cancel failed', order_list))
+            except Exception as ex:
+                msg = ('\n\n' + str(time.ctime()) + ' ' + str(attempt)
+                       + ' ' + str(type(ex).__name__) +
+                       ' CANCEL FAILED, RECONNECTING '
+                       + str(nodes[0]) + ' ' + str(order_list))
+                zprint(msg)
+                race_append(doc='microDEX_log.txt', text=msg)
+                account, market, nodes = reconnect(
+                    BitPAIR, USERNAME, PASS_PHRASE)
                 attempt += 1
                 if attempt > 10:
-                    zprint('cancel aborted')
+                    zprint('CANCEL ABORTED')
                     return
                 pass
+        race_append(doc='microDEX_log.txt', text=msg)
+
     # interact with tkinter
     confirm = Tk()
     if len(orders):
@@ -766,7 +725,7 @@ def dex_cancel():
             Button(
                 confirm,
                 text='CONFIRM CANCEL ALL',
-                command=cancel).grid(
+                command=lambda: cancel(market)).grid(
                 row=1,
                 column=0,
                 pady=8)
@@ -832,21 +791,26 @@ def launch_book(a):
             p[str(b)] = Process(target=book, args=(a, b,))
             p[str(b)].daemon = True
             p[str(b)].start()
+            # assign each child a random lifespan
             p[str(b)].join(TIMEOUT * 0.5 + TIMEOUT * random())
-        except:
-            print('book failed', a , b)
+
+        except Exception as ex:
+            msg = ('\n\n' + str(time.ctime()) + ' ' + str(a, b)
+                   + ' ' + str(type(ex).__name__) +
+                   ' LAUNCH BOOK')
+            race_append(doc='microDEX_log.txt', text=msg)
             pass
 
-def float_sma(array, period):  # floating point periods accepted
+def float_sma(array, period):
 
     def moving_average(array, period):  # numpy array moving average
         csum = np.cumsum(array, dtype=float)
         csum[period:] = csum[period:] - csum[:-period]
         return csum[period - 1:] / period
 
-    if period == int(period):
+    if period == int(period):  # simple moving average
         return moving_average(array, int(period))
-    else:
+    else:  # simple moving average w/ decimal period
         floor_period = int(period)
         ceil_period = int(floor_period + 1)
         floor_ratio = ceil_period - period
@@ -863,7 +827,6 @@ def chartdata(pair, start, stop, period):  # Public API cryptocompare
 
     #{"time","close","high","low","open","volumefrom","volumeto"}
     # docs at https://www.cryptocompare.com/api/
-
     if period in [60, 300, 900, 1800, 3600, 7200, 14400, 43200, 86400]:
 
         uri = 'https://min-api.cryptocompare.com/data/'
@@ -927,17 +890,16 @@ def live_candles(pair, candle, depth):  # Current HLOCV arrays
         d['volume'].append(raw[i]['volumefrom'])
     # filter absurd wicks
     for i in range(len(d['unix'])):
-        if d['high'][i] > 2*d['close'][i]:
-                d['high'][i] = 2*d['close'][i]
-        if d['low'][i] < 0.5*d['close'][i]:
-                d['low'][i] = 0.5*d['close'][i]
+        if d['high'][i] > 3 * d['close'][i]:
+                d['high'][i] = 3 * d['close'][i]
+        if d['low'][i] < 0.4 * d['close'][i]:
+                d['low'][i] = 0.4 * d['close'][i]
     d['unix'] = np.array(d['unix'][-depth:])
     d['high'] = np.array(d['high'][-depth:])
     d['low'] = np.array(d['low'][-depth:])
     d['open'] = np.array(d['open'][-depth:])
     d['close'] = np.array(d['close'][-depth:])
     d['volume'] = np.array(d['volume'][-depth:])
-
     return d
 
 def plot_format(log):
@@ -957,19 +919,17 @@ def plot_format(log):
     plt.minorticks_on
     plt.grid(b=True, which='major', color='0.2', linestyle='-')
     plt.grid(b=True, which='minor', color='0.2', linestyle='-')
-
     if log == 1:
         plt.ylabel('LOGARITHMIC PRICE SCALE')
         plt.yscale('log')
-    ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    ax.yaxis.set_minor_formatter(matplotlib.ticker.ScalarFormatter())
-    ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter("%.8f"))
-    ax.yaxis.set_minor_formatter(matplotlib.ticker.FormatStrFormatter("%.8f"))
+    ax.yaxis.set_major_formatter(tkr.ScalarFormatter())
+    ax.yaxis.set_minor_formatter(tkr.ScalarFormatter())
+    ax.yaxis.set_major_formatter(tkr.FormatStrFormatter("%.8f"))
+    ax.yaxis.set_minor_formatter(tkr.FormatStrFormatter("%.8f"))
     plt.autoscale(enable=True, axis='y')
     plt.tight_layout()
-
     if log == 1:
-        # force 'autoscale'
+        # manifest 'logarithmic autoscale'
         yd = []  # matrix of y values from all lines on plot
         xd = []  # matrix of x values from all lines on plot
         for n in range(len(plt.gca().get_lines())):
@@ -982,7 +942,7 @@ def plot_format(log):
         xd = [item for sublist in xd for item in sublist]
         xmin, xmax = np.min(xd), np.max(xd)
         ax.set_xlim([xmin, xmax])
-        # add sub minor ticks
+        # add sub minor ticks on log scale
         set_sub_formatter = []
         sub_ticks = [10, 11, 12, 14, 16, 18, 22, 25, 35, 45]
         sub_range = [-8, 8]
@@ -995,18 +955,16 @@ def plot_format(log):
                 k.append(l)
         ax.set_yticks(k)
 
-
-
+    # Format X axis
     def timestamp(x, pos):
         return (datetime.fromtimestamp(x)).strftime('%m/%d %H:%M')
-    ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(timestamp))
+    ax.xaxis.set_major_formatter(tkr.FuncFormatter(timestamp))
     plt.gcf().autofmt_xdate(rotation=30)
     plt.gcf().canvas.set_window_title('microDEX CHART')
 
 def charts():
 
     def draw_chart():
-        zprint('UPDATING CHART DATA')
         ASSET = BitASSET.replace('OPEN.', '')
         CURRENCY = BitCURRENCY.replace('OPEN.', '')
         PAIR = ('%s_%s' % (CURRENCY, ASSET))
@@ -1033,21 +991,20 @@ def charts():
         cex_d_high = cex_d_high[-crop:-50]
         cex_d_low = cex_d_low[-crop:-50]
         cex_d_x = [(i + 43400) for i in cex_d_x]
-        try:
-            ma1_2h_period = 12.0 * float(MA1.get())
-            ma2_2h_period = 12.0 * float(MA2.get())
-        except:
-            ma1_2h_period = 120
-            ma2_2h_period = 600
+        ma1_d_period = float(MA1.get())
+        ma2_d_period = float(MA2.get())
+        ma1_2h_period = 12.0 * ma1_d_period
+        ma2_2h_period = 12.0 * ma2_d_period
+        ma1_c1 = float(MA1c1.get())
+        ma2_c1 = float(MA2c1.get())
         ma1_2h = float_sma(cex_2h_close, ma1_2h_period)
         ma2_2h = float_sma(cex_2h_close, ma2_2h_period)
         min_len = min(len(ma1_2h), len(ma2_2h))
         ma1_2h = ma1_2h[-min_len:]
         ma2_2h = ma2_2h[-min_len:]
         ma_x_2h = cex_2h_x[-min_len:]
-        ma_x_2h = [(i + 7200) for i in ma_x_2h]
-        ma1_d_period = ma1_2h_period /12.0
-        ma2_d_period = ma2_2h_period /12.0
+        ma1_2h = [i * ma1_c1 for i in ma1_2h]
+        ma2_2h = [i * ma2_c1 for i in ma2_2h]
         if min(ma1_d_period, ma2_d_period) > 2:
             ma1_d = float_sma(cex_d_close, ma1_d_period)
             ma2_d = float_sma(cex_d_close, ma2_d_period)
@@ -1056,52 +1013,59 @@ def charts():
             ma2_d = ma2_d[-min_len:]
             ma_x_d = cex_d_x[-min_len:]
             ma_x_d = [(i + 86400) for i in ma_x_d]
+            ma1_d = [i * ma1_c1 for i in ma1_d]
+            ma2_d = [i * ma2_c1 for i in ma2_d]
 
         account, market, nodes = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
         trades = market.trades(limit=100)
         for t in range(len(trades)):
             ts = time.strptime(str(trades[t]['time']), '%Y-%m-%d %H:%M:%S')
             trades[t]['unix'] = int(time.mktime(ts))
-        dex_x, dex_y = [],[]
+        dex_x, dex_y = [], []
         for t in range(len(trades)):
-            dex_x.append(float(trades[t]['unix']))
-            dex_y.append(float(trades[t]['price']))
+            if float(trades[t]['price']) > 0:
+                dex_x.append(float(trades[t]['unix']))
+                dex_y.append(float(trades[t]['price']))
+
         plt.cla
         ax = plt.gca()
         log = int((scale.var).get())
         for l in ax.get_lines():
                 l.remove()
         fig.patch.set_facecolor('0.15')
+
         plt.plot(cex_5m_x, cex_5m_high,
-            markersize=1, marker='.', color='magenta')
+                 markersize=1, marker='.', color='magenta')
         plt.plot(cex_5m_x, cex_5m_low,
-            markersize=1, marker='.', color='magenta')
+                 markersize=1, marker='.', color='magenta')
         plt.plot(cex_5m_x, cex_5m_close,
-            markersize=1, marker='.', color='yellow')
+                 markersize=1, marker='.', color='yellow')
         plt.plot(cex_2h_x, cex_2h_high,
-            markersize=1, marker='.', color='magenta')
+                 markersize=1, marker='.', color='magenta')
         plt.plot(cex_2h_x, cex_2h_low,
-            markersize=1, marker='.', color='magenta')
+                 markersize=1, marker='.', color='magenta')
         plt.plot(cex_2h_x, cex_2h_close,
-            markersize=1, marker='.', color='yellow')
+                 markersize=1, marker='.', color='yellow')
         plt.plot(cex_d_x, cex_d_high,
-            markersize=1, marker='.', color='magenta')
+                 markersize=1, marker='.', color='magenta')
         plt.plot(cex_d_x, cex_d_low,
-            markersize=1, marker='.', color='magenta')
+                 markersize=1, marker='.', color='magenta')
         plt.plot(cex_d_x, cex_d_close,
-            markersize=1, marker='.', color='yellow')
+                 markersize=1, marker='.', color='yellow')
         plt.plot(ma_x_2h, ma1_2h,
-            markersize=1, marker='.', color='pink')
+                 markersize=1, marker='.', color='pink')
         plt.plot(ma_x_2h, ma2_2h,
-            markersize=1, marker='.', color='aqua')
+                 markersize=1, marker='.', color='aqua')
+
         if min(ma1_d_period, ma2_d_period) > 2:
             plt.plot(ma_x_d, ma1_d,
-                markersize=1, marker='.', color='pink')
+                     markersize=1, marker='.', color='pink')
             plt.plot(ma_x_d, ma2_d,
-                markersize=1, marker='.', color='aqua')
+                     markersize=1, marker='.', color='aqua')
+
         plt.plot(dex_x, dex_y, markersize=6, marker='.', color='white')
-        interface.after(60000, draw_chart)        
         plot_format(log)
+        interface.after(300000, draw_chart)  # refresh in milliseconds
         plt.show()
     fig = plt.figure()
     interface = Tk()
@@ -1110,196 +1074,228 @@ def charts():
         to=100,
         resolution=0.01,
         orient=HORIZONTAL,
-        length=800,
-        label='Moving Average 1')
+        length=500)
     MA2 = Scale(
         from_=0.2,
         to=100,
         resolution=0.01,
         orient=HORIZONTAL,
-        length=800,
-        label='Moving Average 2')
+        length=500)
+    MA1c1 = Scale(
+        from_=0.333,
+        to=3,
+        resolution=0.01,
+        orient=HORIZONTAL,
+        length=200)
+    MA2c1 = Scale(
+        from_=0.333,
+        to=3,
+        resolution=0.01,
+        orient=HORIZONTAL,
+        length=200)
+
     v = IntVar()
     scale = Checkbutton(text="LOG SCALE", variable=v)
     scale.var = v
-    Label(interface, text="CHART UPDATE WIDGET, DO NOT CLOSE").grid(row=0, column=0)
     MA1.set(10)
     MA2.set(50)
+    MA1c1.set(1)
+    MA2c1.set(1)
+    Label(text='Moving Average 1 and Coeff').pack()
     MA1.pack()
+    MA1c1.pack()
+    Label(text='Moving Average 2 and Coeff').pack()
     MA2.pack()
+    MA2c1.pack()
     scale.pack()
     Button(text='UPDATE CHART', command=draw_chart).pack()
     interface.after(1, draw_chart)
-    interface.title('PLOT WIDGET: DO NOT CLOSE')
+    interface.title('microDEX plot updater')
     interface.geometry("0x0+0+0")
+    interface.lift()
+    interface.call('wm', 'attributes', '.', '-topmost', True)
     interface.mainloop()
 
-# run nodes latency test as background process
-servers = Process(target=nodes_loop)
-servers.daemon = True
-servers.start()
+def main():
 
-# sign in
-print("\033c")
-print('')
-print('')
-print("")
-print("                                     ______   ________  ____  ____  ")
-print("                                    (_   _ `.(_   __  |(_  _)(_  _) ")
-print("     __  __  ____  ___  ____   ___    | | `. \ | |_ \_|  \ \__/ /   ")
-print("    (  \/  )(_  _)/ __)(  _ \ / _ \   | |  | | |  _) _    ) __ (    ")
-print("     )    (  _||_( (__  )   /( (_) ) _| |_.' /_| |__/ | _/ /  \ \_  ")
-print("    (_/\/\_)(____)\___)(_)\_) \___/ (______.'(________|(____)(____) ")
-print('   =================================================================')
-print('           ' + VERSION)
-print('   =================================================================')
-print('')
-print('')
+    global USERNAME, BitPAIR, BitASSET, BitCURRENCY, BEGIN
+    global account, market, PASS_PHRASE
+    global login, buy_price, buy_amount, sell_price, sell_amount, lock
 
-valid = 0
-while not valid:
-    try:
-        USERNAME =input('           Account: ')
-        account = Account(
-            USERNAME,
-            bitshares_instance=BitShares(
-                nodes,
-                num_retries=0))
-        valid = 1
-    except Exception as ex:
-        print (type(ex).__name__, 'try again...')
-        pass
-print('')
-print('      Welcome Back: %s' % account)
-print('')
-print(' Default market is: %s' % BitPAIR)
-print('')
-print('Input new Bitshares DEX market below or press ENTER to skip')
-print('e.g.: BTS:CNY, BTS:OPEN.BTC, OPEN.LTC:OPEN.BTC, OPEN.BTC:USD')
-print('')
-valid = 0
-default = BitPAIR
-while not valid:
-    try:
-        BitPAIR = input('  Change market to: ') or default
-        BitASSET = BitPAIR.split(':')[0]
-        BitCURRENCY = BitPAIR.split(':')[1]
-        market = Market(
-            BitPAIR,
-            bitshares_instance=BitShares(
-                nodes,
-                num_retries=0),
-            mode='head')
-        valid = 1
-    except Exception as ex:
-        print (type(ex).__name__, 'try again...')
-        pass
-print('')
-print('Enter PASS PHRASE below to unlock your wallet or press ENTER to skip')
-print('')
-valid = 0
-default = ''
-while not valid:
-    try:
-        PASS_PHRASE = getpass(prompt='       Pass Phrase: ') or default
-        if PASS_PHRASE != '':
-            market.bitshares.wallet.unlock(PASS_PHRASE)
-            print('')
-            print('AUTHENTICATED - YOUR WALLET IS UNLOCKED')
+    version()
+    constants()
+    timing()
+
+    # run nodes latency test as background process
+    servers = Process(target=nodes_loop)
+    servers.daemon = False
+    servers.start()
+
+    # sign in
+    print("\033c")
+    print('')
+    print('')
+    print("")
+    print("                                     ______   ________  ____  ____  ")
+    print("                                    (_   _ `.(_   __  |(_  _)(_  _) ")
+    print("     __  __  ____  ___  ____   ___    | | `. \ | |_ \_|  \ \__/ /   ")
+    print("    (  \/  )(_  _)/ __)(  _ \ / _ \   | |  | | |  _) _    ) __ (    ")
+    print("     )    (  _||_( (__  )   /( (_) ) _| |_.' /_| |__/ | _/ /  \ \_  ")
+    print("    (_/\/\_)(____)\___)(_)\_) \___/ (______.'(________|(____)(____) ")
+    print('   =================================================================')
+    print('           ' + VERSION)
+    print('   =================================================================')
+    print('')
+    print('')
+
+    valid = 0
+    while not valid:
+        try:
+            USERNAME = input('           Account: ')
+            account = Account(
+                USERNAME,
+                bitshares_instance=BitShares(
+                    nodes,
+                    num_retries=0))
             valid = 1
-        else:
-            print('')
-            print('SKIP AUTHENTICATION - YOUR WALLET IS LOCKED')
+        except Exception as ex:
+            print (type(ex).__name__, 'try again...')
+            pass
+    print('')
+    print('      Welcome Back: %s' % account)
+    print('')
+    print(' Default market is: %s' % BitPAIR)
+    print('')
+    print('Input new Bitshares DEX market below or press ENTER to skip')
+    print('e.g.: BTS:CNY, BTS:OPEN.BTC, OPEN.LTC:OPEN.BTC, OPEN.BTC:USD')
+    print('')
+    valid = 0
+    default = BitPAIR
+    while not valid:
+        try:
+            BitPAIR = input('  Change market to: ') or default
+            BitASSET = BitPAIR.split(':')[0]
+            BitCURRENCY = BitPAIR.split(':')[1]
+            market = Market(
+                BitPAIR,
+                bitshares_instance=BitShares(
+                    nodes,
+                    num_retries=0),
+                mode='head')
             valid = 1
-    except Exception as ex:
-        print (type(ex).__name__, 'try again...')
-        pass
-print('')
-print('Connecting to the Bitshares Distributed Exchange, please wait...')
-print('')
+        except Exception as ex:
+            print (type(ex).__name__, 'try again...')
+            pass
+    print('')
+    print('Enter PASS PHRASE below to unlock your wallet or press ENTER to skip')
+    print('')
+    valid = 0
+    default = ''
+    while not valid:
+        try:
+            PASS_PHRASE = getpass(prompt='       Pass Phrase: ') or default
+            if PASS_PHRASE != '':
+                market.bitshares.wallet.unlock(PASS_PHRASE)
+                print('')
+                print('AUTHENTICATED - YOUR WALLET IS UNLOCKED')
+                valid = 1
+            else:
+                print('')
+                print('SKIP AUTHENTICATION - YOUR WALLET IS LOCKED')
+                valid = 1
+        except Exception as ex:
+            print (type(ex).__name__, 'try again...')
+            pass
+    print('')
+    print('Connecting to the Bitshares Distributed Exchange, please wait...')
+    print('')
 
-# begin several concurrent background processes of launch_book()
-BEGIN = int(time.time())
-multinode = {}
-for a in range(CONNECTIONS):
-    multinode[str(a)] = Process(target=launch_book, args=(a,))
-    multinode[str(a)].start()
-    time.sleep(PAUSE)
+    # begin several concurrent background processes of launch_book()
+    BEGIN = int(time.time())
+    multinode = {}
+    for a in range(CONNECTIONS):
+        multinode[str(a)] = Process(target=launch_book, args=(a,))
+        multinode[str(a)].daemon = False
+        multinode[str(a)].start()
+        time.sleep(PAUSE)
 
-# begin live charts
-try:
-    c = Process(target=charts)
-    c.daemon = True
-    c.start()
-except:
-    print('WARN: plotting only available for crypto altcoins')
+    # begin live charts
+    try:
+        c = Process(target=charts)
+        c.daemon = True
+        c.start()
+    except:
+        print('WARN: plotting only available for crypto altcoins')
 
-time.sleep(2)
-print("\033c")
-print('')
-print('')
-print('')
-print('initializing microDEX...')
+    print("\033c")
+    print('')
+    print('')
+    print('')
+    print('initializing microDEX...')
 
-# tkinter primary busybox
-time.sleep(15)
-master = Tk()
-lock = StringVar()
-lock.set('UNLOCKED')
-if market.bitshares.wallet.locked():
-    lock.set('LOCKED')
-master.title(VERSION)
-Label(master, text="PRICE:").grid(row=0, column=0, sticky=E)
-Label(master, text="AMOUNT:").grid(row=1, column=0, sticky=E)
-Label(master, text="PRICE:").grid(row=0, column=2, sticky=E)
-Label(master, text="AMOUNT:").grid(row=1, column=2, sticky=E)
-Label(master, textvariable=lock).grid(row=6, column=2, sticky=W)
-Label(master, text=
-      "   *ORDERS TAKE A FEW SECONDS TO APPEAR; CLICK ONCE, THEN CONFIRM*"
-      ).grid(row=7, column=0, columnspan=4, sticky=W)
-buy_price = Entry(master)
-buy_amount = Entry(master)
-sell_price = Entry(master)
-sell_amount = Entry(master)
-login = Entry(master)
-buy_price.grid(row=0, column=1)
-buy_amount.grid(row=1, column=1)
-sell_price.grid(row=0, column=3)
-sell_amount.grid(row=1, column=3)
-login.grid(row=6, column=1)
-Button(
-    master,
-    text='BUY',
-    command=dex_buy).grid(
-    row=3,
-    column=1,
-    sticky=W,
-    pady=4)
-Button(
-    master,
-    text='SELL',
-    command=dex_sell).grid(
-    row=3,
-    column=3,
-    sticky=W,
-    pady=4)
-Button(
-    master,
-    text='CANCEL ALL',
-    command=dex_cancel).grid(
-    row=5,
-    column=0,
-    sticky=E,
-    pady=4)
-Button(
-    master,
-    text='LOCK/UNLOCK',
-    command=dex_auth_gui).grid(
-    row=6,
-    column=0,
-    sticky=E,
-    pady=4)
-master.geometry('+550+700')
-master.lift()
-master.call('wm', 'attributes', '.', '-topmost', True)
-mainloop()
+    # tkinter primary busybox
+    time.sleep(MASTER)
+    master = Tk()
+    lock = StringVar()
+    lock.set('UNLOCKED')
+    if market.bitshares.wallet.locked():
+        lock.set('LOCKED')
+    master.title(VERSION)
+    Label(master, text="PRICE:").grid(row=0, column=0, sticky=E)
+    Label(master, text="AMOUNT:").grid(row=1, column=0, sticky=E)
+    Label(master, text="PRICE:").grid(row=0, column=2, sticky=E)
+    Label(master, text="AMOUNT:").grid(row=1, column=2, sticky=E)
+    Label(master, textvariable=lock).grid(row=6, column=2, sticky=W)
+    Label(master, text=
+          "   *ORDERS TAKE A FEW SECONDS TO APPEAR; CLICK ONCE, THEN CONFIRM*"
+          ).grid(row=7, column=0, columnspan=4, sticky=W)
+    buy_price = Entry(master)
+    buy_amount = Entry(master)
+    sell_price = Entry(master)
+    sell_amount = Entry(master)
+    login = Entry(master)
+    buy_price.grid(row=0, column=1)
+    buy_amount.grid(row=1, column=1)
+    sell_price.grid(row=0, column=3)
+    sell_amount.grid(row=1, column=3)
+    login.grid(row=6, column=1)
+    Button(
+        master,
+        text='BUY',
+        command=dex_buy).grid(
+        row=3,
+        column=1,
+        sticky=W,
+        pady=4)
+    Button(
+        master,
+        text='SELL',
+        command=dex_sell).grid(
+        row=3,
+        column=3,
+        sticky=W,
+        pady=4)
+    Button(
+        master,
+        text='CANCEL ALL',
+        command=dex_cancel).grid(
+        row=5,
+        column=0,
+        sticky=E,
+        pady=4)
+    Button(
+        master,
+        text='LOCK/UNLOCK',
+        command=dex_auth_gui).grid(
+        row=6,
+        column=0,
+        sticky=E,
+        pady=4)
+    master.geometry('+550+700')
+    master.lift()
+    master.call('wm', 'attributes', '.', '-topmost', True)
+    mainloop()
+
+if __name__ == "__main__":
+
+    main()
