@@ -1,5 +1,5 @@
 # extinction-event
-cryptocurrency algo trading tools
+Cryptocurrency Algo Trading Tools
 
 *Tested on Raspberry Pi3*
 
