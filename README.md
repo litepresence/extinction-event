@@ -46,10 +46,12 @@ https://matplotlib.org/users/installing.html
 
 Install pybitshares
 
-Install with pip:
+Install with apt-get install:
 	
 	sudo apt-get install libffi-dev libssl-dev python3-dev scrypt
-	
+
+Install pybitshares with pip3 
+
 	sudo pip3 install bitshares
 	
 http://docs.pybitshares.com/en/latest/installation.html
