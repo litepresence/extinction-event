@@ -1,6 +1,12 @@
 # extinction-event
 cryptocurrency algo trading tools
 
+*Tested on Raspberry Pi3*
+
+*Tested on ubuntu 16.04*
+
+*Tested on debian-9.4.0-amd64*
+
 ## EXTINCTION EVENT REQUIRES THE FOLLOWING TO BE INSTALLED:
 * Python 3
 * PIP3
@@ -41,6 +47,10 @@ https://matplotlib.org/users/installing.html
 Install pybitshares
 
 Install with pip:
-	sudo apt-get install libffi-dev libssl-dev python3-dev
+	
+	sudo apt-get install libffi-dev libssl-dev python3-dev scrypt
+	
 	sudo pip3 install bitshares
+	
+http://docs.pybitshares.com/en/latest/installation.html
 
