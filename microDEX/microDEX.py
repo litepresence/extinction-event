@@ -36,7 +36,7 @@ def version():
 
     global VERSION
 
-    VERSION = 'microDEX v0.00000012 - low latency minimalist UI'
+    VERSION = 'microDEX v0.00000013 - low latency minimalist UI'
 
     sys.stdout.write('\x1b]2;' + VERSION + '\x07')  # terminal #title
 
@@ -504,8 +504,8 @@ def dex_buy():
                 msg = (' BUY ' + str(amount) + ' of ' + str(BitPAIR) +
                        ' @ ' + str(price) + '\n' + str(msg))
                 print (msg)
-            except Exception as e:
                 attempt = 0
+            except Exception as e:
                 msg = msg_(e)
                 race_append(doc='microDEX_log.txt', text=msg)
                 msg += (+ str(attempt) + ' ' + ' BUY FAILED, RECONNECTING '
@@ -614,7 +614,6 @@ def dex_sell():
                 print (msg)
                 attempt = 0
             except Exception as e:
-                attempt = 0
                 msg = msg_(e)
                 race_append(doc='microDEX_log.txt', text=msg)
                 msg += (+ str(attempt) + ' ' + ' SELL FAILED, RECONNECTING '
@@ -725,7 +724,6 @@ def dex_cancel():
                 print (msg)
                 attempt = 0
             except Exception as e:
-                attempt = 0
                 msg = msg_(e)
                 race_append(doc='microDEX_log.txt', text=msg)
                 msg += (+ str(attempt) + ' ' + ' CANCEL FAILED, RECONNECTING '
