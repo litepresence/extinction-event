@@ -44,7 +44,6 @@ Install Matplotlib
 
 https://matplotlib.org/users/installing.html
 
-Install pybitshares
 
 Install with apt-get install:
 	
