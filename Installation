@@ -34,7 +34,7 @@ STEP 1) LINUX
 
     Make sure system is fully updated.
 
-	    sudo apt-get update
+	sudo apt-get update
 
 STEP 2) PYTHON
 ==============================
@@ -167,7 +167,7 @@ STEP 11) INSTALL BITSHARES GRAPHICAL UI
     You should come away from step 11 with
 
         account name
-        graphical UI account password
+        Reference UI account password
         WIF KEY
 
     
