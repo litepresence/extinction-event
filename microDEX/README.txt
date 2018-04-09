@@ -8,3 +8,5 @@ over a single cup of coffee?
 
 
 [ANN] microDEX
+
+see 'Installation' to begin trading
