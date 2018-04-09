@@ -1,1 +1,0 @@
-['wss://us.nodes.bitshares.ws/wss', 'wss://api.bts.blckchnd.com/wss', 'wss://la.dexnode.net/wss', 'wss://dex.rnglab.org/wss', 'wss://eu-west-1.bts.crypto-bridge.org/wss', 'wss://bts.proxyhosts.info/wss', 'wss://this.uptick.rocks/ws', 'wss://b.mrx.im/wss', 'wss://ap-northeast-2.bts.crypto-bridge.org/wss', 'wss://eu.nodes.bitshares.ws/wss']
