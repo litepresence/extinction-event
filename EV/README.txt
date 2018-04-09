@@ -1,36 +1,24 @@
-5 NODE VERIFIED LAST PRICE
+Extinction Event
 
-nodes.py and last.py should be run in seperate terminals
+Stand alone algo trading bot framework for Bitshares DEX
 
-nodes.py creates file nodes.txt
-last.py creates file last.txt and appends to file blacklist.txt
+Gathers centralized exchange data to make decisions
 
-nodes.txt is the top 10 latency sorted nodes of about 50 known nodes; updated approx every 2 minutes
+Works with most altcoin/bitcoin pairs available on the DEX
 
-last.txt uses nodes.txt to get price from 5 nodes, then makes a list "prices"
+Includes Backtesting Engine and Live Session
 
-then process that list of prices from 5 different nodes pseudocode:
+Comes standard with a simple moving average finite state machine:
 
+Bull Market
+    Selloff
+    Support
+Bear Market
+    Resistance
+    Despair
 
-if the spread of the prices is too wide:
-
-    append to file blacklist.txt the list of prices and the list of nodes used to gather them
-
-
-if all prices are same:
-    
-    last = latest price
-
-elif latest price less than 2% different than mean(prices):
-    
-    last = latest price
-  
-else:
-    try: last = mode(prices)
-    except: last = median(prices)
-
-return last
+With stoploss feature at Bull/Bear transition
 
 
-   
-   
+
+see 'Installation' to begin trading
