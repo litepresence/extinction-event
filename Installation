@@ -97,6 +97,7 @@ STEP 7C) PYBITSHARES - Upgrade
 STEP 8A) UPTICK - pip3 Installation
 ==============================
 
+    pip3 install wheel
     sudo pip3 install uptick --user --upgrade
 
 STEP 8B) UPTICK - Manual installation:
@@ -109,7 +110,7 @@ STEP 8B) UPTICK - Manual installation:
 STEP 8C) UPTICK - Upgrade
 ==============================
 
-	pip3 install --user --upgrade uptick
+    pip3 install --user --upgrade uptick
 
     http://docs.uptick.rocks/en/latest/installation.html
 
