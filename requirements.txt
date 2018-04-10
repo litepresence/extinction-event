@@ -1,0 +1,7 @@
+scrypt
+wheel
+matplotlib
+numpy
+requests
+bitshares>=0.1.12
+uptick
