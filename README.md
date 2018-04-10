@@ -7,12 +7,12 @@ The repo name "Extinction Event" was born of the notion that DEX tech combined w
 
 Clone repository
 
-    $ git clone git@github.com:litepresence/extinction-event.git
-    $ cd extinction-event
+	$ git clone git@github.com:litepresence/extinction-event.git
+	$ cd extinction-event
 
 Install environment
 	
-	$ apt-get install -y python3 python3-pip
+	$ sudo apt-get install -y python3 python3-pip
 
 Install virtual environment and setup 
 
@@ -23,4 +23,4 @@ Install virtual environment and setup
 	
 Run microDEX in virtual environment
 
-    $ python3 microDEX/microDEX.py
+	$ python3 microDEX/microDEX.py
