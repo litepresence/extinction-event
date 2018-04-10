@@ -1,5 +1,4 @@
-['wss://altcap.io/wss',
-'wss://ap-northeast-1.bts.crypto-bridge.org/wss',
+['wss://ap-northeast-1.bts.crypto-bridge.org/wss',
 'wss://ap-northeast-2.bts.crypto-bridge.org/wss',
 'wss://ap-southeast-1.bts.crypto-bridge.org/wss',
 'wss://ap-southeast-2.bts.crypto-bridge.org/wss',
