@@ -7,7 +7,7 @@ The repo name "Extinction Event" was born of the notion that DEX tech combined w
 
 Clone repository
 
-    $ git clonce git@github.com:litepresence/extinction-event.git
+    $ git clone git@github.com:litepresence/extinction-event.git
     $ cd extinction-event
 
 Install environment
