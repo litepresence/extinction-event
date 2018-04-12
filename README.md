@@ -1,6 +1,5 @@
-# ===============================================
-# Extinction Event and microDEX Installation
-# ===============================================
+# Installation
+
 
 Cryptocurrency algo trading tools
 
@@ -13,7 +12,7 @@ The repo name "Extinction Event" was born of the notion that DEX tech combined w
 	lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
 
 Make sure you are on an updated linux machine
-========================================================
+-----------------------------------------------
 
 	$ sudo apt-get update
 	
@@ -21,7 +20,7 @@ Make sure you are on an updated linux machine
 
 
 Clone repository
-========================================================
+-----------------------------------------------
 
     In terminal change directory to location you would like to install my repository, then:
 
@@ -30,7 +29,7 @@ Clone repository
 	h/t @sschiessl for setup.py & Makefile
 
 Change directory to:
-========================================================
+-----------------------------------------------
 	
 	$ cd extinction-event
 	$ dir
@@ -39,27 +38,28 @@ Change directory to:
 	along with some other dex tools under development.
 
 Install environment
-========================================================
+-----------------------------------------------
 	
 	$ sudo apt-get install -y python3 python3-pip
 	
 	*NOTE this requirement may already be satisified on your system, do it anyway to check
 
 Install virtual environment and requirements
-========================================================
+-----------------------------------------------
 
 	$ pip3 install virtualenv
 	$ virtualenv -p python3 env 
 	$ source env/bin/activate
 	$ pip install -r requirements.txt
 	
-TEST RUN microDEX in virtual environment
-========================================================
+Test microDEX in virtual environment
+-----------------------------------------------
 
 	$ python3 microDEX/microDEX.py
 	
-TEST RUN Extinction Event in virtual environment
-========================================================
+Test Extinction Event in virtual environment
+-----------------------------------------------
+
 
 	$ python3 EV/EV.py
 	
@@ -67,8 +67,9 @@ EV and microDEX are a bot framework and exchange interface respectively.
 You cannot use these to create accounts or withdraw funds.
 
 
-CREATE ACCOUNT ON BITSHARES GRAPHICAL UI
-========================================================
+Create an account on Bishares Reference UI
+-----------------------------------------------
+
 
 	To create an account:
 	
@@ -90,8 +91,8 @@ CREATE ACCOUNT ON BITSHARES GRAPHICAL UI
         WIF KEY
 
     
-CREATE LOCAL WALLET KEYS WITH UPTICK
-========================================================
+Create a local wallet with uptick
+-----------------------------------------------
 
     go to: https://media.readthedocs.org/pdf/uptick/latest/uptick.pdf
     perform steps:
@@ -117,8 +118,8 @@ CREATE LOCAL WALLET KEYS WITH UPTICK
         will then ask you for WIF KEY from step 11
 
 
-OBTAIN LATEST SCRIPTS
-========================================================
+Obtain latest scripts
+-----------------------------------------------
 
     Check back regularly to obtain latest version of Extinction Event and microDEX from official source:
 
@@ -148,9 +149,8 @@ OBTAIN LATEST SCRIPTS
     READ THE CODE - Check litepresence github regularly for latest version.
 
 
-
-RUN microDEX
-========================================================
+Run microDEX
+-----------------------------------------------
 
     in terminal navigate to the virtual environment folder containing microDEX.py
 
@@ -162,8 +162,8 @@ RUN microDEX
     enter market in format as shown
     enter local wallet password from step 12
 
-RUN Extinction Event
-========================================================
+Run Extinction Event
+-----------------------------------------------
 
     in terminal navigate to the virtual environment folder containing EV.py
 
@@ -178,7 +178,7 @@ RUN Extinction Event
 	will exit to terminal from either script ending all processes
 
 
-VISIT litepresence.com for machine optimized algorithms
+Visit litepresence.com for machine optimized algorithms
 ========================================================
 
 	using elitist bred quantum particle swarms I run hundreds of thousands of backtests to optimize algorithms
