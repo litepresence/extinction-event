@@ -1,17 +1,16 @@
-# ========================================================
+# ===============================================
 # Extinction Event and microDEX Installation
-# ========================================================
+# ===============================================
 
 Cryptocurrency algo trading tools
 
 The repo name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algo trading tech reaching the common user, in unison, would be an extinction level event for centralized web based exchanges, intrusive state AML/KYC policies, and orchestrated pump and dump schemes; all of which I consider anathema to individual financial liberty and decentralized free market economy. 
 
 # Extinction Event 
-# algo trading bot framework for trading on the Bitshares DEX with external data
+	algo trading bot framework for trading on the Bitshares DEX with external data
 
 # microDEX 
-# lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
-
+	lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
 
 Make sure you are on an updated linux machine
 ========================================================
@@ -27,6 +26,8 @@ Clone repository
     In terminal change directory to location you would like to install my repository, then:
 
 	$ git clone https://github.com/litepresence/extinction-event.git
+	
+	h/t @sschiessl for setup.py & Makefile
 
 Change directory to:
 ========================================================
@@ -184,3 +185,5 @@ VISIT litepresence.com for machine optimized algorithms
 	you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
 
 	litepresence.com
+	
+
