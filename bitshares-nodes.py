@@ -31,6 +31,7 @@
 'wss://dele-puppy.com/wss',
 'wss://dex.rnglab.org/wss',
 'wss://dexnode.net/wss',
+'wss://england.bitshares.apasia.tech/ws',
 'wss://eu-central-1.bts.crypto-bridge.org/wss',
 'wss://eu-west-1.bts.crypto-bridge.org/wss',
 'wss://eu.nodes.bitshares.ws/wss',
