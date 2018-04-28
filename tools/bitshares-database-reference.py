@@ -323,16 +323,23 @@ get_assets = Z + '"get_assets",[["%s",]]]}' % asset_id
 # @param asset_ids IDs of the assets to retrieve
 # @return The assets corresponding to the provided IDs
 # This function has semantics identical to @ref get_objects
+"(['symbol', 'id', 'dynamic_asset_data_id', 'issuer', 'options', 'precision'])"
+
+
 list_assets = Z + '"list_assets",["%s","%s"]]}' % (asset, limit)
 # @brief Get assets alphabetically by symbol name
 # @param lower_bound_symbol Lower bound of symbol names to retrieve
 # @param limit Maximum number of assets to fetch (must not exceed 100)
 # @return The assets found
+"(['symbol', 'id', 'dynamic_asset_data_id', 'issuer', 'options', 'precision'])"
+
+
 lookup_asset_symbols= Z + '"lookup_asset_symbols",[%s]]}' % coins
 # @brief Get a list of assets by symbol
 # @param asset_symbols Symbols or stringified IDs of the assets to retrieve
 # @return The assets corresponding to the provided symbols or IDs
 # This function has semantics identical to @ref get_objects
+"(['symbol', 'id', 'dynamic_asset_data_id', 'issuer', 'options', 'precision'])"
 
 '''
 /////////////////////
@@ -525,7 +532,7 @@ get_worker_count = Z + '"get_worker_count",[]]}'
 ///////////
 '''
 
-lookup_vote_ids = Z + ''
+lookup_vote_ids = Z + '' #( const vector<vote_id_type>& votes )
 # @brief Given a set of votes, return the objects they are voting for.
 # This will be a mixture of committee_member_object, witness_objects, and worker_objects
 # The results will be in the same order as the votes.  Null will be returned for
@@ -542,7 +549,7 @@ get_transaction_hex = Z + '"get_transaction_hex",[%s]]}' % trx
 # @brief Get a hexdump of the serialized binary form of a transaction
 'dd202b1154fac330e35a0101420200000000000000b6da3596373c0400000000002b541d000000000079246bec5a00000000'
 
-get_required_signatures = Z + 'FIXME'
+get_required_signatures = Z + 'FIXME' #( const signed_transaction& trx, const flat_set<public_key_type>& available_keys )
 # @brief This API will take a partially signed transaction and a set of public keys that the owner has the ability to sign for
 # and return the minimal subset of public keys that should add signatures to the transaction.
 
@@ -562,7 +569,7 @@ verify_authority = Z + '"verify_authority",[%s]]}' % trx
 # @return true of the @ref trx has all of the required signatures, otherwise throws an exception
 ''
 
-verify_account_authority = Z + 'FIXME'
+verify_account_authority = Z + 'FIXME' #( const string& name_or_id, const flat_set<public_key_type>& signers )
 # @return true if the signers have enough authority to authorize an account
 ''
 
@@ -570,7 +577,7 @@ validate_transaction = Z + '"validate_transaction",[%s]]}' % trx
 # @brief Validates a transaction against the current state without broadcasting it on the network.
 ''
 
-get_required_fees = Z + 'FIXME'
+get_required_fees = Z + 'FIXME' #( const vector<operation>& ops, asset_id_type id )
 # @brief For each operation calculate the required fee in the specified asset type.  If the asset type does
 # not have a valid core_exchange_rate
 ''
@@ -590,7 +597,7 @@ get_proposed_transactions = Z + '"get_proposed_transactions",["%s"]]}' % account
 //////////////////////
 '''
 
-get_blinded_balances = Z + 'FIXME'
+get_blinded_balances = Z + 'FIXME' #( const flat_set<commitment_type>& commitments )
 # @return the set of blinded balance objects by commitment ID
 
 '''
@@ -599,13 +606,13 @@ get_blinded_balances = Z + 'FIXME'
 /////////////////
 '''
 
-get_withdraw_permissions_by_giver = Z + 'FIXME'
+get_withdraw_permissions_by_giver = Z + 'FIXME' #(account_id_type account, withdraw_permission_id_type start, uint32_t limit)
 # @brief Get non expired withdraw permission objects for a giver(ex:recurring customer)
 # @param account Account to get objects from
 # @param start Withdraw permission objects(1.12.X) before this ID will be skipped in results. Pagination purposes.
 # @param limit Maximum number of objects to retrieve
 # @return Withdraw permission objects for the account
-get_withdraw_permissions_by_recipient = Z + 'FIXME'
+get_withdraw_permissions_by_recipient = Z + 'FIXME' #(account_id_type account, withdraw_permission_id_type start, uint32_t limit)
 # @brief Get non expired withdraw permission objects for a recipient(ex:service provider)
 # @param account Account to get objects from
 # @param start Withdraw permission objects(1.12.X) before this ID will be skipped in results. Pagination purposes.
