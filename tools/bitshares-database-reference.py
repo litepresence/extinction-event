@@ -46,7 +46,7 @@ node = 'wss://api.bts.mobi/wss'
 #node = 'wss://eu.openledger.info/wss'
 
 now = iso_date(time.time()) 
-then = iso_date(time.time()-86400)
+then = iso_date(time.time()-3*86400)
 asset = 'BTS' # symbol
 currency = 'OPEN.BTC' #symbol
 start = '2017-01-01T11:22:33' # iso date
@@ -763,10 +763,14 @@ CALLS = call_types[CALLS]
 
 print(CALLS)
 
+if CHOICE == 1:
+
+    # create a websocket connection once
+    ws = websocket.create_connection(node)
+
 for call in CALLS:
 
     call = call.replace("'",'"') # double quotes ONLY
-
     # print call parameters
     print('')
     print((call.split(',"params":')[1]).rstrip('}'))
@@ -777,10 +781,11 @@ for call in CALLS:
 
         print("connecting via wss using websocket-client module to", node)
         try:
-            ws = websocket.create_connection(node)
+            start = time.time()
             ws.send(call)
             ret = literal(ws.recv())
-            ws.close()
+            elapsed = time.time()-start
+            print('elapsed:', ('%.3f' % elapsed))
         except Exception as e:
             print (e.args)
             pass
@@ -791,7 +796,10 @@ for call in CALLS:
         node = node.replace('wss://','https://')
         print("connecting via https using requests module to", node)
         try:
+            start = time.time()
             ret = literal(requests.post(node, data=call).text)
+            elapsed = time.time()-start
+            print('elapsed:', ('%.3f' % elapsed))
         except Exception as e:
             print (e.args)
             pass
@@ -814,3 +822,9 @@ for call in CALLS:
         print (ret)
     except:
         print('failed')
+
+try:
+    # close websocket connection when done
+    ws.close()
+except:
+    pass
