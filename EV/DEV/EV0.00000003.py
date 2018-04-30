@@ -290,29 +290,17 @@ def tune_install():  # Basic User Controls
     #######################################
     CURRENCY        = "BTC"
     ASSET           = "BTS"
-    MA1            = 7.01
-    MA2            = 31.60
-    SELLOFF        = 2.015
-    SUPPORT        = 0.868
-    RESISTANCE     = 0.936
-    DESPAIR        = 0.770
-    MIN_CROSS      = 0.953
-    MAX_CROSS      = 1.011
-    BULL_STOP      = 1.093
-    BEAR_STOP      = 0.982
+    MA1            = 10
+    MA2            = 50
+    SELLOFF        = 2
+    SUPPORT        = 1
+    RESISTANCE     = 0.75
+    MIN_CROSS      = 1
+    MAX_CROSS      = 1
+    BULL_STOP      = 1
+    BEAR_STOP      = 1
 
-    CURRENCY = "BTC"
-    ASSET = "XBC"
-    MA1 = 24.11
-    MA2 = 51.66
-    SELLOFF = 1.573
-    SUPPORT = 0.973
-    RESISTANCE = 1.109
-    DESPAIR = 0.834
-    MIN_CROSS = 0.972
-    MAX_CROSS = 1.426
-    BULL_STOP = 0.891
-    BEAR_STOP = 1.000
+
 
 def control_panel():  # Advanced User Controls
 
