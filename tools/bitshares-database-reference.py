@@ -19,7 +19,7 @@ Samples calls without pybitshares, using requests or websocket-client
 # make sure lists are not in quotes
 
 # @brief, @param, @return as published in the graphene database_api.hpp
-# keys are as returned by api call
+' list of keys are as returned by api call '
 # several calls have not yet been translated, PR appreciated
 #///////////////////////////////////////////////////////////////////////
 
@@ -29,7 +29,7 @@ import requests # pip3 install requests
 
 import time
 from datetime import datetime
-from ast import literal_eval as literal
+import json
 websocket.enableTrace(False)
 
 def iso_date(unix): #'2017-01-01T11:22:33'
@@ -74,10 +74,13 @@ trx = '{"expiration":"2018-04-27T14:16:35","extensions":[],"operation_results":[
 '''
 ///////////////////////////////////////////////////////////////////////
 // TYPICAL API CALL FORMAT
-// '{"id":1,"method":"call","params":["database","x",[y]]}'
-// "id" will be returned to you unchanged in response header
-// "x" is one of the calls below
-// "y' is in the format of one of the example arguments above
+//
+// '{"id":1,"method":"call","params":["A","B",[C]]}'
+//
+// "id" - is returned to you unchanged in response header as marker
+// "A"  - api_identifier_name    - "database" for all to this api
+// "B"  - api_method_name        - one of the calls below
+// "C'  - api_params_in_array    - example arguments above
 ///////////////////////////////////////////////////////////////////////
 '''
 
@@ -90,7 +93,7 @@ Z = '{"id":1,"method":"call","params":["database",'
 /////////////
 '''
 
-get_objects = Z + 'FIXME' # (const vector<object_id_type>& ids)
+get_objects = Z +  '"get_objects",[["%s"]]]}' % account_id 
 # @brief Get the objects corresponding to the provided IDs
 # @param ids IDs of the objects to retrieve
 # @return The objects retrieved, in the order they are mentioned in ids
@@ -138,23 +141,23 @@ get_block_header = Z + '"get_block_header",["%s"]]}' % block_num
 #  @brief Retrieve a block header
 #  @param block_num Height of the block whose header should be returned
 #  @return header of the referenced block, or null if no matching block was found
-"(['previous', 'witness', 'extensions', 'timestamp', 'transaction_merkle_root'])"
-
+"(['extensions', 'timestamp', 'transaction_merkle_root', 'witness', 'previous'])"
 
 get_block_header_batch = Z + '"get_block_header_batch",[%s]]}' % (block_nums)
 #  @brief Retrieve multiple block header by block numbers
 #  @param block_num vector containing heights of the block whose header should be returned
 #  @return array of headers of the referenced blocks, or null if no matching block was found
-"(['timestamp', 'extensions', 'witness', 'previous', 'transaction_merkle_root'])"
+"(['extensions', 'timestamp', 'transaction_merkle_root', 'witness', 'previous'])"
 
 get_block = Z + '"get_block",["%s"]]}' % block_num
 # @brief Retrieve a full, signed block
 # @param block_num Height of the block to be returned
 # @return the referenced block, or null if no matching block was found
+"(['extensions', 'transaction_merkle_root', 'transactions', 'timestamp', 'witness_signature', 'witness', 'previous'])"
 
 get_transaction = Z + '"get_transaction",["%s", "%s"]]}' % (block_num, trx_in_block)
 # @brief used to fetch an individual transaction.
-"(['previous', 'witness', 'extensions', 'timestamp', 'transaction_merkle_root'])"
+"((['extensions', 'operations', 'ref_block_num', 'operation_results', 'expiration', 'ref_block_prefix', 'signatures'])"
 
 get_recent_transaction_by_id = Z + '' # ( const transaction_id_type& id )
 
@@ -174,8 +177,7 @@ get_chain_properties  = Z + '"get_chain_properties",[]]}'
 
 get_global_properties = Z + '"get_global_properties",[]]}'
 # @brief Retrieve the current @ref global_property_object
-"(['chain_id', 'id', 'immutable_parameters'['min_committee_member_count', 'min_witness_count', 'num_special_accounts', 'num_special_assets']])"
-
+"(['active_committee_members', 'next_available_vote_id', 'parameters', 'id', 'active_witnesses'])"
 get_config = Z + '"get_config",[]]}'
 # @brief Retrieve compile-time constants
 "([**large dictionary of GRAPHENE constants**])"
@@ -201,7 +203,7 @@ get_dynamic_global_properties   = Z + '"get_dynamic_global_properties",[]]}'
 '''
 
 get_key_references = Z + '"get_key_references",[["%s",]]]}' % public_key
-#
+# Account ID associated with public key?
 ''
 
 is_public_key_registered = Z + '"is_public_key_registered",["%s"]]}' % public_key
@@ -289,6 +291,7 @@ get_account_count = Z + '"get_account_count",[]]}'
 // Balances //
 //////////////
 '''
+
 get_account_balances = Z + '"get_account_balances",["%s", [] ]]}' % (account_id)
 # @brief Get an account's balances in various assets
 # @param id ID of the account to get balances for
@@ -624,6 +627,7 @@ get_withdraw_permissions_by_recipient = Z + 'FIXME' #(account_id_type account, w
 MAKE SEVERAL TESTS CALLS BY TYPE
 ///////////////////////////////////////////////////////////////////////
 '''
+
 all_calls = [get_objects,set_subscribe_callback,
     set_pending_transaction_callback,set_block_applied_callback,
     cancel_all_subscriptions,get_block_header,get_block_header_batch,
@@ -648,7 +652,7 @@ all_calls = [get_objects,set_subscribe_callback,
     get_proposed_transactions,get_blinded_balances,
     get_withdraw_permissions_by_giver,get_withdraw_permissions_by_recipient,]
 
-object_calls = []
+object_calls = [get_objects]
 
 subscription_calls = []
 
@@ -761,50 +765,53 @@ call_types = [all_calls, object_calls, subscription_calls, block_calls,
 
 CALLS = call_types[CALLS]
 
-print(CALLS)
+for call in CALLS:
+    print((call.split(',"params":')[1]).rstrip('}'))
+print('')
 
 if CHOICE == 1:
 
-    # create a websocket connection once
+    print('websocket handshake, this will take a few seconds')
+    start = time.time()
     ws = websocket.create_connection(node)
+    elapsed = time.time()-start 
+    print('elapsed:', ('%.3f' % elapsed))
+    print("connected via wss using websocket-client module to", node)
+
+if CHOICE == 2: 
+
+    node = node.replace('wss://','https://')
+    print("connecting via https using requests module to", node)
 
 for call in CALLS:
 
     call = call.replace("'",'"') # double quotes ONLY
-    # print call parameters
+    # Print call parameters
     print('')
     print((call.split(',"params":')[1]).rstrip('}'))
     print('-----------------------------------------------------------')
 
-
     if CHOICE == 1: 
-
-        print("connecting via wss using websocket-client module to", node)
         try:
             start = time.time()
             ws.send(call)
-            ret = literal(ws.recv())
-            elapsed = time.time()-start
+            ret = json.loads(ws.recv())
+            elapsed = time.time()-start # this will be less than 0.500
             print('elapsed:', ('%.3f' % elapsed))
         except Exception as e:
             print (e.args)
             pass
-
-
-    if CHOICE == 2: # connect via https using requests module
-
-        node = node.replace('wss://','https://')
-        print("connecting via https using requests module to", node)
+    if CHOICE == 2: 
         try:
             start = time.time()
-            ret = literal(requests.post(node, data=call).text)
+            ret = json.loads(requests.post(node, data=call).text)
             elapsed = time.time()-start
             print('elapsed:', ('%.3f' % elapsed))
         except Exception as e:
             print (e.args)
             pass
 
-    # Print keys and full response
+    # Print keys in response
     try:
         keys = ret['result'].keys()
         print('#', keys)
@@ -818,6 +825,8 @@ for call in CALLS:
                 print('#', keys)
             except:
                 print('# Returns string')
+    # Print full reponse
+    print ('')
     try:
         print (ret)
     except:
