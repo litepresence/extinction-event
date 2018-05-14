@@ -88,4 +88,7 @@
         'wss://ws.gdex.top/wss',
         'wss://ws.hellobts.com/',
         'wss://ws.winex.pro/wss',
-        'wss://za.bitshares.africa/ws',]
+        'wss://za.bitshares.africa/ws',
+        'wss://api.bitsharesdex.com',
+        'wss://api.fr.bitsharesdex.com',
+        ]
