@@ -1,3 +1,44 @@
+'''
+20 processes running w/ lifespan of 200-400 seconds; 
+each gathers ticker, history, book, account balances. 
+
+7 most recent results are statistically curated 
+into metaNODE.txt which can be read by any other app.  
+
+given 90 nodes; sorting 20 as "whitelist" and 30 as "blacklist".  
+
+All requests handled without pybitshares using websocket-client.
+
+Whereas running your own private node might consume 4+ gigs of RAM.  
+metaNODE is using about 400mb of RAM (plus 500 for the OS)
+
+The primary advantages of metaNODE vs publicNODE 
+is trustless data curation and uptime.  
+
+The primary advantages of metaNODE vs privateNODE 
+is RAM resources consumed and technical overhead to launch and maintain.
+
+metaNODE.py creates metaNODE.txt 
+which holds the metaNODE dictionary of curated market data. 
+On each tick of botscript you simply call:
+
+    metaNODE = Bitshares_Trustless_Client()
+
+to refresh the streaming dictionary values. 
+
+            metaNODE['bids']
+            metaNODE['asks']
+            metaNODE['currency_balance']
+            metaNODE['asset_balance']
+            metaNODE['market_history']
+            metaNODE['last']
+            metaNODE['whitelist']
+            metaNODE['blacklist']
+            metaNODE['blocktime']
+'''
+
+
+
 
 ' (BTS) litepresence1 '
 
