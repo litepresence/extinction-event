@@ -1,4 +1,5 @@
 metaNODE = Bitshares_Trustless_Client()
+========================
 
 There were two ways to get data from Bitshares blockchain:
 
@@ -10,6 +11,7 @@ I've created a 3rd path; connect to several random nodes in the public network..
 
 
 [ANN] metaNODE
+===============
 
 Alex M - clockwork, [19.04.18 11:29]
 Its intriguing definitely
@@ -43,6 +45,7 @@ May 2018
 
 
 The Challenge:
+===========
 
 When we deal with a centralized exchange, there is a single server running a single software.  
 Although the websites are prone to ddos; the API's we tie our bots to are often rock solid reliable. The closing price is the closing price; it can be counted on. The profit incentive, for the exchange to keep API data reliable and timely, is huge.
@@ -80,6 +83,7 @@ To streamline requests and eliminate any connectivity issues, metaNODE will not 
 
 
 The Methods:
+==============
 
 cache()
 The first thing metaNODE does is make several calls to determine key blockchain information used later in our script. Given an account name, what is the account ID?  Given an asset symbol, what is its asset ID? When we have an asset quantity as integer where do we put the decimal place?  In the metaNODE tradition, this data is collected from multiple nodes and then statistically rendered.
@@ -104,7 +108,9 @@ Race is a condition where multiple processes attempt to read or write to a file 
 
 bifurcation()
 Mavens are trusted experts, but that doesn't mean they're correct.  The statistical mode (most common) of the mavens' datasets is sought.  If there is no mode with all 7 mavens; the mode of 6 or 5 most recent are also considered.   When a mode is found, metaNODE.txt is written with the most common data amongst the mavens.  This subprocess is attempted every second; 99% of the time a mode is found. 
+
 Usage:
+===============
 
 In the beginning of your script you'd declare:
 
@@ -141,7 +147,9 @@ Additional calls would fit in the framework with a few lines of code.  For examp
 https://github.com/bitshares/bitshares-core/pull/849
 
 Likewise, the metaNODE framework could be adapted to other custom blockchain feeds.
+
 Common Exceptions:
+===============
 
 Connection Related Errors:
 WebSocketBadStatusException('Handshake status 502 Bad Gateway',)
@@ -182,7 +190,7 @@ In each of these instances, metaNODE shifts to another node, gathers new data, a
 
 
 Results:
-
+================
 metaNODE has now been running 5 straight days without interruption and is using less than ½ GB of RAM. RAM usage remained unchanged, network history fell into a steady pattern, and cpu usage remained tightly clustered around 15% on each core.  This, indicates the framework is very stable and could run for a long time; ie. no RAM leaks, no hung instances, and no burned up cpu cores... even though we're moving tons of pertinent data, from many untrusted websocket sources, writing concurrently; and doing so relentlessly and fast. 
 
 MetaNODElog.txt maintains a list of the various errors encountered in the data.  The three most common errors relate to connectivity time; handshake time, ping time, and blocktime latency.   These calls are made first so that any issues with connectivity cause a switching of nodes, before any additional effort is wasted making calls for market data.  Another common error is zero price values either in last, orderbook, or history.   Also from time to time we see that the highest bid is greater than the lowest ask.  In these instances we also move onto another node.  
@@ -197,7 +205,7 @@ The primary advantages of metaNODE vs publicNODE is trustless data curation and 
 
 
 Deploy:
-
+=====================
 The only non-python-native module you may need is websocket-client.  If you have installed pybitshares, its setup process automatically installed websocket-client for you. 
 
 Simply launch metaNODE.py from the same folder as your botscript, you'll be asked to input your account name and the symbol of the asset and currency for the market you'd like to curate.
@@ -239,7 +247,7 @@ to watch error report, in third terminal type:
 >>> tail -f metaNODElog.txt'
 
 Controls
-
+===============
 
 Presets as live tested:
 
