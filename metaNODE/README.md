@@ -104,7 +104,7 @@ Maintains two text documents in a dynamic manner concurrently by multiple proces
 When a node address is whitelisted, its collected data is then called a maven and is sent on to the nascent trend definition which maintains maven.txt.   Mavens are the 7 most recent datasets from nodes that passed the threshing process.  A maven is a trusted expert, who seeks to pass timely and relevant knowledge. 
 
 	race_write()
-Race is a condition where multiple processes attempt to read or write to a file concurrently and cause exception error.  This circumstance creates some issues which must be handled by the programmer.  race_write() race_read(), race_append(), and Bitshares_Trustless_Client() definitions all handle file access without clashing. 
+Race is a condition where multiple processes attempt to read or write to a file concurrently and cause exception error.  This circumstance creates some issues which must be handled by the programmer.  `race_write() race_read(), race_append(), `and `Bitshares_Trustless_Client()` definitions all handle file access without clashing. 
 
 	bifurcation()
 Mavens are trusted experts, but that doesn't mean they're correct.  The statistical mode (most common) of the mavens' datasets is sought.  If there is no mode with all 7 mavens; the mode of 6 or 5 most recent are also considered.   When a mode is found, metaNODE.txt is written with the most common data amongst the mavens.  This subprocess is attempted every second; 99% of the time a mode is found. 
@@ -116,9 +116,9 @@ In the beginning of your script you'd declare:
 
 	use_metaNODE=True  
 
-metaNODE.py is a stand alone script that runs in the terminal and creates metaNODE.txt 
+`metaNODE.py` is a stand alone script that runs in the terminal and creates `metaNODE.txt` 
 
-metaNODE.txt holds the metaNODE dictionary of curated market data.  
+`metaNODE.txt` holds the metaNODE dictionary of curated market data.  
 
 On each tick of your bot you would simply call:
 
@@ -135,12 +135,16 @@ In subsequent calls when you gather data like the latest ticker:
 		last = Market.Ticker()['lastest'] 
 		# get data with pybitshares websocket call
 
-This means instead of making a websocket call to a potentially rogue node for last price, you are reading a curated text document on your local machine maintained by metaNODE.py.
-metaNODE uses websocket-client which is already installed on any machine with pybitshares.  metaNODE has no additional module requisites and does not natively depend on pybitshares, which means any bugs in the do-everything pybitshares reference software cannot cause complications to the feeds provided by the lightweight metaNODE.py.  
+This means instead of making a websocket call to a potentially rogue node for last price, you are reading a curated text document on your local machine maintained by `metaNODE.py`.
+metaNODE uses websocket-client which is already installed on any machine with pybitshares.  metaNODE has no additional module requisites and does not natively depend on pybitshares, which means any bugs in the do-everything pybitshares reference software cannot cause complications to the feeds provided by the lightweight `metaNODE.py`.  
 
-At this time, buy/sell/cancel operations would still be performed by pybitshares.    However, additionally, where your bot currently has a single public node specified to do business with, you would be advised to check with metaNODE['whitelisted'] prior to making a buy/sell/cancel request with pybitshares. From here forward it would be making that request on a node that has recently been pre-qualified in a trust-less manner, rather than one naively cherry picked; potentially days earlier.
+At this time, buy/sell/cancel operations would still be performed by pybitshares.    However, additionally, where your bot currently has a single public node specified to do business with, you would be advised to check with 
 
-metaNODE.py would be running in the same folder as your botscript and would perform all of the wss operations for gathering market data including last price, market history, order book, account balances. The data would be returned in this format:  https://pastebin.com/LE19ex3p 
+	metaNODE['whitelisted'] 
+	
+prior to making a buy/sell/cancel request with pybitshares. From here forward it would be making that request on a node that has recently been pre-qualified in a trust-less manner, rather than one naively cherry picked; potentially days earlier.
+
+`metaNODE.py` would be running in the same folder as your botscript and would perform all of the wss operations for gathering market data including last price, market history, order book, account balances. The data would be returned in this format:  https://pastebin.com/LE19ex3p 
 
 Additional calls would fit in the framework with a few lines of code.  For example, I intend to add open order id's when core pull request 849/463 is complete later this month. see: 
 
