@@ -164,7 +164,8 @@ Run microDEX
 
     enter account name from step 11
     enter market in format as shown
-    enter local wallet password from step 12
+    enter local wallet password from step 12 
+    (you can skip this and demo without password)
 
 Run Extinction Event
 -----------------------------------------------
