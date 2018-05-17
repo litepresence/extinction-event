@@ -107,7 +107,7 @@ When a node address is whitelisted, its collected data is then called a maven an
 Race is a condition where multiple processes attempt to read or write to a file concurrently and cause exception error.  This circumstance creates some issues which must be handled by the programmer.  `race_write() race_read(), race_append(), `and `Bitshares_Trustless_Client()` definitions all handle file access without clashing. 
 
 	bifurcation()
-Mavens are trusted experts, but that doesn't mean they're correct.  The statistical mode (most common) of the mavens' datasets is sought.  If there is no mode with all 7 mavens; the mode of 6 or 5 most recent are also considered.   When a mode is found, metaNODE.txt is written with the most common data amongst the mavens.  This subprocess is attempted every second; 99% of the time a mode is found.  Keywise, through the maven nascent trend maven data, we are sorting the truthful "mode" mavens from the outliers; in a ongoing "moving average" manner.
+Mavens are trusted experts, but that doesn't mean they're correct.  The statistical mode (most common) of the mavens' datasets is sought.  If there is no mode with all 7 mavens; the mode of 6 or 5 most recent are also considered.   When a mode is found, metaNODE.txt is written with the most common data amongst the mavens.  This subprocess is attempted every second; 99% of the time a mode is found.  Keywise, through the nascent trend maven data, we are sorting the truthful "mode" mavens from the outliers; in a ongoing "moving average" manner.
 
 Usage:
 ===============
