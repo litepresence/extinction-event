@@ -32,6 +32,9 @@ The repo name "Extinction Event" was born of the notion that DEX tech combined w
 
 # bitshares-latency.py
 	scans all known nodes in the Bitshares public network for lowest latency
+	
+# bitshares-database-reference.py
+        make api requests to Bitshares database without pybitshares
 
 
 
