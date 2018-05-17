@@ -152,10 +152,14 @@ Obtain latest scripts
 Run microDEX
 -----------------------------------------------
 
+        source env/bin/activate
+	
+    from the extinction-event folder will turn on your virtual environment
+
     in terminal navigate to the virtual environment folder containing microDEX.py
 
     commands: 'dir', 'cd ..', 'cd folder/folder' are helpful
-
+    
         python3 microDEX.py
 
     enter account name from step 11
