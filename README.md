@@ -2,19 +2,19 @@
 
 
 NOTE: this toolset is currently in alpha state of development; more new toys coming soon!
-----------------
+
 
 (BTS) litpresence1 
 ----------------------
 
-`
+```
 def WTFPL_v0_March_1765():
     if any([stamps, licenses, taxation, regulation, fiat, etat]):
         try:
             print('no thank you')
         except:    
             return [tar, feathers]
-`
+```
 
 Cryptocurrency algo trading tools
 
