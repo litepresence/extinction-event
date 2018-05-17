@@ -39,6 +39,10 @@ bitshares-database-reference.py
 
 
 
+
+
+
+
 Make sure you are on an updated linux machine
 -----------------------------------------------
 
