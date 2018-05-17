@@ -157,44 +157,44 @@ Common Exceptions:
 
 Connection Related Errors:
 ----------------
-WebSocketBadStatusException('Handshake status 502 Bad Gateway',)
-WebSocketTimeoutException('The read operation timed out',)
-ConnectionResetError(104, 'Connection reset by peer')
-timeout('_ssl.c:584: The handshake operation timed out',)
-WebSocketAddressException(gaierror(-2, 'Name or service not known'),)
-WebSocketBadStatusException('Handshake status 404 Not Found',)
-ConnectionRefusedError(111, 'Connection refused')
-timeout('timed out',)
+	WebSocketBadStatusException('Handshake status 502 Bad Gateway',)
+	WebSocketTimeoutException('The read operation timed out',)
+	ConnectionResetError(104, 'Connection reset by peer')
+	timeout('_ssl.c:584: The handshake operation timed out',)
+	WebSocketAddressException(gaierror(-2, 'Name or service not known'),)
+	WebSocketBadStatusException('Handshake status 404 Not Found',)
+	ConnectionRefusedError(111, 'Connection refused')
+	timeout('timed out',)
 
 API returns any empty dictionary or an error
 ----------------
-KeyError('result',)
+	KeyError('result',)
 
 Latency and testnet related errors:
 ----------------
-ValueError('chain_id != MAINNET')
-ValueError('ping_elapsed', 1.5726029872894287) # fails if >1
-ValueError('handshake_elapsed', 7.850483179092407) # fails if >4
-ValueError('blocktime is stale', 7697593.410705566) # fails if >6
+	ValueError('chain_id != MAINNET')
+	ValueError('ping_elapsed', 1.5726029872894287) # fails if >1
+	ValueError('handshake_elapsed', 7.850483179092407) # fails if >4
+	ValueError('blocktime is stale', 7697593.410705566) # fails if >6
 
 Occasionally data gathered cannot be statistically analyzed:
 ----------------
-ValueError('min() arg is an empty sequence',)
-StatisticsError('no unique mode; found 2 equally common values',)
+	ValueError('min() arg is an empty sequence',)
+	StatisticsError('no unique mode; found 2 equally common values',)
 
 When metaNODE attempts to contact a node known to recently give bad data
 ----------------
-ValueError('blacklisted')
+	ValueError('blacklisted')
 When metaNODE attempts to contact a node with more than one process
 ----------------
-ValueError('whitelisted')
+	ValueError('whitelisted')
 
 Some common errors validated from price feeds:
 ----------------
-ValueError('zero price last')
-ValueError('zero price in history')
-ValueError('zero price in bids')
-ValueError('mismatched orderbook')
+	ValueError('zero price last')
+	ValueError('zero price in history')
+	ValueError('zero price in bids')
+	ValueError('mismatched orderbook')
 
 In each of these instances, metaNODE shifts to another node, gathers new data, and attempts to analyze again without getting hung.  If your goal was to monitor several public nodes as a provider you might wish to include additional stack trace to the output log. 
 
@@ -231,23 +231,23 @@ metaNODE does everything else.
 
     metaNODE is now a python dictionary with these curated public node Bitshares DEX feeds:
 
-metaNODE['last']   
+	metaNODE['last']   
           float; latest price
-metaNODE['bids']  
+	metaNODE['bids']  
           list of (price,amount) tuples; [0][0]=highest bid price
-metaNODE['asks'] 
+	metaNODE['asks'] 
           list of (price,amount) tuples; [0][0]=lowest ask price
-metaNODE['history']
+	metaNODE['history']
           list of (unix,price,amount) tuples; [0][0]=last trade time
-metaNODE['currency']
+	metaNODE['currency']
           float; quantity of currency
-metaNODE['assets']  
+	metaNODE['assets']  
           float; quantity of assets
-metaNODE['whitelist']
+	metaNODE['whitelist']
           list; [0]=most recently whitelisted node
-metaNODE['blacklist'] 
+	metaNODE['blacklist'] 
           list; [0]=most recently blacklisted node
-metaNODE['blocktime'] 
+	metaNODE['blocktime'] 
           oldest blockchain time in metaNODE maven data
 
 
@@ -274,12 +274,12 @@ Presets as live tested:
     PAUSE = 2
     BLIP = 0.05
 
-WHITE is the number of whitelisted nodes you'd like to retain for buy/sell/cancel operations
-BLACK is the number of nodes you suspect you'd prefer to ignore
-TIMEOUT is the rough lifespan of each threshing process launched by spawn
-PROCESSES is the maximum number of concurrent websocket connections you'll maintained
-MAVENS is the depth of the maven data you'll consider for statistical mode
-BOOK DEPTH relate to how many items deep each side of the orderbook is
-HISTORY DEPTH relates to number of items in market order history
-PAUSE is how much time each threshing process remains silent before making wss requests again
-BLIP is a brief moment of pause to prevent clashing or overwhelmed processes
+	WHITE is the number of whitelisted nodes you'd like to retain for buy/sell/cancel operations
+	BLACK is the number of nodes you suspect you'd prefer to ignore
+	TIMEOUT is the rough lifespan of each threshing process launched by spawn
+	PROCESSES is the maximum number of concurrent websocket connections you'll maintained
+	MAVENS is the depth of the maven data you'll consider for statistical mode
+	BOOK DEPTH relate to how many items deep each side of the orderbook is
+	HISTORY DEPTH relates to number of items in market order history
+	PAUSE is how much time each threshing process remains silent before making wss requests again
+	BLIP is a brief moment of pause to prevent clashing or overwhelmed processes
