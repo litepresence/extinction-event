@@ -6,7 +6,7 @@ There were two ways to get data from Bitshares blockchain:
 1) private node that uses lots of RAM, prefers its own machine, and is technical to tend
 2) public node that is difficult to stay connected to and may provide rogue data
 
-I've created a 3rd path; connect to several random nodes in the public network... ask them each for latest market data; then move on to another node.  Finally, perform statistical analysis on the combined feeds and maintain a streaming curated output file; the metaNODE.
+I've created a 3rd path; connect to several random nodes in the public network... ask them each for latest market data; then move on to other node nodes.  Finally, perform statistical analysis on the combined feeds and maintain a streaming curated output file; the metaNODE.  
 
 
 
@@ -85,28 +85,28 @@ To streamline requests and eliminate any connectivity issues, metaNODE will not 
 The Methods:
 ==============
 
-cache()
+	cache()
 The first thing metaNODE does is make several calls to determine key blockchain information used later in our script. Given an account name, what is the account ID?  Given an asset symbol, what is its asset ID? When we have an asset quantity as integer where do we put the decimal place?  In the metaNODE tradition, this data is collected from multiple nodes and then statistically rendered.
 
-inquire()
+	inquire()
 To get this cache data we establish a standard method for contacting a public node and switching nodes if the contact fails using the reliable websocket-client package. 
 
-spawn()
+	spawn()
 After we have ID numbers and other cached data we can move on to collecting live market data from multiple nodes.  We would like to check many nodes concurrently, so we'll be using the multiprocessing module.  Sometimes these instances become hung for whatever reason, so we'll kill them off and re-spawn them continually in a timely, yet somewhat random manner.  
 
-thresh()
+	thresh()
 Each of our spawned processes will begin searching for value errors in all the data we wish to collect, namely: last price, market history, account balances, and the order book.  There are many common categories of errors that can quickly be discerned and the node's data disregarded.  From thresh, if no errors are found the data is sent off to nascent_trend(), and either way it is winnowed into a whitelist (if good data) or blacklist (if rogue). Once connected to a node it will go through several thresh cycles before moving on to the next node, or the process is killed by spawn. 
 
-winnow()
+	winnow()
 Maintains two text documents in a dynamic manner concurrently by multiple processes; whitelist.txt and blacklist.txt.  If the node made it through the threshing process unscathed, its address is written to the whitelist ; if not blacklist.    
 
-nascent_trend()
+	nascent_trend()
 When a node address is whitelisted, its collected data is then called a maven and is sent on to the nascent trend definition which maintains maven.txt.   Mavens are the 7 most recent datasets from nodes that passed the threshing process.  A maven is a trusted expert, who seeks to pass timely and relevant knowledge. 
 
-race_write()
+	race_write()
 Race is a condition where multiple processes attempt to read or write to a file concurrently and cause exception error.  This circumstance creates some issues which must be handled by the programmer.  race_write() race_read(), race_append(), and Bitshares_Trustless_Client() definitions all handle file access without clashing. 
 
-bifurcation()
+	bifurcation()
 Mavens are trusted experts, but that doesn't mean they're correct.  The statistical mode (most common) of the mavens' datasets is sought.  If there is no mode with all 7 mavens; the mode of 6 or 5 most recent are also considered.   When a mode is found, metaNODE.txt is written with the most common data amongst the mavens.  This subprocess is attempted every second; 99% of the time a mode is found. 
 
 Usage:
