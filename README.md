@@ -1,15 +1,31 @@
 # Installation
+==================
+
+# NOTE: this toolset is currently in alpha state of development; more new toys coming soon!
+
+# (BTS) litpresence1 
+
+def WTFPL_v0_March_1765():
+    if any([stamps, licenses, taxation, regulation, fiat, etat]):
+        try:
+            print('no thank you')
+        except:    
+            return [tar, feathers]
 
 
 Cryptocurrency algo trading tools
 
-The repo name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algo trading tech reaching the common user, in unison, would be an extinction level event for centralized web based exchanges.
+The repo name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algo trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algo trading services.
+
 
 # Extinction Event 
-	algo trading bot framework for trading on the Bitshares DEX with external data
+	daily candle algo trading bot framework for trading on the Bitshares DEX with external CEX data
 
 # microDEX 
 	lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
+
+# metaNODE
+	statistical curation of market data from multiple public DEX nodes into a streaming text file
 
 Make sure you are on an updated linux machine
 -----------------------------------------------
