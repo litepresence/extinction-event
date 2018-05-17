@@ -13,20 +13,20 @@ I've created a 3rd path; connect to several random nodes in the public network..
 [ANN] metaNODE
 ===============
 
-Alex M - clockwork, [19.04.18 11:29]
-Its intriguing definitely
+	Alex M - clockwork, [19.04.18 11:29]
+	Its intriguing definitely
 
-Marko Paasila, [19.04.18 11:38]
-Much additional value from a small program
+	Marko Paasila, [19.04.18 11:38]
+	Much additional value from a small program
 
-Permie, [25.04.18 02:38]
-Wow nice work man!
+	Permie, [25.04.18 02:38]
+	Wow nice work man!
 
-Digital Lucife®, [12.05.18 23:45]
-Almighty
+	Digital Lucife®, [12.05.18 23:45]
+	Almighty
 
-Stefan Schießl, [14.05.18 23:44]
-Very cool
+	Stefan Schießl, [14.05.18 23:44]
+	Very cool
 
 
 
@@ -39,9 +39,9 @@ Until now, the public nodes connected to by traders were rated based on trust ea
 
 https://github.com/litepresence/extinction-event/tree/master/metaNODE
 
-litepresence 
+	litepresence 
 
-May 2018
+	May 2018
 
 
 The Challenge:
@@ -57,11 +57,11 @@ Further complicating matters, there is group-think tendency amongst users of the
 
 There also exist the potential for a node to purposefully deceive with inaccurate market prices or slow responses to manipulate markets.  This individual could deliver good data for months… then suddenly send all connected bots erroneous price feeds. 
 
-Then normalization issues:      1.21 = '1.21'  
+	Then normalization issues:      1.21 = '1.21'  
 
 To botscript this is an error; but something as simple as float is not equal to string can arise between a public node updating versions of the Bitshares core; and the result is your bot crashes. 
 
-Zero price is another problem.         price = 0
+	Zero price is another problem.         price = 0
 
 To botscript zero is the price, even though to human eye its obviously an error to be ignored until the next data request.  For whatever reason, these little glitches are part of the nature of dealing with the DEX.  On some nodes, for whatever reason, you get zero price sometimes in last, order book, or history.
 
@@ -114,7 +114,7 @@ Usage:
 
 In the beginning of your script you'd declare:
 
-use_metaNODE=True  
+	use_metaNODE=True  
 
 metaNODE.py is a stand alone script that runs in the terminal and creates metaNODE.txt 
 
@@ -122,18 +122,18 @@ metaNODE.txt holds the metaNODE dictionary of curated market data.
 
 On each tick of your bot you would simply call:
 
-metaNODE = Bitshares_Trustless_Client()
+	metaNODE = Bitshares_Trustless_Client()
 
 This will perform a “race read” operation on metaNODE.txt, see:  https://pastebin.com/BX7khLDG
 
 In subsequent calls when you gather data like the latest ticker: 
 
-if use_metaNODE: 
-	last = metaNODE['last'] 
-	# get data from curated dictionary now in RAM
-else: 
-	last = Market.Ticker()['lastest'] 
-	# get data with pybitshares websocket call
+	if use_metaNODE: 
+		last = metaNODE['last'] 
+		# get data from curated dictionary now in RAM
+	else: 
+		last = Market.Ticker()['lastest'] 
+		# get data with pybitshares websocket call
 
 This means instead of making a websocket call to a potentially rogue node for last price, you are reading a curated text document on your local machine maintained by metaNODE.py.
 metaNODE uses websocket-client which is already installed on any machine with pybitshares.  metaNODE has no additional module requisites and does not natively depend on pybitshares, which means any bugs in the do-everything pybitshares reference software cannot cause complications to the feeds provided by the lightweight metaNODE.py.  
@@ -152,6 +152,7 @@ Common Exceptions:
 ===============
 
 Connection Related Errors:
+----------------
 WebSocketBadStatusException('Handshake status 502 Bad Gateway',)
 WebSocketTimeoutException('The read operation timed out',)
 ConnectionResetError(104, 'Connection reset by peer')
@@ -161,25 +162,31 @@ WebSocketBadStatusException('Handshake status 404 Not Found',)
 ConnectionRefusedError(111, 'Connection refused')
 timeout('timed out',)
 
-Results when API returns any empty dictionary or an error
+API returns any empty dictionary or an error
+----------------
 KeyError('result',)
 
 Latency and testnet related errors:
+----------------
 ValueError('chain_id != MAINNET')
 ValueError('ping_elapsed', 1.5726029872894287) # fails if >1
 ValueError('handshake_elapsed', 7.850483179092407) # fails if >4
 ValueError('blocktime is stale', 7697593.410705566) # fails if >6
 
 Occasionally data gathered cannot be statistically analyzed:
+----------------
 ValueError('min() arg is an empty sequence',)
 StatisticsError('no unique mode; found 2 equally common values',)
 
 When metaNODE attempts to contact a node known to recently give bad data
+----------------
 ValueError('blacklisted')
 When metaNODE attempts to contact a node with more than one process
+----------------
 ValueError('whitelisted')
 
 Some common errors validated from price feeds:
+----------------
 ValueError('zero price last')
 ValueError('zero price in history')
 ValueError('zero price in bids')
@@ -193,7 +200,9 @@ Results:
 ================
 metaNODE has now been running 5 straight days without interruption and is using less than ½ GB of RAM. RAM usage remained unchanged, network history fell into a steady pattern, and cpu usage remained tightly clustered around 15% on each core.  This, indicates the framework is very stable and could run for a long time; ie. no RAM leaks, no hung instances, and no burned up cpu cores... even though we're moving tons of pertinent data, from many untrusted websocket sources, writing concurrently; and doing so relentlessly and fast. 
 
-MetaNODElog.txt maintains a list of the various errors encountered in the data.  The three most common errors relate to connectivity time; handshake time, ping time, and blocktime latency.   These calls are made first so that any issues with connectivity cause a switching of nodes, before any additional effort is wasted making calls for market data.  Another common error is zero price values either in last, orderbook, or history.   Also from time to time we see that the highest bid is greater than the lowest ask.  In these instances we also move onto another node.  
+	MetaNODElog.txt 
+
+maintains a list of the various errors encountered in the data.  The three most common errors relate to connectivity time; handshake time, ping time, and blocktime latency.   These calls are made first so that any issues with connectivity cause a switching of nodes, before any additional effort is wasted making calls for market data.  Another common error is zero price values either in last, orderbook, or history.   Also from time to time we see that the highest bid is greater than the lowest ask.  In these instances we also move onto another node.  
 
 It does not seem like well trusted nodes are any more or less likely to have occasional issues.  In reporting some of the issues to the telegram Node Admin channel as they arise, I find the node administrator just needs to restart, make some small change, or is having trouble with their hosting service.  It is far more common that rogue data is due to errant operation than malicious intent. 
 
@@ -240,11 +249,11 @@ metaNODE['blocktime']
 
 to watch data feed, in second terminal type:
 
->>> tail -f metaNODE.txt'
+	>>> tail -f metaNODE.txt'
 
 to watch error report, in third terminal type:
 
->>> tail -f metaNODElog.txt'
+	>>> tail -f metaNODElog.txt'
 
 Controls
 ===============
