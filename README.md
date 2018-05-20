@@ -58,7 +58,7 @@ Clone repository
 
 	$ git clone https://github.com/litepresence/extinction-event.git
 	
-	h/t @sschiessl for setup.py & Makefile
+	Thanks to: @sschiessl for setup.py & Makefile
 
 Change directory to:
 -----------------------------------------------
@@ -79,7 +79,7 @@ Install environment
 Install virtual environment and requirements
 -----------------------------------------------
 
-	$ pip3 install virtualenv
+	$ sudo pip3 install virtualenv
 	$ virtualenv -p python3 env 
 	$ source env/bin/activate
 	$ pip install -r requirements.txt
