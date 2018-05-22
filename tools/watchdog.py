@@ -2,7 +2,7 @@
 
 # allows for audible linux alarm when another app gets hung
 # two copies of this method should be run, one in each script being monitored
-# or on in script being monitored and another stand alone copy of this method
+# or one in script being monitored and another stand alone copy of this method
 # set one to identity = 1 the other to identity = 0
 # if the watchdog() does not sense its other half it will call on_error()
 # then ring bell, print warning, raise sys.exit() etc.
