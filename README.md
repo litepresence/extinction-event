@@ -1,20 +1,50 @@
-# ========================================================
-# Extinction Event and microDEX Installation
-# ========================================================
+# Installation
+
+
+NOTE: this toolset is currently in alpha state of development; more new toys coming soon!
+
+
+(BTS) litpresence1 
+----------------------
+
+```
+def WTFPL_v0_March_1765():
+    if any([stamps, licenses, taxation, regulation, fiat, etat]):
+        try:
+            print('no thank you')
+        except:    
+            return [tar, feathers]
+```
 
 Cryptocurrency algo trading tools
 
-The repo name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algo trading tech reaching the common user, in unison, would be an extinction level event for centralized web based exchanges, intrusive state AML/KYC policies, and orchestrated pump and dump schemes; all of which I consider anathema to individual financial liberty and decentralized free market economy. 
+The repo name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algo trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algo trading services.
 
-# Extinction Event 
-# algo trading bot framework for trading on the Bitshares DEX with external data
 
-# microDEX 
-# lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
+EV.py 
+------------
+	daily candle algo trading bot framework for trading on the Bitshares DEX with external CEX data
+microDEX.py 
+------------
+	lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
+metaNODE.py
+------------
+	statistical curation of market data from multiple public DEX nodes into a streaming text file
+bitshares-latency.py
+------------
+	scans all known nodes in the Bitshares public network for lowest latency
+bitshares-database-reference.py
+------------
+	make api requests to Bitshares database without pybitshares
+
+
+
+
+
 
 
 Make sure you are on an updated linux machine
-========================================================
+-----------------------------------------------
 
 	$ sudo apt-get update
 	
@@ -22,14 +52,16 @@ Make sure you are on an updated linux machine
 
 
 Clone repository
-========================================================
+-----------------------------------------------
 
     In terminal change directory to location you would like to install my repository, then:
 
 	$ git clone https://github.com/litepresence/extinction-event.git
+	
+	Thanks to: @sschiessl for setup.py & Makefile
 
 Change directory to:
-========================================================
+-----------------------------------------------
 	
 	$ cd extinction-event
 	$ dir
@@ -38,27 +70,28 @@ Change directory to:
 	along with some other dex tools under development.
 
 Install environment
-========================================================
+-----------------------------------------------
 	
 	$ sudo apt-get install -y python3 python3-pip
 	
 	*NOTE this requirement may already be satisified on your system, do it anyway to check
 
 Install virtual environment and requirements
-========================================================
+-----------------------------------------------
 
-	$ pip3 install virtualenv
+	$ sudo pip3 install virtualenv
 	$ virtualenv -p python3 env 
 	$ source env/bin/activate
 	$ pip install -r requirements.txt
 	
-TEST RUN microDEX in virtual environment
-========================================================
+Test microDEX in virtual environment
+-----------------------------------------------
 
 	$ python3 microDEX/microDEX.py
 	
-TEST RUN Extinction Event in virtual environment
-========================================================
+Test Extinction Event in virtual environment
+-----------------------------------------------
+
 
 	$ python3 EV/EV.py
 	
@@ -66,8 +99,9 @@ EV and microDEX are a bot framework and exchange interface respectively.
 You cannot use these to create accounts or withdraw funds.
 
 
-CREATE ACCOUNT ON BITSHARES GRAPHICAL UI
-========================================================
+Create an account on Bishares Reference UI
+-----------------------------------------------
+
 
 	To create an account:
 	
@@ -89,8 +123,8 @@ CREATE ACCOUNT ON BITSHARES GRAPHICAL UI
         WIF KEY
 
     
-CREATE LOCAL WALLET KEYS WITH UPTICK
-========================================================
+Create a local wallet with uptick
+-----------------------------------------------
 
     go to: https://media.readthedocs.org/pdf/uptick/latest/uptick.pdf
     perform steps:
@@ -116,8 +150,8 @@ CREATE LOCAL WALLET KEYS WITH UPTICK
         will then ask you for WIF KEY from step 11
 
 
-OBTAIN LATEST SCRIPTS
-========================================================
+Obtain latest scripts
+-----------------------------------------------
 
     Check back regularly to obtain latest version of Extinction Event and microDEX from official source:
 
@@ -147,22 +181,26 @@ OBTAIN LATEST SCRIPTS
     READ THE CODE - Check litepresence github regularly for latest version.
 
 
+Run microDEX
+-----------------------------------------------
 
-RUN microDEX
-========================================================
+        source env/bin/activate
+	
+    from the extinction-event folder will turn on your virtual environment
 
     in terminal navigate to the virtual environment folder containing microDEX.py
 
     commands: 'dir', 'cd ..', 'cd folder/folder' are helpful
-
+    
         python3 microDEX.py
 
     enter account name from step 11
     enter market in format as shown
-    enter local wallet password from step 12
+    enter local wallet password from step 12 
+    (you can skip this and demo without password)
 
-RUN Extinction Event
-========================================================
+Run Extinction Event
+-----------------------------------------------
 
     in terminal navigate to the virtual environment folder containing EV.py
 
@@ -177,10 +215,12 @@ RUN Extinction Event
 	will exit to terminal from either script ending all processes
 
 
-VISIT litepresence.com for machine optimized algorithms
+Visit litepresence.com for machine optimized algorithms
 ========================================================
 
 	using elitist bred quantum particle swarms I run hundreds of thousands of backtests to optimize algorithms
 	you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
 
 	litepresence.com
+	
+

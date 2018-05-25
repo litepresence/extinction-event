@@ -293,9 +293,8 @@ def tune_install():  # Basic User Controls
     MA1            = 10
     MA2            = 50
     SELLOFF        = 2
-    SUPPORT        = 0.75
-    RESISTANCE     = 1
-    DESPAIR        = 0.75
+    SUPPORT        = 1
+    RESISTANCE     = 0.75
     MIN_CROSS      = 1
     MAX_CROSS      = 1
     BULL_STOP      = 1
