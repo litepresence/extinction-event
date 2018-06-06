@@ -1,135 +1,112 @@
-'''
-20 processes running w/ lifespan of 200-400 seconds; 
-each gathers ticker, history, book, account balances. 
+' litepresence 2018 '
 
-7 most recent results are statistically curated 
-into metaNODE.txt which can be read by any other app.  
-
-given 90 nodes; sorting 20 as "whitelist" and 30 as "blacklist".  
-
-All requests handled without pybitshares using websocket-client.
-
-Whereas running your own private node might consume 4+ gigs of RAM.  
-metaNODE is using about 400mb of RAM (plus 500 for the OS)
-
-The primary advantages of metaNODE vs publicNODE 
-is trustless data curation and uptime.  
-
-The primary advantages of metaNODE vs privateNODE 
-is RAM resources consumed and technical overhead to launch and maintain.
-
-metaNODE.py creates metaNODE.txt 
-which holds the metaNODE dictionary of curated market data. 
-On each tick of botscript you simply call:
-
-    metaNODE = Bitshares_Trustless_Client()
-
-to refresh the streaming dictionary values. 
-
-            metaNODE['bids']
-            metaNODE['asks']
-            metaNODE['currency_balance']
-            metaNODE['asset_balance']
-            metaNODE['market_history']
-            metaNODE['last']
-            metaNODE['whitelist']
-            metaNODE['blacklist']
-            metaNODE['blocktime']
-'''
+def WTFPL_v0_March_1765():
+    if any([stamps, licenses, taxation, regulation, fiat, etat]):
+        try:
+            print('no thank you')
+        except:
+            return [tar, feathers]
 
 
-
-
-' (BTS) litepresence1 '
-
-# pip install websocket-client
-import websocket
-websocket.enableTrace(True)
-
-from random import random, shuffle, randint
+from random import random, shuffle, randint, choice
 from ast import literal_eval as literal
 from multiprocessing import Process
-from threading import Thread
-import numpy
 from datetime import datetime
 from statistics import mode
+import traceback
+import numpy
 import time
 import json
 import sys
+import os
+
+try:
+    import websocket
+    websocket.enableTrace(True)
+except:
+    raise ValueError('pip install websocket-client')
+
+
+def banner():
+    print("\033c")
+    if 1:
+        print(
+        '''
+
+        Do this:
+
+            metaNODE = Bitshares_Trustless_Client()
+        ''')
+        time.sleep(4)
+        print("\033c")
+        print(
+        '''
+
+        Get these curated Bitshares DEX feeds:
+
+        ''')
+        time.sleep(0.5)
+        print("        metaNODE['last']      #" +
+              " float; latest price \n")
+        time.sleep(0.5)
+        print("        metaNODE['bids']      #" +
+              " list of (price,amount) tuples; [0][0]=highest bid price \n")
+        time.sleep(0.5)
+        print("        metaNODE['asks']      #" +
+              " list of (price,amount) tuples; [0][0]=lowest ask price \n")
+        time.sleep(0.5)
+        print("        metaNODE['history']   #" +
+              " list of (unix,price,amount) tuples; [0][0]=last trade time \n")
+        time.sleep(0.5)
+        print("        metaNODE['currency']  #" +
+              " float; quantity of currency \n")
+        time.sleep(0.5)
+        print("        metaNODE['assets']    #" +
+              " float; quantity of assets \n")
+        print("        metaNODE['orders']    #" +
+              " list of dicts of human readable orders \n")
+        time.sleep(0.5)
+        print("        metaNODE['whitelist'] #" +
+              " list; [0]=most recently whitelisted node \n")
+        time.sleep(0.5)
+        print("        metaNODE['blacklist'] #" +
+              " list; [0]=most recently blacklisted node \n")
+        time.sleep(0.5)
+        print("        metaNODE['blocktime'] #" +
+              " oldest blockchain time in metaNODE data \n\n\n\n")
+        time.sleep(1)
+        print("to watch data feed, in second terminal type:")
+        print('')
+        print('>>> tail -f metaNODE.txt')
+        print('')
+        print("to watch error report, in third terminal type:")
+        print('')
+        print('>>> tail -f metaNODElog.txt')
+        print('')
+        time.sleep(2)
 
 # GLOBALS
-#
+# ======================================================================
+
 def controls():
 
     global WHITE, BLACK, TIMEOUT, PROCESSES, MAVENS
     global BOOK_DEPTH, HISTORY_DEPTH, PAUSE, BLIP
 
-    WHITE = 20
-    BLACK = 30
-    TIMEOUT = 300
-    PROCESSES = 20
-    MAVENS = 7
-    BOOK_DEPTH = 10
-    HISTORY_DEPTH = 50
-    PAUSE = 2
-    BLIP = 0.05
-
-def logo():
-
-    print(
-r'''
-\xee\xe7\x8a\xb9\xa7\xfe\x95\x89\xad\xf8\x96\xb3\xb8\xd4\x96\xaf\xa1
-\xb7\xa1\xf8\xc7\xec\x97\xa9\x81\xb7\xb8\xea\x87\xb7\xbf\xee\xc7\xfa
-                             ____  _____   ___   ______   ________
-Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \   
-  __  __  ____  ____   __     |   \ | | /  .-.  \ | | `. \ | |_ \_|   
- (  \/  )( ___)(_  _) /  \    | |\ \| | | |   | | | |  | | |  _) _
-  )    ( | __)   ||  / <> \  _| |_\   |_\  `-'  /_| |_.' /_| |__/ |
- (_/\/\_)(____) (__)(__)(__)(_____|\____)`.___.'(______.'(________/
-
-\x81\xdb\xd6\xcc\x8b\xe5\xad\xee\xe2\x81\xf4\xf6\xba\xc9\xf4\xa1\xee
-\x91\xbe\xa3\xef\xc7\xec\xee\xe8\x84\xba\xa0\xa9\xc9\xf4\xbc\xea\x97
-''')
-
-def Bitshares_Trustless_Client():
-
-    # Deploy your bot script in the same folder as metaNODE.py
-    # Include this definition in your script to access curated feed
-    from ast import literal_eval as literal
-    i = 0
-    while True:
-        time.sleep(BLIP * i ** 2)
-        i += 1
-        try:
-            with open('metaNODE.txt', 'r') as f:
-                metaNODE = literal(f.read())
-                f.close()
-                break
-        except Exception as e:
-            msg = str(type(e).__name__) + str(e.args)
-            print(msg)
-            try:
-                f.close()
-            except:
-                pass
-        finally:
-            try:
-                f.close()
-            except:
-                pass
-    return metaNODE
-
-def version():
-
-    global VERSION
-
-    VERSION = 'metaNODE v0.00000007 - Bitshares Trustless Client'
-
-    sys.stdout.write('\x1b]2;' + VERSION + '\x07')  # terminal #title
+                            #As Tested
+    WHITE           = 20    #20
+    BLACK           = 30    #30
+    TIMEOUT         = 300   #300
+    PROCESSES       = 20    #20
+    MAVENS          = 7     #7
+    BOOK_DEPTH      = 10    #10
+    HISTORY_DEPTH   = 50    #50
+    PAUSE           = 4     #2
+    BLIP            = 0.05  #0.05
 
 def public_nodes():
 
-    global nodes
+    global nodes, node_count
     nodes = ['wss://ap-northeast-1.bts.crypto-bridge.org/wss',
              'wss://ap-northeast-2.bts.crypto-bridge.org/wss',
              'wss://ap-southeast-1.bts.crypto-bridge.org/wss',
@@ -221,6 +198,7 @@ def public_nodes():
              'wss://ws.hellobts.com/',
              'wss://ws.winex.pro/wss',
              'wss://za.bitshares.africa/ws', ]
+    node_count = len(nodes)
 
 def constants():
 
@@ -236,29 +214,74 @@ def sign_in():
 
     global account_name, currency, asset
 
+    print('''
+    (BTS) litepresence1
+
+    Resistance and Disobedience in Economic Activity
+    is the Most Moral Human Action Possible
+    -SEK3''')
+
     print('')
     print('Input Account and Market, or press Enter for demo')
     print('')
 
-    account_name = input('account name:')
+    account_name = input('account name: ').strip('"').strip("'")
+    print('')
+    currency = input('    currency: ').strip('"').strip("'").upper()
+    print('')
+    asset    = input('       asset: ').strip('"').strip("'").upper()
+    print('')
+
     if account_name == '':
         account_name = 'abc123'
-        currency = 'OPEN.BTC'
+    if currency == '':
+        currency = 'GDEX.BTC'
+    if asset == '':
         asset = 'BTS'
-    else:
-        currency = input('currency:')
-        asset = input('asset:')
 
 def initialize():
 
+    now = int(time.time())
     race_write(doc='blacklist.txt', text=[])
     race_write(doc='whitelist.txt', text=[])
     race_write(doc='metaNODElog.txt', text='')
     race_write(doc='metaNODE.txt', text={})
     race_write(doc='mavens.txt', text=[])
+    race_write(doc='watchdog.txt', text=[now, now])
+
 
 # TEXT PIPE
 # ======================================================================
+
+def Bitshares_Trustless_Client(): # Your access to the metaNODE
+
+    # Include this definition in your script to access metaNODE.txt
+    # Deploy your bot script in the same folder as metaNODE.py
+
+    'from ast import literal_eval as literal'
+    i = 0
+    while True:
+        time.sleep(0.05 * i ** 2)
+        i += 1
+        try:
+            with open('metaNODE.txt', 'r') as f:
+                ret = f.read()
+                f.close()
+                metaNODE = literal(ret)
+                break
+        except Exception as e:
+            msg = str(type(e).__name__) + str(e.args)
+            print(msg)
+            try:
+                f.close()
+            except:
+                pass
+        finally:
+            try:
+                f.close()
+            except:
+                pass
+    return metaNODE
 
 def race_read(doc=''):  # Concurrent Read from File Operation
 
@@ -269,6 +292,7 @@ def race_read(doc=''):  # Concurrent Read from File Operation
         try:
             with open(doc, 'r') as f:
                 ret = f.read()
+                f.close()
                 try:
                     ret = literal(ret)
                 except:
@@ -284,8 +308,6 @@ def race_read(doc=''):  # Concurrent Read from File Operation
                                 ret = {}
                             else:
                                 ret = []
-
-                f.close()
                 break
         except Exception as e:
             msg = str(type(e).__name__) + str(e.args)
@@ -337,7 +359,7 @@ def race_append(doc='', text=''):  # Concurrent Append to File Operation
             if i > 10:
                 break
             with open(doc, 'a+') as f:
-                f.write(str(text))
+                f.write(text)
                 f.close()
                 break
         except Exception as e:
@@ -353,7 +375,64 @@ def race_append(doc='', text=''):  # Concurrent Append to File Operation
             except:
                 pass
 
-def inquire(call):
+def watchdog():
+
+    identity = 1 # metaNODE:1, botscript:0
+    max_latency = 600
+
+    while 1:
+        try:
+            try:
+                with open('watchdog.txt', 'r') as f:
+                    ret = f.read()
+                    f.close()
+
+                ret = literal(ret)
+                response = int(ret[identity])
+                now = int(time.time())
+                latency = now-response
+
+                if identity == 0:
+                    msg = str([response, now])
+                if identity == 1:
+                    msg = str([now, response])
+
+                with open('watchdog.txt', 'w+') as f:
+                    f.write(msg)
+                    f.close()
+
+                msg = str(latency)
+                if latency > max_latency:
+                    bell()
+                    gmail()
+                    msg += ' !!!!! WARNING: the other app is not responding !!!!!'
+                return msg
+   
+            except Exception as e:
+                msg = str(type(e).__name__) + str(e.args)
+                print(msg)
+                now = int(time.time())
+                with open('watchdog.txt', 'w+') as f:
+                    f.write(str([now, now]))
+                    f.close()
+                    break # exit while loop
+        except Exception as e:
+            msg = str(type(e).__name__) + str(e.args)
+            print(msg)
+            try:
+                f.close()
+            except:
+                pass 
+        finally:
+            try:
+                f.close()
+            except:
+                pass
+
+# CURATION
+# ======================================================================
+
+def inquire(call): # single use public node database api call
 
     while True:
         try:
@@ -368,7 +447,7 @@ def inquire(call):
             if node in white:
                 raise ValueError('whitelisted')
             call = call.replace("'", '"')  # never use single quotes
-            ws = websocket.create_connection(node, timeout=4)
+            ws = websocket.create_connection(node, timeout=6)
             ws.send(call)
             ret = json.loads(ws.recv())['result']
             ws.close()
@@ -381,7 +460,7 @@ def inquire(call):
             winnow('blacklist', node)
             pass
 
-def cache():
+def cache(): # acquire asset id and asset amount decimal place
 
     # given account name, currency and asset symbols, lookup these globals
     global account_id, asset_id, currency_id
@@ -404,8 +483,8 @@ def cache():
         print('==================================')
         print('')
 
-    # trustless of 5 nodes
-    for i in range(5):
+    # trustless of multiple nodes
+    for i in range(3):
         wwc()
         account_id = (inquire(lookup_accounts))[0][1]
         wwc()
@@ -427,14 +506,14 @@ def cache():
     websocket.enableTrace(False)
     print_market()
 
-def spawn():  # multiprocessing watchdog
+def spawn():  # multiprocessing handler
 
     # initialize background bifurcation process
     b_process = Process(target=bifurcation)
     b_process.daemon = False
     b_process.start()
 
-    # initialize  multiple threshing processes
+    # initialize multiple threshing processes
     b = 0
     c = 0
     multinode = {}
@@ -446,6 +525,7 @@ def spawn():  # multiprocessing watchdog
         time.sleep(BLIP)
 
     # kill and respawn threshing processes periodically for durability
+    # even if anything gets hung metaNODE always moves on
     while True:
         b += 1
         race_write(doc='metaNODElog.txt', text='')
@@ -469,180 +549,297 @@ def spawn():  # multiprocessing watchdog
                 race_append(doc='metaNODElog.txt', text=msg)
                 pass
             
+def thresh(process, epoch, pid):  # make calls, shake out errors
 
-def thresh(process, epoch, pid):  # shake out value errors
+    # DATABASE CALLS
+
+    def dex_handshake(node):
+        start = time.time()
+        ws = websocket.create_connection(node, timeout=4)
+        handshake_latency = time.time() - start
+        if 0 > handshake_latency > 4:
+            raise ValueError('handshake_latency', handshake_latency)
+        return handshake_latency, ws
+
+    def dex_ping_latency(ws):
+        get_chain_id = Z + '"get_chain_id",[]]}'
+        start = time.time()
+        ws.send(get_chain_id)
+        chain_id = json.loads(ws.recv())['result']
+        ping_latency = time.time() - start
+        if chain_id != MAINNET:
+            raise ValueError('chain_id != MAINNET')
+        if 0 > ping_latency > 1:
+            raise ValueError('ping_latency', ping_latency)
+        return ping_latency
+
+    def dex_block_latency(ws):
+        get_dynamic_global_properties = Z + \
+            '"get_dynamic_global_properties",[]]}'
+        ws.send(get_dynamic_global_properties)
+        dynamic_global_properties = json.loads(ws.recv())['result']
+        blocktime = from_iso_date(dynamic_global_properties['time'])
+        block_latency = TZ + time.time() - blocktime
+        if 0 > block_latency > 6:
+            raise ValueError('blocktime is stale', block_latency)
+        return block_latency, blocktime
+
+    def dex_last(ws, currency, asset):
+        get_ticker = Z + \
+            '"get_ticker",["%s","%s","%s"]]}' % (
+                currency, asset, False)
+        ws.send(get_ticker)
+        ticker = json.loads(ws.recv())['result']
+        last = precision(ticker['latest'], 16)
+        if float(last) == 0:
+            raise ValueError('zero price last')
+        return last
+
+    def dex_market_history(ws, currency, asset, now, then, depth=100):
+        get_trade_history = Z + \
+            '"get_trade_history",["%s","%s","%s","%s","%s"]]}' % (
+                currency, asset, now, then, depth)
+        ws.send(get_trade_history)
+        trade_history = json.loads(ws.recv())['result']
+        history = []
+        for i in range(len(trade_history)):
+            unix = from_iso_date(trade_history[i]['date'])
+            price = precision(trade_history[i]['price'], 16)
+            if float(price) == 0:
+                raise ValueError('zero price in history')
+            amount = precision(
+                trade_history[i]['amount'], asset_precision)
+            history.append((unix, price, amount))
+        if not len(history):
+            raise ValueError('no history')
+        return history
+        
+    def dex_account_balances(ws, account_name,
+            asset_ids=[asset_id, currency_id],
+            asset_precisions=[asset_precision, currency_precision]):
+
+        get_balances = Z + ( 
+            '"get_named_account_balances",["%s", [' %
+                account_name)
+        for i in range(len(asset_ids)):
+            get_balances += ('"' + asset_ids[i] + '",')
+        get_balances += ']]]}'
+        ws.send(get_balances)
+        ret = json.loads(ws.recv())['result']
+        balances = {}
+        if asset_ids == []: # Any assets with balance
+            for k in range(len(ret)):
+                balances[ret[k]['asset_id']] = float(
+                    ret[k]['amount'])
+            return balances
+        else: # Specific assets including zero balance
+            for j in range(len(asset_ids)):
+                balances[asset_ids[j]] = 0
+            for j in range(len(asset_ids)):
+                for k in range(len(ret)):
+                    if ret[k]['asset_id'] == asset_ids[j]:
+                        balances[asset_ids[j]] += float(
+                            ret[k]['amount'])/10**asset_precisions[j]
+            return balances
+
+    def dex_open_orders(ws, asset, asset_id, asset_precision,
+                    currency, currency_id, currency_precision):
+        get_full_accounts = Z + \
+            '"get_full_accounts",[["%s",],%s]]}' % (
+                account_name, 'false')
+        # a databnase call to the api returns price as fraction
+        # with unreferenced decimal point locations on both amounts
+        # they're also reference by A.B.C instead of ticker symbol
+        time.sleep(BLIP)
+        ws.send(get_full_accounts)
+        ret = ws.recv()
+        BitPAIR = asset + ":" + currency
+        print (BitPAIR)
+        try:
+            limit_orders = json.loads(ret)['result'][0][1]['limit_orders']
+        except:
+            limit_orders = []
+        orders = []
+        for order in limit_orders:
+            orderNumber = order['id']
+            base_id = order['sell_price']['base']['asset_id']
+            quote_id = order['sell_price']['quote']['asset_id']
+            if ((base_id in [currency_id, asset_id]) and
+                (quote_id in [currency_id, asset_id])):
+                amount = float(order['for_sale'])
+                base_amount = float(order['sell_price']['base']['amount'])
+                quote_amount = float(order['sell_price']['quote']['amount'])
+                if base_id == currency_id:
+                    base_precision = currency_precision
+                    quote_precision = asset_precision
+                else:
+                    base_precision = asset_precision
+                    quote_precision = currency_precision
+                base_amount /= 10**base_precision
+                quote_amount /= 10**quote_precision
+                if base_id == asset_id:
+                    orderType = 'sell'
+                    price = quote_amount / base_amount
+                    amount = (amount/10**base_precision)
+                else:
+                    orderType = 'buy'
+                    price = base_amount / quote_amount
+                    amount = (amount/10**base_precision)/price
+                orders.append({'orderNumber': orderNumber,
+                               'orderType': orderType,
+                               'market': BitPAIR,
+                               'amount': precision(amount, asset_precision),
+                               'price': precision(price, 16)})
+        return sorted(orders, key=lambda k: k['price']) 
+
+
+    def dex_book(ws, currency, asset, depth=3):
+        get_order_book = Z + \
+            '"get_order_book",["%s","%s","%s"]]}' % (
+                currency, asset, depth)
+        time.sleep(BLIP)
+        ws.send(get_order_book)
+        order_book = json.loads(ws.recv())['result']
+        askp = []
+        bidp = []
+        askv = []
+        bidv = []
+        for i in range(len(order_book['asks'])):
+            price = precision(order_book['asks'][i]['price'], 16)
+            if float(price) == 0:
+                raise ValueError('zero price in asks')
+            volume = precision(
+                order_book['asks'][i]['quote'], asset_precision)
+            askp.append(price)
+            askv.append(volume)
+        for i in range(len(order_book['bids'])):
+            price = precision(order_book['bids'][i]['price'], 16)
+            if float(price) == 0:
+                raise ValueError('zero price in bids')
+            volume = precision(
+                order_book['bids'][i]['quote'], asset_precision)
+            bidp.append(price)
+            bidv.append(volume)
+        if float(bidp[0]) >= float(askp[0]):
+            raise ValueError('mismatched orderbook')
+
+        return askp, bidp, askv, bidv
+
+    # THRESHING EVENT LOOP
 
     while True:
         try:
             ws = 0
             time.sleep(random())
-            # REQUEST ARGUMENTS
-            coins = [currency_id, asset_id]
-            now = to_iso_date(time.time())
-            then = to_iso_date(time.time() - 3 * 86400)
-            get_chain_id = Z + '"get_chain_id",[]]}'
-            get_dynamic_global_properties = Z + \
-                '"get_dynamic_global_properties",[]]}'
-            get_ticker = Z + \
-                '"get_ticker",["%s","%s","%s"]]}' % (
-                    currency, asset, False)
-            get_trade_history = Z + \
-                '"get_trade_history",["%s","%s","%s","%s","%s"]]}' % (
-                    currency, asset, now, then, HISTORY_DEPTH)
-            get_named_account_balances = Z + \
-                '"get_named_account_balances",["%s", ["%s","%s"]]]}' % (
-                    account_name, currency_id, asset_id)
-            get_order_book = Z + \
-                '"get_order_book",["%s","%s","%s"]]}' % (
-                    currency, asset, BOOK_DEPTH)
-
             # CHECK BLACK AND WHITE LISTS
             black = race_read(doc='blacklist.txt')
             white = race_read(doc='whitelist.txt')
             shuffle(nodes)
             node = nodes[0]
-            print(node)
             if node in black:
                 raise ValueError('blacklisted')
             if node in white:
                 raise ValueError('whitelisted')
 
-            # WEBSOCKET HANDSHAKE
-            handshake_time = time.time()
-            ws = websocket.create_connection(node, timeout=4)
-            handshake_elapsed = time.time() - handshake_time
-            if handshake_elapsed > 4:
-                raise ValueError('handshake_elapsed', handshake_elapsed)
-
-            for i in range(randint(8, 12)):
+            # connect to websocket
+            handshake_latency, ws = dex_handshake(node)
+            # use node a dozen times
+            for i in range(12):
                 time.sleep(PAUSE)
-                # CHAIN ID
-                start = time.time()
-                ws.send(get_chain_id)
-                chain_id = json.loads(ws.recv())['result']
-                ping_elapsed = time.time() - start
-                if chain_id != MAINNET:
-                    raise ValueError('chain_id != MAINNET')
-                if ping_elapsed > 1:
-                    raise ValueError('ping_elapsed', ping_elapsed)
-                # BLOCKTIME
-                time.sleep(BLIP)
-                ws.send(get_dynamic_global_properties)
-                dynamic_global_properties = json.loads(ws.recv())['result']
-                block_time = from_iso_date(dynamic_global_properties['time'])
-                block_latency = TZ + time.time() - block_time
-                if block_latency > 6:
-                    raise ValueError('blocktime is stale', block_latency)
-                # LAST
-                time.sleep(BLIP)
-                ws.send(get_ticker)
-                ticker = json.loads(ws.recv())['result']
-                last = precision(ticker['latest'], 16)
-                if float(last) == 0:
-                    raise ValueError('zero price last')
-                # MARKET HISTORY
-                time.sleep(BLIP)
-                ws.send(get_trade_history)
-                trade_history = json.loads(ws.recv())['result']
-                history = []
-                for i in range(len(trade_history)):
-                    unix = from_iso_date(trade_history[i]['date'])
-                    price = precision(trade_history[i]['price'], 16)
-                    if float(price) == 0:
-                        raise ValueError('zero price in history')
-                    amount = precision(
-                        trade_history[i]['amount'], asset_precision)
-                    history.append((unix, price, amount))
-                # ACCOUNT BALANCES
-                time.sleep(BLIP)
-                ws.send(get_named_account_balances)
-                named_account_balances = json.loads(ws.recv())['result']
-                currency_balance = 0
-                asset_balance = 0
-                for i in range(len(named_account_balances)):
-                    if named_account_balances[i]['asset_id'] == asset_id:
-                        asset_balance += float(
-                            named_account_balances[i]['amount']
-                        ) / 10 ** asset_precision
-                    elif named_account_balances[i]['asset_id'] == currency_id:
-                        currency_balance += float(
-                            named_account_balances[i]['amount']
-                        ) / 10 ** currency_precision
-                # ORDER BOOK
-                time.sleep(BLIP)
-                ws.send(get_order_book)
-                order_book = json.loads(ws.recv())['result']
-                asks = []
-                bids = []
-                for i in range(len(order_book['asks'])):
-                    price = precision(order_book['asks'][i]['price'], 16)
-                    if float(price) == 0:
-                        raise ValueError('zero price in asks')
-                    volume = precision(
-                        order_book['asks'][i]['quote'], asset_precision)
-                    asks.append((price, volume))
-                for i in range(len(order_book['bids'])):
-                    price = precision(order_book['bids'][i]['price'], 16)
-                    if float(price) == 0:
-                        raise ValueError('zero price in bids')
-                    volume = precision(
-                        order_book['bids'][i]['quote'], asset_precision)
-                    bids.append((price, volume))
-                if bids[0][0] >= asks[0][0]:
-                    raise ValueError('mismatched orderbook')
+                # Database calls
+                ping_latency = dex_ping_latency(ws)
+                block_latency, blocktime = dex_block_latency(ws)
+                last = dex_last(ws, currency, asset)
+                now = to_iso_date(time.time())
+                then = to_iso_date(time.time() - 3 * 86400)
+                history = dex_market_history(ws, currency, asset, now, then)
+                askp, bidp, askv, bidv = dex_book(ws, currency, asset, depth=3)
+                balances = dex_account_balances(ws, account_name,
+                        asset_ids=[asset_id, currency_id],
+                        asset_precisions=[asset_precision, currency_precision])
+                asset_balance, currency_balance = balances[asset_id], balances[currency_id]
+                orders = dex_open_orders(ws, asset, asset_id, asset_precision,
+                                            currency, currency_id, currency_precision)
+
+                try:
+                    import psutil # REQUIRES MODULE INSTALL
+                    proc = psutil.Process()
+                    descriptors = proc.num_fds()
+                    cpu = '%.3f' % (float(os.popen('''grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }' ''').readline()))
+                    ram = '%.3f' % (100*float(proc.memory_percent()))
+                    io = list(proc.io_counters())[:2]
+                except Exception as e: 
+                    msg = str(type(e).__name__) + str(e.args)
+                    print(msg)
+
+                watchdog_latency = watchdog()
+
                 runtime = int(time.time()) - BEGIN
 
+                # in the event data passes all tests, then
+                # print, winnow the node, and nascent trend the maven
                 print_market()
                 if (len(white) < WHITE) or (len(black) < BLACK):
-                    alert = 'ALERT!'
+                    alert = ' * building lists *'
                 else:
                     alert = ''
-                
-
-                print('runtime        ', runtime)
-                print('epoch          ', epoch, 'pid', pid)
-                print('process        ', process, 'of', PROCESSES)
+                print('runtime          ', runtime)
+                print('epoch            ', epoch, 'pid', pid)
+                print('fds, processes   ', descriptors, process, 'of', PROCESSES)
+                try:
+                    print('cpu ram          ', cpu , ram)
+                except:
+                    pass
+                try:
+                    print('read write       ', io)
+                except:
+                    pass
+                print('node             ', node)
+                print('total:white:black', node_count, len(white), len(black), alert)
                 print('')
-                print('node           ', node)
-                print('total nodes    ', len(nodes))
-                print('white : black  ', len(white), ':', len(black), alert)
+                print('block latency    ', ('%.3f' % block_latency))
+                print('handshake        ', ('%.3f' % handshake_latency))
+                print('ping             ', ('%.3f' % ping_latency))
                 print('')
-                print('block latency  ', ('%.3f' % block_latency))
-                print('handshake      ', ('%.3f' % handshake_elapsed))
-                print('ping           ', ('%.3f' % ping_elapsed))
+                print('currency         ', currency_balance, currency)
+                print('assets           ', asset_balance, asset)
                 print('')
-                print('currency       ', currency_balance, currency)
-                print('assets         ', asset_balance, asset)
+                print('last             ', ('%.16f' % float(last)))
                 print('')
-                print('last           ', ('%.16f' % float(last)))
-                print('')
-                print('history depth', len(history))
+                print('history depth    ', len(history))
                 for i in range(3):
                     print(history[i])
                 print('')
-
-                print('asks depth', len(asks))
+                print('asks depth       ', len(askp))
                 for i in range(3):
-                    print(asks[i])
-                print('bids depth', len(bids))
+                    print(askp[i], askv[i])
+                print('bids depth       ', len(bidp))
                 for i in range(3):
-                    print(bids[i])
+                    print(bidp[i], bidv[i])
+                print('')
+                print('open orders      ', len(orders))
+                for order in orders:
+                    print(order)
+                print('')
+                print('watchdog latency:', watchdog_latency)
                 print('')
 
-                winnow('whitelist', node)
-
+                # winnow whitelist the node and nascent trend the maven
                 maven = {}
-                maven['bids'] = bids
-                maven['asks'] = asks
+                maven['bidv'] = bidv
+                maven['askv'] = askv
+                maven['bidp'] = bidp
+                maven['askp'] = askp
                 maven['currency_balance'] = currency_balance
                 maven['asset_balance'] = asset_balance
                 maven['market_history'] = history
+                maven['orders'] = orders
                 maven['last'] = last
                 maven['whitelist'] = white
                 maven['blacklist'] = black
-                maven['blocktime'] = block_time
-
+                maven['blocktime'] = blocktime
                 nascent_trend(maven)
+                winnow('whitelist', node)
 
             try:
                 time.sleep(BLIP)
@@ -650,6 +847,7 @@ def thresh(process, epoch, pid):  # shake out value errors
             except Exception as e:
                 msg = str(type(e).__name__) + str(e.args)
                 print(msg)
+                pass
             continue
 
         except Exception as e:
@@ -659,6 +857,18 @@ def thresh(process, epoch, pid):  # shake out value errors
             except:
                 pass
             msg = str(type(e).__name__) + str(e.args) + node
+            if (('ValueError' not in msg) and
+                ('StatisticsError' not in msg) and
+                ('result' not in msg) and
+                ('timeout' not in msg) and
+                ('SSL' not in msg) and
+                ('WebSocketTimeoutException' not in msg) and
+                ('WebSocketBadStatusException' not in msg) and
+                ('WebSocketAddressException' not in msg) and
+                ('ConnectionResetError' not in msg) and
+                ('ConnectionRefusedError' not in msg)) :
+                    msg += '\n'+ str(traceback.format_exc())
+
             print(msg)
             if 'listed' not in msg:
                 race_append(doc='metaNODElog.txt', text=msg)
@@ -711,8 +921,11 @@ def bifurcation():  # statistically curate data
 
             l = len(mavens)
 
-            bids = []
-            asks = []
+            # initialize lists to sort data from each maven by key
+            bidp = []
+            askp = []
+            bidv = []
+            askv = []
             currency_balance = []
             asset_balance = []
             history = []
@@ -720,26 +933,31 @@ def bifurcation():  # statistically curate data
             whitelist = []
             blacklist = []
             blocktime = []
-
+            orders = []
+            # initialize the metaNODE dictionary
             metaNODE = {}
 
+            # sort maven data for statistical analysis by key
             for i in range(len(mavens)):
                 maven = literal(mavens[i])
-
                 currency_balance.append(maven['currency_balance'])
                 asset_balance.append(maven['asset_balance'])
                 last.append(maven['last'])
                 blocktime.append(maven['blocktime'])
-
-                bids.append(str(maven['bids']))
-                asks.append(str(maven['asks']))
-                history.append(str(maven['market_history']))
-
                 whitelist.append(maven['whitelist'])
                 blacklist.append(maven['blacklist'])
+                # stringify lists for statistical mode
+                bidp.append(str(maven['bidp']))
+                askp.append(str(maven['askp']))
+                bidv.append(str(maven['bidv']))
+                askv.append(str(maven['askv']))
+                history.append(str(maven['market_history']))
+                orders.append(str(maven['orders']))
 
+            # find the oldest bitshares blocktime in our dataset
             blocktime = min(blocktime)
-            # get the mode of the mavens; allow 1 less than total
+            # get the mode of the mavens for each metric
+            # allow 1 or 2 less than total & most recent for mode
             # accept "no mode" statistics error as possibility
             try:
                 currency_balance = mode(currency_balance)
@@ -763,19 +981,34 @@ def bifurcation():  # statistically curate data
                 except:
                     last = mode(last[-(l-2):])
             try:
-                bids = literal(mode(bids))
+                bidp = literal(mode(bidp))
             except:
                 try:
-                    bids = literal(mode(bids[-(l-1):]))
+                    bidp = literal(mode(bidp[-(l-1):]))
                 except:
-                    bids = literal(mode(bids[-(l-2):]))
+                    bidp = literal(mode(bidp[-(l-2):]))
             try:
-                asks = literal(mode(asks))
+                askp = literal(mode(askp))
             except:
                 try:
-                    asks = literal(mode(asks[-(l-1):]))
+                    askp = literal(mode(askp[-(l-1):]))
                 except:
-                    asks = literal(mode(asks[-(l-2):]))
+                    askp = literal(mode(askp[-(l-2):]))
+            try:
+                bidv = literal(mode(bidv))
+            except:
+                try:
+                    bidv = literal(mode(bidv[-(l-1):]))
+                except:
+                    bidv = literal(mode(bidv[-(l-2):]))
+            try:
+                askv = literal(mode(askv))
+            except:
+                try:
+                    askv = literal(mode(askv[-(l-1):]))
+                except:
+                    askv = literal(mode(askv[-(l-2):]))
+
             try:
                 history = literal(mode(history))
             except:
@@ -783,6 +1016,14 @@ def bifurcation():  # statistically curate data
                     history = literal(mode(history[-(l-1):]))
                 except:
                     history = literal(mode(history[-(l-2):]))
+
+            try:
+                orders = literal(mode(orders))
+            except:
+                try:
+                    orders = literal(mode(orders[-(l-1):]))
+                except:
+                    orders = literal(mode(orders[-(l-2):]))
 
             # attempt a full whitelist and blacklist
             wl = []
@@ -794,26 +1035,70 @@ def bifurcation():  # statistically curate data
                 bl += i
             blacklist = list(set(bl))[-BLACK:]
 
-            metaNODE['bids'] = bids
-            metaNODE['asks'] = asks
-            metaNODE['currency_balance'] = currency_balance
-            metaNODE['asset_balance'] = asset_balance
-            metaNODE['market_history'] = history
-            metaNODE['last'] = last
-            metaNODE['whitelist'] = whitelist
-            metaNODE['blacklist'] = blacklist
-            metaNODE['blocktime'] = blocktime
+            # rebuild orderbook as 4 key dict with lists of floats
+            bidp = [float(i) for i in bidp]
+            bidv = [float(i) for i in bidv]
+            askp = [float(i) for i in askp]
+            askv = [float(i) for i in askv]
+            book = {'bidp':bidp, 'bidv':bidv, 'askp':askp, 'askv':askv}
 
+            # if you made it this far without statistics error
+            # truncate and rewrite the metaNODE with curated data
+            metaNODE['book'] = book
+            metaNODE['currency_balance'] = float(currency_balance)
+            metaNODE['asset_balance'] = float(asset_balance)
+            metaNODE['history'] = history #LIST
+            metaNODE['orders'] = orders #LIST
+            metaNODE['last'] = float(last)
+            metaNODE['whitelist'] = whitelist #LIST
+            metaNODE['blacklist'] = blacklist #LIST
+            metaNODE['blocktime'] = float(blocktime)
+            metaNODE['account_name'] = account_name #STRING
+            metaNODE['account_id'] = account_id #STRING A.B.C
+            metaNODE['asset'] = asset  #STRING SYMBOL
+            metaNODE['asset_id'] = asset_id #STRING A.B.C
+            metaNODE['asset_precision'] = int(asset_precision)
+            metaNODE['currency'] = currency #STRING SYMBOL
+            metaNODE['currency_id'] = currency_id #STRING A.B.C
+            metaNODE['currency_precision'] = int(currency_precision)
+
+            # solitary process with write access to metaNODE.txt            
             race_write(doc='metaNODE.txt', text=metaNODE)
-
-        except Exception as e:
+            print ('metaNODE.txt updated')
+        
+        except Exception as e: # wait a second and try again
+            # common msg is "no mode statistics error"
             msg = str(type(e).__name__) + str(e.args)
             print(msg)
             race_append(doc='metaNODElog.txt', text=msg)
-            pass
+            continue # from top of while loop NOT pass through error
 
 # HELPER FUNCTIONS
 # ======================================================================
+def bell(duration=2, frequency=432):  # Activate linux audible bell
+
+    pass
+    '''
+    os.system('play --no-show-progress --null --channels 1 synth' +
+                  ' %s sine %f' % (duration*1000, frequency))
+    '''
+
+def gmail():
+
+    pass
+    '''
+    send_to     = "THE EMAIL ADDRESS TO SEND TO"
+    send_from   = "YOUR EMAIL ADDRESS"
+    pass        = "YOUR PASSWORD"
+    msg         = "YOUR MESSAGE!"
+
+    import smtplib
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(send_from, pass)
+    server.sendmail(send_from, send_to, msg)
+    server.quit()
+    '''
 
 def to_iso_date(unix):  # returns iso8601 datetime given unix epoch
 
@@ -836,67 +1121,10 @@ def print_market():  # terminal header with cached values
     print(time.ctime())
     print('=======================================')
     print('account   ', account_name, account_id)
-    print('currency  ', currency, currency_id,
-          1 / 10 ** currency_precision)
-    print('asset     ', asset, asset_id,
-          1 / 10 ** asset_precision)
+    print('currency  ', currency, currency_id, currency_precision)
+    print('asset     ', asset, asset_id, asset_precision)
     print('=======================================')
     print('')
-
-def banner():
-    print("\033c")
-    print(
-    '''
-
-    Do this:
-
-        metaNODE = Bitshares_Trustless_Client()
-    ''')
-    time.sleep(4)
-    print("\033c")
-    print(
-    '''
-
-    Get these curated DEX feeds:
-
-    ''')
-    time.sleep(0.5)
-    print("        metaNODE['last']      #" +
-          " float; latest price \n")
-    time.sleep(0.5)
-    print("        metaNODE['bids']      #" +
-          " list of (price,amount) tuples; [0][0]=highest bid price \n")
-    time.sleep(0.5)
-    print("        metaNODE['asks']      #" +
-          " list of (price,amount) tuples; [0][0]=lowest ask price \n")
-    time.sleep(0.5)
-    print("        metaNODE['history']   #" +
-          " list of (unix,price,amount) tuples; [0][0]=last trade time \n")
-    time.sleep(0.5)
-    print("        metaNODE['currency']  #" +
-          " float; quantity of currency \n")
-    time.sleep(0.5)
-    print("        metaNODE['assets']    #" +
-          " float; quantity of assets \n")
-    time.sleep(0.5)
-    print("        metaNODE['whitelist'] #" +
-          " list; [0]=most recently whitelisted node \n")
-    time.sleep(0.5)
-    print("        metaNODE['blacklist'] #" +
-          " list; [0]=most recently blacklisted node \n")
-    time.sleep(0.5)
-    print("        metaNODE['blocktime'] #" +
-          " oldest blockchain time in metaNODE data \n\n\n\n")
-    time.sleep(1)
-    print("to watch data feed, in second terminal type:")
-    print('')
-    print('>>> tail -f metaNODE.txt')
-    print('')
-    print("to watch error report, in third terminal type:")
-    print('')
-    print('>>> tail -f metaNODElog.txt')
-    print('')
-    time.sleep(2)
 
 def welcome():
 
@@ -904,12 +1132,45 @@ def welcome():
     print("\033c")
     logo()
     banner()
-    time.sleep(5)
-    print("\033c")
-    logo()
-    time.sleep(1)
+    time.sleep(3)
+    for i in range(5):
+        print("\033c")
+        logo()
+        time.sleep(0.5)
+    
+def logo():
 
-def main():
+    def wxyz():
+        a = 'abcdef1234567890'
+        b = ''
+        for i in range(17):
+            b = str(b + r'\x' + choice(a) + choice(a))
+        return b
+    w,x,y,z = wxyz(),wxyz(),wxyz(),wxyz()
+    print(w)
+    print(x)
+    print(
+'''                             ____  _____   ___   ______   ________
+Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \   
+  __  __  ____  ____   __     |   \ | | /  .-.  \ | | `. \ | |_ \_|   
+ (  \/  )( ___)(_  _) /  \    | |\ \| | | |   | | | |  | | |  _) _
+  )    ( | __)   ||  / <> \  _| |_\   |_\  `-'  /_| |_.' /_| |__/ |
+ (_/\/\_)(____) (__)(__)(__)(_____|\____)`.___.'(______.'(________/
+                                                        ''' + version)
+             
+    print(y)
+    print(z)
+
+def version():
+
+    global VERSION, version
+
+    version = 'v0.00000010'
+    VERSION = 'metaNODE ' + version + ' - Bitshares Trustless Client'
+
+    sys.stdout.write('\x1b]2;' + VERSION + '\x07')  # terminal #title
+
+def main(): # script primary backbone
 
     controls()
     welcome()
