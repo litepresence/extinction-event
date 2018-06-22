@@ -390,7 +390,7 @@ def control_panel():  # Advanced User Controls
     ANIMATE = False
     STORAGE_RESET = False
     CURRENCY_STOP = False
-    WARMUP = 5
+    WARMUP = 90
 
     # live window
     LIVE_PLOT_DEPTH = 86400  # 86400 = 1 day
