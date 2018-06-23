@@ -23,7 +23,7 @@ The repo name "Extinction Event" was born of the notion that DEX tech combined w
 
 EV.py 
 ------------
-	daily candle algo trading bot framework for trading on the Bitshares DEX with external CEX data
+	algo trading bot framework for trading on the Bitshares DEX with external CEX data; requires metaNODE
 microDEX.py 
 ------------
 	lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX

@@ -6,7 +6,7 @@ There were two ways to get data from Bitshares blockchain:
 1) private node that uses lots of RAM, prefers its own machine, and is technical to tend
 2) public node that is difficult to stay connected to and may provide rogue data
 
-I've created a 3rd path; connect to several random nodes in the public network... ask them each for latest market data; then move on to other node nodes.  Finally, perform statistical analysis on the combined feeds and maintain a streaming curated output file; the metaNODE.  
+I've created a 3rd path; connect to several random nodes in the public network... ask them each for latest market data; then move on to another node.  Finally, perform statistical analysis on the combined feeds and maintain a streaming curated output file; the metaNODE.  
 
 
 
