@@ -22,17 +22,20 @@ import time
 import sys
 import os
 
+# terminal header
 sys.stdout.write('\x1b]2;' + 'Bitshares Latency' + '\x07')
 
+# bitshares main net id
 ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 
+# set to true to share your latency test
 JSONBIN = False
 
 def jsonbin(no_suffix, unique, speed, urls):
 
     uri = 'https://api.jsonbin.io/b/'
     '''
-    # create a new jsonbin
+    # run this commmented subscript to create a new jsonbin
 
     headers = {'Content-Type': 'application/json', 
         'secret-key':key,
