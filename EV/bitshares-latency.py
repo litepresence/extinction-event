@@ -3,8 +3,12 @@
 # Returns list of live tested nodes sorted by latency
 # Prints list to file
 
+# Includes Geolocation Data from ip-api.com
+
 # Uploads list to jsonbin.io
 '''maintained live at https://api.jsonbin.io/b/5c06e4f71deea01014bd4261/latest#Bitshares_Latency'''
+
+
 
 # (BTS) litepresence1
 
@@ -28,10 +32,16 @@ sys.stdout.write('\x1b]2;' + 'Bitshares Latency' + '\x07')
 # bitshares main net id
 ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 
-# set to true to share your latency test
-JSONBIN = False
+BIN = 'get your bin id by creating a new bin with commented script above'
+KEY = 'get your api keys after signup at jsonbin.io'
 
-def jsonbin(no_suffix, unique, speed, urls):
+# set to true to share your latency test
+JSONBIN = True
+# set to true to add geolocation data 
+IPAPI = True
+
+def jsonbin(no_suffix, unique, speed, geo, urls):
+
 
     uri = 'https://api.jsonbin.io/b/'
     '''
@@ -49,15 +59,10 @@ def jsonbin(no_suffix, unique, speed, urls):
     print (data)
     print(data['id'])
     '''
-
-    uri = 'https://api.jsonbin.io/b/'
-    bin = 'get your bin id by creating a new bin with commented script above'
-    key = 'get your api keys after signup at jsonbin.io'
-
-    url = uri + bin
+    url = uri + BIN
 
     headers = {'Content-Type': 'application/json', 
-        'secret-key':key,
+        'secret-key':KEY,
         'private':'false'}
 
     data = {
@@ -71,6 +76,7 @@ def jsonbin(no_suffix, unique, speed, urls):
         "UNIX": str(int(time.time())),
         "UTC":  str(time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())),
         "URLS": str(urls),
+        "GEO": str(geo),
         "SOURCE_CODE": "https://github.com/litepresence/extinction-event/blob/master/EV/bitshares-latency.py"
         }
 
@@ -282,10 +288,27 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
 
         unique = []
         speed = []
+        geo = []
         for i in range(len(pinged)):
+            geolocate = 'http://ip-api.com/json/'
             if pinged[i].strip('/ws') not in [j.strip('/ws') for j in unique]:
                 unique.append(pinged[i])
-                speed.append((pinged[i],int(timed[i]*1000)/1000.0))       
+                speed.append((pinged[i],int(timed[i]*1000)/1000.0))  
+                time.sleep(1) 
+                if IPAPI:
+                    print('geolocating...')
+                    ip = (validate([pinged[i]])[0])[6:]  
+                    geolocate += ip
+                    print(geolocate)               
+                    req = requests.get(geolocate, headers={})
+                    ret = json.loads(req.text)
+                    entriesToRemove =    ('isp','regionName','org','countryCode','timezone','region','as','status','zip')
+                    for k in entriesToRemove:
+                        ret.pop(k, None)
+                    ret['ip'] = ret.pop('query')
+                    print (ret)
+                    geo.append((pinged[i],ret))
+
 
         # report outcome
         print('')
@@ -342,8 +365,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             except:
                 pass
 
-    if JSONBIN:
-        jsonbin(no_suffix, unique, speed, urls)
+    if JSONBIN: jsonbin(no_suffix, unique, speed, geo, urls)
 
     return (ret)
 
