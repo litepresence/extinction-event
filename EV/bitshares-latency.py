@@ -6,7 +6,7 @@
 # (BTS) litepresence1
 
 '''
-licence: WTFPL
+license: WTFPL
 '''
 
 from multiprocessing import Process, Value, Array
