@@ -64,7 +64,8 @@ def jsonbin(no_suffix, unique, speed, urls):
         "PING": str(speed),
         "UNIX": str(int(time.time())),
         "UTC":  str(time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())),
-        "URLS": str(urls)
+        "URLS": str(urls),
+        "SOURCE_CODE": "https://github.com/litepresence/extinction-event/blob/master/EV/bitshares-latency.py"
         }
 
     data["DICT_KEYS"] = str(list(data.keys()))
