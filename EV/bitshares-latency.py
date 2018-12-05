@@ -2,7 +2,9 @@
 #
 # Returns list of live tested nodes sorted by latency
 # Prints list to file
+
 # Uploads list to jsonbin.io
+'''maintained live at https://api.jsonbin.io/b/5c06e4f71deea01014bd4261/latest#Bitshares_Latency'''
 
 # (BTS) litepresence1
 
