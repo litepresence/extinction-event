@@ -1,7 +1,8 @@
 # Python3
 #
 # Returns list of live tested nodes sorted by latency
-#
+# Prints list to file
+# Uploads list to jsonbin.io
 
 # (BTS) litepresence1
 
