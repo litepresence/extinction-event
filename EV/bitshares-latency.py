@@ -16,6 +16,7 @@
 license: WTFPL
 '''
 
+
 from multiprocessing import Process, Value, Array
 from bitshares.blockchain import Blockchain
 from bitshares import BitShares
@@ -35,12 +36,17 @@ ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 BIN = 'get your bin id by creating a new bin with commented script above'
 KEY = 'get your api keys after signup at jsonbin.io'
 
+
 # set to true to share your latency test
 JSONBIN = True
 # set to true to add geolocation data 
 IPAPI = True
+# set to true to plot
+PLOT = True
+# set true to upload final image to hosting service
+UPLOAD = True
 
-def jsonbin(no_suffix, unique, speed, geo, urls):
+def jsonbin(no_suffix, unique, speed, geo, urls, image_url):
 
 
     uri = 'https://api.jsonbin.io/b/'
@@ -77,6 +83,7 @@ def jsonbin(no_suffix, unique, speed, geo, urls):
         "UTC":  str(time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())),
         "URLS": str(urls),
         "GEO": str(geo),
+        "MAP_URL": str(image_url),
         "SOURCE_CODE": "https://github.com/litepresence/extinction-event/blob/master/EV/bitshares-latency.py"
         }
 
@@ -108,7 +115,16 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
         included = ['api.bts.mobi', 'status200.bitshares.apasia.tech']
 
     if exclude:
-        excluded = []
+        excluded = [
+            'wss://bit.btzadazdsabc.org',
+            'wss://bitazdazdshares.openledger.info', 
+            'wss://bitshaazdzares.openledger.info',
+            'wss://bitshasdares.dacplay.org:8089',
+            'wss://bitsqsdqsdhares.openledger.info',
+            'wss://secuasdre.freedomledger.com',
+            'wss://testnet.bitshares.eu/wqsdsqs', 
+            ] # known typos found in webscraping methods, etc.
+
 
     # web scraping methods
     def clean(raw):
@@ -131,6 +147,8 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             if v[i].endswith('/wss'):
                 v[i] = v[i][:-4]
         return sorted(list(set(v)))
+
+
 
     def suffix(v):
 
@@ -190,17 +208,46 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     urls = []
     # scrape from github
     git = 'https://raw.githubusercontent.com'
+    # Bitshares Master
     url = git + '/bitshares/bitshares-ui/master/app/api/apiConfig.js'
     urls.append(url)
+    
     if not master:
-        url = git + '/bitshares/bitshares-ui/staging/app/api/apiConfig.js'
-        urls.append(url)
-        url = git + '/CryptoBridge/cryptobridge-ui/'
-        url += 'e5214ad63a41bd6de1333fd98d717b37e1a52f77/app/api/apiConfig.js'
-        urls.append(url)
-        url = git + '/litepresence/extinction-event/master/bitshares-nodes.py'
-        urls.append(url)
-
+        
+        gits = [
+            '/bitshares/bitshares-ui/staging/app/api/apiConfig.js',
+            '/CryptoBridge/cryptobridge-ui/e5214ad63a41bd6de1333fd98d717b37e1a52f77/app/api/apiConfig.js',
+            '/litepresence/extinction-event/master/bitshares-nodes.py',
+            '/blckchnd/rudex-ui/rudex/app/api/apiConfig.js',
+            '/jhtitor/citadel/92c561a23aee20189c3827e231643f6d54ed55c1/bitsharesqt/bootstrap.py',
+            '/BitSharesEurope/wallet.bitshares.eu/c618759e450ed645629421d6e6d063d0623652b1/app/api/apiConfig.js',
+            '/dexgate/dexgate-ui/b16c117df1aa13348925ca99caf12f27947ccfbc/app/api/apiConfig.js',
+            '/tpkeeper/btswallet_web/master/app/api/apiConfig.js',
+            '/crexonline/crex/00fec97b4305d9105b19d723bccf93085bf55a12/app/api/apiConfig.js',
+            '/InfraexDev/BTSExchange/a9de1845ceed16270e1d22752cf0a0e98841f4bd/app/api/apiConfig.js',
+            '/myneworder/crex-ui/eb3f77ddb81b415c83c817c8aa980abf79ac8bb5/app/api/apiConfig.js',
+            '/hamzoni/zcom-ui/aed6c10417e40f9b9467a891c48aba1d64a5dc18/app/api/apiConfig.js',
+            '/mhowardweb/blockchain-connector/5c99251cfcb780a04f9bb06150d76a6423a7c871/vuex-bitshares/config.js',
+            '/TKFORKED/hx-ui/6e5282ace6e4845a4cf3db99b9688ba6b2de6c80/app/api/apiConfig.js',
+            '/MCLXI/cb/d3842a05f052276cc0d48e5d1ece4fd4b0977dcd/app/api/apiConfig.js',
+            '/blag-potok/blgtk/c5192cedf09f9f298cf8d7d59de89cebc1f71f8c/index.html',
+            '/Open-Asset/Bitshares_nodes/d375fa830699131a9e334cb689a5d70578f4db4f/Bitshares%20Public%20Nodes%20Open-Assets',
+            '/zcom-project/zcomjs-ws/94dd0763c4ea0866dfffcaba568ac5f970c7d38a/test/Manager.js',
+            '/AAAChain/w3ajs-ws/479b7c562fe216156edc2d38b3e22297428ea30b/test/Manager.js',
+            '/LocalCoinIS/localcoinjs-ws/00870ec1471b69014b8076e84ba76ef8bd16f7b5/test/Manager.js',
+            '/Cloud-eer/cloud-ws/17f95488b444bf5ff693cd16701bad9fd4902d8b/test/Manager.js',
+            '/denkhaus/bitshares/f73c254c7b94b36174cd0597c68b1c6c5ecb982e/api/tester.go',
+            '/BTS-CM/Bitshares-HUG-REST-API/a39b3d09e65a118ad551dc0834ef9199ec618a14/hug_script.py',
+            '/dbxone/dbxui/4a39f849d203f28d8e27a78b5b70c4ae5b6e3f5a/app/api/apiConfig.js',
+            '/oooautoclub/autounite-js/51c04acd6b795ad9801b2241a01ca890ec8a535e/app/api/apiConfig.js',
+            '/alldex/alldex-ui/61323a668783aa3609eb1e77b92348f5cffcba01/app/api/apiConfig.js',
+            '/jwaiswa7/bit_shares_exknox/046a514a31d10dba38c0ea37f3dbd14b64abecad/app/api/apiConfig.js',
+            '/theserranos/bitsharesAPINode/3a9a49cc566246e95a71b49389fe1eebffcfce81/config.js',
+            ]
+        for g in gits:
+            url = git + g
+            urls.append(url)
+    
     # include manually entered sites for Bitshares nodes
     validated = [] + included
 
@@ -224,13 +271,17 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
         print(('remove %s known bad nodes' % len(excluded)))
         validated = [i for i in validated if i not in excluded]
 
+    ########################################################
+    ########################################################
     #manual timeout and validated list for quick custom test
     if 0:
         timeout = 30
     if 0:
         validated = ['wss://b.mrx.im', 'wss://b.mrx.im/ws', 'wss://b.mrx.im/wss']
     if 0:
-        validated = validated[-3:]
+        validated = validated[-5:]
+    ########################################################
+    ########################################################
 
     # final sanitization
     validated = sorted(list(set(validate(parse(clean(validated))))))
@@ -290,6 +341,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
         speed = []
         geo = []
         for i in range(len(pinged)):
+
             geolocate = 'http://ip-api.com/json/'
             if pinged[i].strip('/ws') not in [j.strip('/ws') for j in unique]:
                 unique.append(pinged[i])
@@ -297,7 +349,15 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
                 time.sleep(1) 
                 if IPAPI:
                     print('geolocating...')
-                    ip = (validate([pinged[i]])[0])[6:]  
+                    ip = (validate([pinged[i]])[0])[6:]  #strip wws://, /wss, /ws, and / 
+                    ip = ip.split(":")[0]
+                    # ip-api has trouble with these; parsed manually at ipinfo.info:
+                    if (ip == 'freedom.bts123.cc'):
+                        ip = '121.42.8.104'
+                    if (ip == 'ws.gdex.top'):
+                        ip = '106.15.82.97' 
+                    if (ip == 'bitshares.dacplay.org'):
+                        ip = '120.55.181.181'
                     geolocate += ip
                     print(geolocate)               
                     req = requests.get(geolocate, headers={})
@@ -365,7 +425,72 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             except:
                 pass
 
-    if JSONBIN: jsonbin(no_suffix, unique, speed, geo, urls)
+    if PLOT:
+
+        print('plotting...')
+        import matplotlib.pyplot as plt
+        import matplotlib.cbook as cbook
+        import numpy as np
+        imageFile = cbook.get_sample_data('/home/oracle/extinction-event/LIVE/map2.png')
+        img = plt.imread(imageFile)
+        fig, ax = plt.subplots(figsize=(9,18))
+        plt.xticks(np.arange(-180,180,30))
+        plt.yticks(np.arange(-90,90,30))
+        ax.imshow(img, extent=[-180, 180, -90, 90])
+        fig.tight_layout()
+
+        plt.pause(0.1)
+
+        xs = []
+        ys = []
+        for i in range(len(geo)):
+            try:
+                x = float(geo[i][1]['lon'])
+                y = float(geo[i][1]['lat'])
+                xs.append(x)
+                ys.append(y)
+                l = geo[i][0]
+                try:
+                    s = float(speed[i][1])
+                    m = 10*5/s              
+                except:
+                    m = 10
+                    pass
+                print(x,y,l,s,m)
+                plt.plot([x],[y],'ro', markersize=m,alpha=0.2)
+
+            except:
+                print('skipping', geo[i])
+                pass
+        plt.plot(xs,ys,'yo', markersize=4)
+
+
+
+
+        plt.savefig('/home/oracle/extinction-event/LIVE/nodemap.png', dpi=100)
+
+    if UPLOAD:
+
+        image_url = ''
+        try:
+            url = 'https://vgy.me/upload'
+            files = {'file': open('nodemap.png', 'rb')}
+            r = requests.post(url, files=files)
+            image_url = json.loads(r.text)['image']
+        except:
+            print('vgy failed')
+            pass
+        print (image_url)
+
+    if JSONBIN: jsonbin(no_suffix, unique, speed, geo, urls, image_url)
+
+    if PLOT:
+        for i in range(9000):
+            plt.pause(0.1)
+    else: 
+        time.sleep(900)
+
+    
 
     return (ret)
 
@@ -373,9 +498,9 @@ def loop():
 
     while 1:
         try:
-            nodes(timeout=10, pings=999, crop=999, noprint=False, write=True,
-                include=True, exclude=False, master=False)
-            time.sleep(900)
+            nodes(timeout=6, pings=999, crop=999, noprint=False, write=True,
+                include=True, exclude=True, master=False)
+            
 
         # no matter what happens just keep verifying book
         except Exception as e:
@@ -391,7 +516,7 @@ def update():
     try:
         while not updated:
             nodes(timeout=6, pings=999, crop=999, noprint=False, write=True,
-                include=False, exclude=False, master=False)
+                include=False, exclude=False, master=True)
             updated = 1
 
     # not satisfied until verified once
