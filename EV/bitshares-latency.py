@@ -33,9 +33,8 @@ sys.stdout.write('\x1b]2;' + 'Bitshares Latency' + '\x07')
 # bitshares main net id
 ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 
-BIN = 'get your bin id by creating a new bin with commented script in def jsonbin'
+BIN = 'get your bin id by creating a new bin with commented script above'
 KEY = 'get your api keys after signup at jsonbin.io'
-
 
 # set to true to share your latency test
 JSONBIN = True
@@ -46,7 +45,58 @@ PLOT = True
 # set true to upload final image to hosting service
 UPLOAD = True
 
-def jsonbin(no_suffix, unique, speed, geo, urls, image_url):
+
+def test_seeds():
+    
+    # scrape list of seed nodes from github:
+    url = 'https://raw.githubusercontent.com/bitshares/bitshares-core/master/libraries/app/application.cpp'
+
+    # my ISP is currently blocking github so...
+    uri = 'https://www.textise.net/showText.aspx?strURL=https%253A//'
+    url = uri + 'raw.githubusercontent.com/bitshares/bitshares-core/master/libraries/app/application.cpp'
+
+    req = requests.get(url).text
+
+    ret = req.replace(" ", "").replace(",", "").split('seeds={')[1].split('}')[0]
+    ret = ret.split('//')
+    ret = [i for i in ret if '"' in i]
+    ret = [i.split('"')[1] for i in ret]
+    ret = [i.split(':')[0] for i in ret]
+
+
+    seeds = []
+    print('pinging and geolocating seed nodes...')
+    print('')
+    for i in ret:
+
+        cmd='ping -c 1 ' + i
+        a=os.popen(cmd).read()
+        try:
+            ping = int(a.split('time=')[1].split(' ms')[0])
+        except:
+            ping = 0
+        geolocate = 'http://ip-api.com/json/'
+        ip = i
+
+        # some ips are not recognized by ip-api.com; substitute ipinfo.info manually:
+        if ip == 'seeds.bitshares.eu':
+            ip = '45.76.70.247'
+        geolocate += ip
+                    
+        req = requests.get(geolocate, headers={})
+        ret = json.loads(req.text)
+        entriesToRemove =    ('isp','regionName','org','countryCode','timezone','region','as','status','zip')
+        for k in entriesToRemove:
+            ret.pop(k, None)
+        ret['ip'] = ret.pop('query')
+        ret = (i, ping, ret)
+        print(ret)
+        seeds.append(ret)
+
+    return seeds
+
+
+def jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds):
 
 
     uri = 'https://api.jsonbin.io/b/'
@@ -83,6 +133,7 @@ def jsonbin(no_suffix, unique, speed, geo, urls, image_url):
         "UTC":  str(time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())),
         "URLS": str(urls),
         "GEO": str(geo),
+        "SEEDS": str(seeds),
         "MAP_URL": str(image_url),
         "SOURCE_CODE": "https://github.com/litepresence/extinction-event/blob/master/EV/bitshares-latency.py"
         }
@@ -109,10 +160,13 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     # crop    : return only best nodes
     # write   : maintains an output file nodes.txt with list of best nodes
 
+
+    seeds = test_seeds()
+
     # include and exclude custom nodes
     included, excluded = [], []
     if include:
-        included = ['api.bts.mobi', 'status200.bitshares.apasia.tech']
+        included = ['api.bts.mobi', 'status200.bitshares.apasia.tech','newapi.bts.ai', 'api.bts.network', 'wss://altcap.io', 'wss://ap-northeast-1.bts.crypto-bridge.org', 'wss://ap-northeast-2.bts.crypto-bridge.org', 'wss://ap-south-1.bts.crypto-bridge.org', 'wss://ap-southeast-1.bts.crypto-bridge.org', 'wss://ap-southeast-2.bts.crypto-bridge.org', 'wss://api-ru.bts.blckchnd.com', 'wss://api.bitshares.bhuz.info', 'wss://api.bitsharesdex.com', 'wss://api.bts.ai', 'wss://api.bts.blckchnd.com', 'wss://api.bts.mobi', 'wss://api.bts.network', 'wss://api.btsgo.net', 'wss://api.btsxchng.com', 'wss://api.dex.trading', 'wss://api.fr.bitsharesdex.com', 'wss://api.open-asset.tech', 'wss://atlanta.bitshares.apasia.tech', 'wss://australia.bitshares.apasia.tech', 'wss://b.mrx.im', 'wss://bit.btsabc.org', 'wss://bitshares-api.wancloud.io', 'wss://bitshares.apasia.tech', 'wss://bitshares.bts123.cc:15138', 'wss://bitshares.crypto.fans', 'wss://bitshares.cyberit.io', 'wss://bitshares.dacplay.org', 'wss://bitshares.dacplay.org:8089', 'wss://bitshares.neocrypto.io', 'wss://bitshares.nu', 'wss://bitshares.openledger.info', 'wss://bitshares.testnet.crypto-bridge.org', 'wss://blockzms.xyz', 'wss://bts-api.lafona.net', 'wss://bts-seoul.clockwork.gr', 'wss://bts.ai.la', 'wss://bts.liuye.tech:4443', 'wss://bts.open.icowallet.net', 'wss://bts.proxyhosts.info', 'wss://bts.to0l.cn:4443', 'wss://bts.transwiser.com', 'wss://btsfullnode.bangzi.info', 'wss://btsws.roelandp.nl', 'wss://btsza.co.za:8091', 'wss://ca-central-1.bts.crypto-bridge.org', 'wss://canada6.daostreet.com', 'wss://capetown.bitshares.africa', 'wss://chicago.bitshares.apasia.tech', 'wss://citadel.li/node', 'wss://crazybit.online', 'wss://croatia.bitshares.apasia.tech', 'wss://dallas.bitshares.apasia.tech', 'wss://de.bts.dcn.cx', 'wss://dele-puppy.com', 'wss://dex.rnglab.org', 'wss://dexnode.net', 'wss://england.bitshares.apasia.tech', 'wss://eu-central-1.bts.crypto-bridge.org', 'wss://eu-west-1.bts.crypto-bridge.org', 'wss://eu-west-2.bts.crypto-bridge.org', 'wss://eu-west-3.bts.crypto-bridge.org', 'wss://eu.nodes.bitshares.works', 'wss://eu.nodes.bitshares.ws', 'wss://eu.openledger.info', 'wss://fake.automatic-selection.com', 'wss://fi.bts.dcn.cx', 'wss://france.bitshares.apasia.tech', 'wss://frankfurt8.daostreet.com', 'wss://freedom.bts123.cc:15138', 'wss://japan.bitshares.apasia.tech', 'wss://kc-us-dex.xeldal.com', 'wss://kimziv.com', 'wss://la.dexnode.net', 'wss://miami.bitshares.apasia.tech', 'wss://na.openledger.info', 'wss://ncali5.daostreet.com', 'wss://netherlands.bitshares.apasia.tech', 'wss://new-york.bitshares.apasia.tech', 'wss://node.bitshares.eu', 'wss://node.btscharts.com', 'wss://node.market.rudex.org', 'wss://node.testnet.bitshares.eu', 'wss://nohistory.proxyhosts.info', 'wss://ohio4.daostreet.com', 'wss://openledger.hk', 'wss://oregon2.daostreet.com', 'wss://paris7.daostreet.com', 'wss://relinked.com', 'wss://sa-east-1.bts.crypto-bridge.org', 'wss://scali10.daostreet.com', 'wss://seattle.bitshares.apasia.tech', 'wss://secure.freedomledger.com', 'wss://seoul9.daostreet.com', 'wss://sg.nodes.bitshares.works', 'wss://sg.nodes.bitshares.ws', 'wss://singapore.bitshares.apasia.tech', 'wss://slovenia.bitshares.apasia.tech', 'wss://status200.bitshares.apasia.tech', 'wss://testnet-eu.bitshares.apasia.tech', 'wss://testnet.bitshares.apasia.tech', 'wss://testnet.bitshares.eu', 'wss://testnet.bts.dcn.cx', 'wss://testnet.dex.trading', 'wss://testnet.nodes.bitshares.ws', 'wss://this.uptick.rocks', 'wss://us-east-1.bts.crypto-bridge.org', 'wss://us-la.bitshares.apasia.tech', 'wss://us-ny.bitshares.apasia.tech', 'wss://us-west-1.bts.crypto-bridge.org', 'wss://us.nodes.bitshares.works', 'wss://us.nodes.bitshares.ws', 'wss://valen-tin.fr:8090', 'wss://valley.bitshares.apasia.tech', 'wss://virginia3.daostreet.com', 'wss://ws.aunite.com', 'wss://ws.gdex.io', 'wss://ws.gdex.top', 'wss://ws.hellobts.com', 'wss://ws.winex.pro', 'wss://wss.ioex.top', 'wss://za.bitshares.africa']
 
     if exclude:
         excluded = [
@@ -206,8 +260,13 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     print ('=====================================')
     print(('found %s nodes stored in script' % len(included)))
     urls = []
+
     # scrape from github
     git = 'https://raw.githubusercontent.com'
+
+    # my ISP is currently blocking github so...
+    git = 'https://www.textise.net/showText.aspx?strURL=https%253A//raw.githubusercontent.com'
+
     # Bitshares Master
     url = git + '/bitshares/bitshares-ui/master/app/api/apiConfig.js'
     urls.append(url)
@@ -251,19 +310,20 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
     # include manually entered sites for Bitshares nodes
     validated = [] + included
 
-    for u in urls:
-        attempts = 3
-        while attempts > 0:
-            try:
-                raw = requests.get(u).text
-                v = validate(parse(clean(raw)))
-                print(('found %s nodes at %s' % (len(v), u[:65])))
-                validated += v
-                attempts = 0
-            except:
-                print(('failed to connect to %s' % u))
-                attempts -= 1
-                pass
+    if 1:
+        for u in urls:
+            attempts = 3
+            while attempts > 0:
+                try:
+                    raw = requests.get(u).text
+                    v = validate(parse(clean(raw)))
+                    print(('found %s nodes at %s' % (len(v), u[:65])))
+                    validated += v
+                    attempts = 0
+                except:
+                    print(('failed to connect to %s' % u))
+                    attempts -= 1
+                    pass
 
     # remove known bad nodes from test
     if len(excluded):
@@ -431,11 +491,13 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
         import matplotlib.pyplot as plt
         import matplotlib.cbook as cbook
         import numpy as np
-        imageFile = cbook.get_sample_data('/home/oracle/extinction-event/LIVE/map2.png')
+        imageFile = cbook.get_sample_data('/home/oracle/extinction-event/EV/basemap.png')
         img = plt.imread(imageFile)
-        fig, ax = plt.subplots(figsize=(9,18))
-        plt.xticks(np.arange(-180,180,30))
-        plt.yticks(np.arange(-90,90,30))
+        fig, ax = plt.subplots(figsize=(12,24))
+        #plt.xticks(np.arange(-180,180,30))
+        #plt.yticks(np.arange(-90,90,30))
+        plt.xticks([])
+        plt.yticks([])
         ax.imshow(img, extent=[-180, 180, -90, 90])
         fig.tight_layout()
 
@@ -452,22 +514,53 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
                 l = geo[i][0]
                 try:
                     s = float(speed[i][1])
-                    m = 10*5/s              
+                    m = 40/s              
                 except:
                     m = 10
                     pass
                 print(x,y,l,s,m)
-                plt.plot([x],[y],'ro', markersize=m,alpha=0.2)
+                plt.plot([x],[y],'mo', markersize=m,alpha=0.25)
 
             except:
                 print('skipping', geo[i])
                 pass
-        plt.plot(xs,ys,'yo', markersize=4)
+        plt.plot(xs,ys,'wo', markersize=4, alpha=0.25)
 
+        # PLOT SEED NODES
+        xs = []
+        ys = []
+        for i in range(len(seeds)):
+            if float(seeds[i][1]) > 0:
+                try:
+                    x = float(seeds[i][2]['lon'])
+                    y = float(seeds[i][2]['lat'])
+                    xs.append(x)
+                    ys.append(y)
+                except:
+                    print('skipping', seeds[i])
+                    pass
+        plt.plot(xs,ys,'yo', markersize=4, alpha=1.0)   
 
+        utc = str(time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())) + ' UTC'
 
+        plt.text(0, -60, utc, alpha=0.5, color='w', size=15)           
 
-        plt.savefig('/home/oracle/extinction-event/LIVE/nodemap.png', dpi=100)
+        location = '/home/oracle/extinction-event/EV/nodemap.png'
+
+        plt.savefig(location, 
+            dpi=100,
+            bbox_inches='tight',
+            pad_inches = 0)
+
+        # SAVE HISTORY
+        if 0:
+            location = '/home/oracle/extinction-event/EV/nodemap_' + str(int(time.time())) + '.png'
+            
+            plt.savefig(location, 
+                dpi=100,
+                bbox_inches='tight',
+                pad_inches = 0)
+        
 
     if UPLOAD:
 
@@ -482,7 +575,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=False,
             pass
         print (image_url)
 
-    if JSONBIN: jsonbin(no_suffix, unique, speed, geo, urls, image_url)
+    if JSONBIN: jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds)
 
     if PLOT:
         for i in range(9000):
@@ -515,7 +608,7 @@ def update():
     updated = 0
     try:
         while not updated:
-            nodes(timeout=6, pings=999, crop=999, noprint=False, write=True,
+            nodes(timeout=7, pings=999, crop=999, noprint=False, write=True,
                 include=False, exclude=False, master=True)
             updated = 1
 
