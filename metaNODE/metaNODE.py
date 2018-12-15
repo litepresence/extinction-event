@@ -26,6 +26,15 @@ try:
 except:
     raise ValueError('pip install websocket-client')
 
+def version():
+
+    global VERSION, version
+
+    version = 'v0.00000012'
+    VERSION = 'metaNODE ' + version + ' - Bitshares Trustless Client'
+
+    sys.stdout.write('\x1b]2;' + 'Bitshares metaNODE' + '\x07')  # terminal #title
+
 
 def banner():
     print("\033c")
@@ -91,11 +100,11 @@ def banner():
 def controls():
 
     global WHITE, BLACK, TIMEOUT, PROCESSES, MAVENS
-    global BOOK_DEPTH, HISTORY_DEPTH, PAUSE, BLIP
+    global BOOK_DEPTH, HISTORY_DEPTH, PAUSE, BLIP, SKIP_INTRO
 
                             #As Tested
-    WHITE           = 20    #20
-    BLACK           = 30    #30
+    WHITE           = 10    #20
+    BLACK           = 10    #30
     TIMEOUT         = 300   #300
     PROCESSES       = 20    #20
     MAVENS          = 7     #7
@@ -103,101 +112,13 @@ def controls():
     HISTORY_DEPTH   = 50    #50
     PAUSE           = 4     #2
     BLIP            = 0.05  #0.05
+    SKIP_INTRO      = True
 
 def public_nodes():
 
     global nodes, node_count
-    nodes = ['wss://ap-northeast-1.bts.crypto-bridge.org/wss',
-             'wss://ap-northeast-2.bts.crypto-bridge.org/wss',
-             'wss://ap-southeast-1.bts.crypto-bridge.org/wss',
-             'wss://ap-southeast-2.bts.crypto-bridge.org/wss',
-             'wss://api-ru.bts.blckchnd.com/wss',
-             'wss://api.bitshares.bhuz.info/ws',
-             'wss://api.bitsharesdex.com',
-             'wss://api.bts.ai/',
-             'wss://api.bts.blckchnd.com/wss',
-             'wss://api.bts.mobi/wss',
-             'wss://api.bts.network',
-             'wss://api.btsgo.net/ws',
-             'wss://api.btsxchng.com',
-             'wss://atlanta.bitshares.apasia.tech/ws',
-             'wss://australia.bitshares.apasia.tech/ws',
-             'wss://b.mrx.im/wss',
-             'wss://bit.btsabc.org/ws',
-             'wss://bitshares-api.wancloud.io/ws',
-             'wss://bitshares.apasia.tech/ws',
-             'wss://bitshares.bts123.cc:15138/',
-             'wss://bitshares.crypto.fans/ws',
-             'wss://bitshares.cyberit.io/',
-             'wss://bitshares.dacplay.org/wss',
-             'wss://bitshares.dacplay.org:8089/wss',
-             'wss://bitshares.neocrypto.io/wss',
-             'wss://bitshares.nu/ws',
-             'wss://bitshares.openledger.info/ws',
-             'wss://blockzms.xyz/ws',
-             'wss://bts-api.lafona.net/ws',
-             'wss://bts-seoul.clockwork.gr',
-             'wss://bts.ai.la/wss',
-             'wss://bts.proxyhosts.info/wss',
-             'wss://bts.open.icowallet.net/ws',
-             'wss://bts.to0l.cn:4443/ws',
-             'wss://bts.transwiser.com/wss',
-             'wss://btsws.roelandp.nl/ws',
-             'wss://btsza.co.za:8091/ws',
-             'wss://canada6.daostreet.com/ws',
-             'wss://capetown.bitshares.africa/ws',
-             'wss://chicago.bitshares.apasia.tech/ws',
-             'wss://crazybit.online',
-             'wss://croatia.bitshares.apasia.tech/ws',
-             'wss://dallas.bitshares.apasia.tech/ws',
-             'wss://dele-puppy.com/wss',
-             'wss://dex.rnglab.org/wss',
-             'wss://dexnode.net/wss',
-             'wss://england.bitshares.apasia.tech/ws',
-             'wss://eu-central-1.bts.crypto-bridge.org/wss',
-             'wss://eu-west-1.bts.crypto-bridge.org/wss',
-             'wss://eu.nodes.bitshares.ws/wss',
-             'wss://eu.openledger.info/ws',
-             'wss://france.bitshares.apasia.tech/ws',
-             'wss://frankfurt8.daostreet.com/ws',
-             'wss://freedom.bts123.cc:15138/',
-             'wss://japan.bitshares.apasia.tech/ws',
-             'wss://kc-us-dex.xeldal.com/wss',
-             'wss://kimziv.com/ws',
-             'wss://la.dexnode.net/wss',
-             'wss://miami.bitshares.apasia.tech/ws',
-             'wss://ncali5.daostreet.com/ws',
-             'wss://new-york.bitshares.apasia.tech/ws',
-             'wss://node.bitshares.eu/wss',
-             'wss://node.btscharts.com/ws',
-             'wss://node.market.rudex.org/wss',
-             'wss://nohistory.proxyhosts.info/wss',
-             'wss://ohio4.daostreet.com/ws',
-             'wss://openledger.hk/ws',
-             'wss://oregon2.daostreet.com/ws',
-             'wss://paris7.daostreet.com/ws',
-             'wss://relinked.com/ws',
-             'wss://sa-east-1.bts.crypto-bridge.org/wss',
-             'wss://scali10.daostreet.com/ws',
-             'wss://seattle.bitshares.apasia.tech/ws',
-             'wss://seoul9.daostreet.com/ws',
-             'wss://sg.nodes.bitshares.ws/wss',
-             'wss://singapore.bitshares.apasia.tech/ws',
-             'wss://slovenia.bitshares.apasia.tech/wss',
-             'wss://this.uptick.rocks/ws',
-             'wss://us-east-1.bts.crypto-bridge.org/wss',
-             'wss://us-la.bitshares.apasia.tech/ws',
-             'wss://us-ny.bitshares.apasia.tech/wss',
-             'wss://us-west-1.bts.crypto-bridge.org/wss',
-             'wss://us.nodes.bitshares.ws/wss',
-             'wss://valen-tin.fr:8090/wss',
-             'wss://valley.bitshares.apasia.tech/ws',
-             'wss://virginia3.daostreet.com/ws',
-             'wss://ws.gdex.io',
-             'wss://ws.gdex.top/wss',
-             'wss://ws.hellobts.com/',
-             'wss://ws.winex.pro/wss',
-             'wss://za.bitshares.africa/ws', ]
+    nodes = ['wss://api-ru.bts.blckchnd.com/wss', 'wss://api.bitshares.bhuz.info/wss', 'wss://api.bitsharesdex.com', 'wss://api.bts.ai/wss', 'wss://api.bts.blckchnd.com/ws', 'wss://api.bts.mobi/ws', 'wss://api.bts.network/wss', 'wss://api.btsgo.net/wss', 'wss://api.dex.trading/ws', 'wss://api.fr.bitsharesdex.com', 'wss://atlanta.bitshares.apasia.tech/wss', 'wss://b.mrx.im/ws', 'wss://bit.btsabc.org/ws', 'wss://bitshares.cyberit.io/wss', 'wss://bitshares.openledger.info/ws', 'wss://blockzms.xyz/wss', 'wss://bts-api.lafona.net/ws', 'wss://bts-seoul.clockwork.gr/wss', 'wss://bts.liuye.tech:4443', 'wss://bts.open.icowallet.net/wss', 'wss://bts.proxyhosts.info/wss', 'wss://btsfullnode.bangzi.info/wss', 'wss://btsws.roelandp.nl/wss', 'wss://chicago.bitshares.apasia.tech/wss', 'wss://crazybit.online/ws', 'wss://dexnode.net/wss', 'wss://england.bitshares.apasia.tech/ws', 'wss://eu.nodes.bitshares.ws/ws', 'wss://eu.openledger.info/wss', 'wss://kc-us-dex.xeldal.com/wss', 'wss://kimziv.com/ws', 'wss://la.dexnode.net/ws', 'wss://na.openledger.info/ws', 'wss://netherlands.bitshares.apasia.tech/ws', 'wss://new-york.bitshares.apasia.tech/wss', 'wss://node.bitshares.eu/wss', 'wss://node.market.rudex.org/wss', 'wss://openledger.hk/wss', 'wss://relinked.com/ws', 'wss://seattle.bitshares.apasia.tech/wss', 'wss://sg.nodes.bitshares.ws/ws', 'wss://us-la.bitshares.apasia.tech/ws', 'wss://us-ny.bitshares.apasia.tech/wss', 'wss://us.nodes.bitshares.ws/wss', 'wss://ws.gdex.io/wss', 'wss://ws.gdex.top/ws', 'wss://ws.hellobts.com/ws']
+
     node_count = len(nodes)
 
 def constants():
@@ -615,8 +536,12 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
         return history
         
     def dex_account_balances(ws, account_name,
-            asset_ids=[asset_id, currency_id],
-            asset_precisions=[asset_precision, currency_precision]):
+            asset_ids=[],
+            asset_precisions=[]):
+
+        if '1.3.0' not in asset_ids:
+            asset_ids.append('1.3.0')
+            asset_precisions.append(5)
 
         get_balances = Z + ( 
             '"get_named_account_balances",["%s", [' %
@@ -627,20 +552,14 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
         ws.send(get_balances)
         ret = json.loads(ws.recv())['result']
         balances = {}
-        if asset_ids == []: # Any assets with balance
+        for j in range(len(asset_ids)):
+            balances[asset_ids[j]] = 0
+        for j in range(len(asset_ids)):
             for k in range(len(ret)):
-                balances[ret[k]['asset_id']] = float(
-                    ret[k]['amount'])
-            return balances
-        else: # Specific assets including zero balance
-            for j in range(len(asset_ids)):
-                balances[asset_ids[j]] = 0
-            for j in range(len(asset_ids)):
-                for k in range(len(ret)):
-                    if ret[k]['asset_id'] == asset_ids[j]:
-                        balances[asset_ids[j]] += float(
-                            ret[k]['amount'])/10**asset_precisions[j]
-            return balances
+                if ret[k]['asset_id'] == asset_ids[j]:
+                    balances[asset_ids[j]] += float(
+                        ret[k]['amount'])/10**asset_precisions[j]
+        return balances
 
     def dex_open_orders(ws, asset, asset_id, asset_precision,
                     currency, currency_id, currency_precision):
@@ -693,7 +612,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
         return sorted(orders, key=lambda k: k['price']) 
 
 
-    def dex_book(ws, currency, asset, depth=3):
+    def dex_book(ws, currency, asset, depth=20):
         get_order_book = Z + \
             '"get_order_book",["%s","%s","%s"]]}' % (
                 currency, asset, depth)
@@ -753,11 +672,13 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 now = to_iso_date(time.time())
                 then = to_iso_date(time.time() - 3 * 86400)
                 history = dex_market_history(ws, currency, asset, now, then)
-                askp, bidp, askv, bidv = dex_book(ws, currency, asset, depth=3)
+                askp, bidp, askv, bidv = dex_book(ws, currency, asset, depth=20)
                 balances = dex_account_balances(ws, account_name,
                         asset_ids=[asset_id, currency_id],
                         asset_precisions=[asset_precision, currency_precision])
-                asset_balance, currency_balance = balances[asset_id], balances[currency_id]
+                bts_balance = balances['1.3.0']
+                asset_balance = balances[asset_id]
+                currency_balance = balances[currency_id]
                 orders = dex_open_orders(ws, asset, asset_id, asset_precision,
                                             currency, currency_id, currency_precision)
 
@@ -776,7 +697,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
 
                 runtime = int(time.time()) - BEGIN
 
-                # in the event data passes all tests, then
+                # in the event data passes all tests, then:
                 # print, winnow the node, and nascent trend the maven
                 print_market()
                 if (len(white) < WHITE) or (len(black) < BLACK):
@@ -801,6 +722,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 print('handshake        ', ('%.3f' % handshake_latency))
                 print('ping             ', ('%.3f' % ping_latency))
                 print('')
+                print('bitshares        ', bts_balance, 'BTS')
                 print('currency         ', currency_balance, currency)
                 print('assets           ', asset_balance, asset)
                 print('')
@@ -830,6 +752,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 maven['askv'] = askv
                 maven['bidp'] = bidp
                 maven['askp'] = askp
+                maven['bts_balance'] = bts_balance
                 maven['currency_balance'] = currency_balance
                 maven['asset_balance'] = asset_balance
                 maven['market_history'] = history
@@ -926,6 +849,7 @@ def bifurcation():  # statistically curate data
             askp = []
             bidv = []
             askv = []
+            bts_balance = []
             currency_balance = []
             asset_balance = []
             history = []
@@ -934,12 +858,14 @@ def bifurcation():  # statistically curate data
             blacklist = []
             blocktime = []
             orders = []
+
             # initialize the metaNODE dictionary
             metaNODE = {}
 
             # sort maven data for statistical analysis by key
             for i in range(len(mavens)):
                 maven = literal(mavens[i])
+                bts_balance.append(maven['bts_balance'])
                 currency_balance.append(maven['currency_balance'])
                 asset_balance.append(maven['asset_balance'])
                 last.append(maven['last'])
@@ -954,11 +880,18 @@ def bifurcation():  # statistically curate data
                 history.append(str(maven['market_history']))
                 orders.append(str(maven['orders']))
 
-            # find the oldest bitshares blocktime in our dataset
-            blocktime = min(blocktime)
+            # find the youngest bitshares blocktime in our dataset
+            blocktime = max(blocktime)
             # get the mode of the mavens for each metric
             # allow 1 or 2 less than total & most recent for mode
             # accept "no mode" statistics error as possibility
+            try:
+                bts_balance = mode(bts_balance)
+            except:
+                try:
+                    bts_balance = mode(bts_balance[-(l-1):])
+                except:
+                    bts_balance = mode(bts_balance[-(l-2):])
             try:
                 currency_balance = mode(currency_balance)
             except:
@@ -1042,9 +975,19 @@ def bifurcation():  # statistically curate data
             askv = [float(i) for i in askv]
             book = {'bidp':bidp, 'bidv':bidv, 'askp':askp, 'askv':askv}
 
+            # calculate total outstanding orders
+            buy_sum = 0
+            sell_sum = 0
+            for order in orders:
+                if order['orderType'] == 'buy':
+                    buy_sum += float(order['amount'])*float(order['price'])
+                if order['orderType'] == 'sell':
+                    sell_sum += float(order['amount'])
+
             # if you made it this far without statistics error
             # truncate and rewrite the metaNODE with curated data
             metaNODE['book'] = book
+            metaNODE['bts_balance'] = float(bts_balance)
             metaNODE['currency_balance'] = float(currency_balance)
             metaNODE['asset_balance'] = float(asset_balance)
             metaNODE['history'] = history #LIST
@@ -1061,6 +1004,8 @@ def bifurcation():  # statistically curate data
             metaNODE['currency'] = currency #STRING SYMBOL
             metaNODE['currency_id'] = currency_id #STRING A.B.C
             metaNODE['currency_precision'] = int(currency_precision)
+            metaNODE['buy_sum'] = float(buy_sum)
+            metaNODE['sell_sum'] = float(sell_sum)
 
             # solitary process with write access to metaNODE.txt            
             race_write(doc='metaNODE.txt', text=metaNODE)
@@ -1131,12 +1076,13 @@ def welcome():
     version()
     print("\033c")
     logo()
-    banner()
-    time.sleep(3)
-    for i in range(5):
-        print("\033c")
-        logo()
-        time.sleep(0.5)
+    if not SKIP_INTRO: 
+        banner()
+        time.sleep(3)
+        for i in range(5):
+            print("\033c")
+            logo()
+            time.sleep(0.5)
     
 def logo():
 
@@ -1157,18 +1103,8 @@ Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \
   )    ( | __)   ||  / <> \  _| |_\   |_\  `-'  /_| |_.' /_| |__/ |
  (_/\/\_)(____) (__)(__)(__)(_____|\____)`.___.'(______.'(________/
                                                         ''' + version)
-             
     print(y)
     print(z)
-
-def version():
-
-    global VERSION, version
-
-    version = 'v0.00000010'
-    VERSION = 'metaNODE ' + version + ' - Bitshares Trustless Client'
-
-    sys.stdout.write('\x1b]2;' + VERSION + '\x07')  # terminal #title
 
 def main(): # script primary backbone
 
