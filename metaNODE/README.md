@@ -1,3 +1,18 @@
+UPDATE DEC 15, 2018
+===================
+I have achieved 60+ day metaNODE run time; the plotted data for the past 7 months has been clean. 
+The only time metaNODE has been down since the experiment began was due to power outage, etc. 
+
+latencyTEST.py writes nodes.txt; a list of responding nodes which metaNODE.py uses for its known universe.
+You will need to provide a nodes.txt; manually or with latencyTEST.py before running the metaNODE.
+
+microDEX.py and extinctionEVENT.py are built to connect to metaNODE.py via metaNODE.txt
+
+microDEX.py is your orderbook, buy/sell/cancel utility, and chart
+extinctionEVENT.py is your algo trading bot and backtesting engine
+
+
+
 metaNODE = Bitshares_Trustless_Client()
 ========================
 
