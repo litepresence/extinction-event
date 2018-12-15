@@ -91,11 +91,11 @@ def banner():
 def controls():
 
     global WHITE, BLACK, TIMEOUT, PROCESSES, MAVENS
-    global BOOK_DEPTH, HISTORY_DEPTH, PAUSE, BLIP
+    global BOOK_DEPTH, HISTORY_DEPTH, PAUSE, BLIP, SKIP_INTRO
 
                             #As Tested
-    WHITE           = 20    #20
-    BLACK           = 30    #30
+    WHITE           = 10    #20
+    BLACK           = 10    #30
     TIMEOUT         = 300   #300
     PROCESSES       = 20    #20
     MAVENS          = 7     #7
@@ -103,101 +103,13 @@ def controls():
     HISTORY_DEPTH   = 50    #50
     PAUSE           = 4     #2
     BLIP            = 0.05  #0.05
+    SKIP_INTRO      = True
 
 def public_nodes():
 
     global nodes, node_count
-    nodes = ['wss://ap-northeast-1.bts.crypto-bridge.org/wss',
-             'wss://ap-northeast-2.bts.crypto-bridge.org/wss',
-             'wss://ap-southeast-1.bts.crypto-bridge.org/wss',
-             'wss://ap-southeast-2.bts.crypto-bridge.org/wss',
-             'wss://api-ru.bts.blckchnd.com/wss',
-             'wss://api.bitshares.bhuz.info/ws',
-             'wss://api.bitsharesdex.com',
-             'wss://api.bts.ai/',
-             'wss://api.bts.blckchnd.com/wss',
-             'wss://api.bts.mobi/wss',
-             'wss://api.bts.network',
-             'wss://api.btsgo.net/ws',
-             'wss://api.btsxchng.com',
-             'wss://atlanta.bitshares.apasia.tech/ws',
-             'wss://australia.bitshares.apasia.tech/ws',
-             'wss://b.mrx.im/wss',
-             'wss://bit.btsabc.org/ws',
-             'wss://bitshares-api.wancloud.io/ws',
-             'wss://bitshares.apasia.tech/ws',
-             'wss://bitshares.bts123.cc:15138/',
-             'wss://bitshares.crypto.fans/ws',
-             'wss://bitshares.cyberit.io/',
-             'wss://bitshares.dacplay.org/wss',
-             'wss://bitshares.dacplay.org:8089/wss',
-             'wss://bitshares.neocrypto.io/wss',
-             'wss://bitshares.nu/ws',
-             'wss://bitshares.openledger.info/ws',
-             'wss://blockzms.xyz/ws',
-             'wss://bts-api.lafona.net/ws',
-             'wss://bts-seoul.clockwork.gr',
-             'wss://bts.ai.la/wss',
-             'wss://bts.proxyhosts.info/wss',
-             'wss://bts.open.icowallet.net/ws',
-             'wss://bts.to0l.cn:4443/ws',
-             'wss://bts.transwiser.com/wss',
-             'wss://btsws.roelandp.nl/ws',
-             'wss://btsza.co.za:8091/ws',
-             'wss://canada6.daostreet.com/ws',
-             'wss://capetown.bitshares.africa/ws',
-             'wss://chicago.bitshares.apasia.tech/ws',
-             'wss://crazybit.online',
-             'wss://croatia.bitshares.apasia.tech/ws',
-             'wss://dallas.bitshares.apasia.tech/ws',
-             'wss://dele-puppy.com/wss',
-             'wss://dex.rnglab.org/wss',
-             'wss://dexnode.net/wss',
-             'wss://england.bitshares.apasia.tech/ws',
-             'wss://eu-central-1.bts.crypto-bridge.org/wss',
-             'wss://eu-west-1.bts.crypto-bridge.org/wss',
-             'wss://eu.nodes.bitshares.ws/wss',
-             'wss://eu.openledger.info/ws',
-             'wss://france.bitshares.apasia.tech/ws',
-             'wss://frankfurt8.daostreet.com/ws',
-             'wss://freedom.bts123.cc:15138/',
-             'wss://japan.bitshares.apasia.tech/ws',
-             'wss://kc-us-dex.xeldal.com/wss',
-             'wss://kimziv.com/ws',
-             'wss://la.dexnode.net/wss',
-             'wss://miami.bitshares.apasia.tech/ws',
-             'wss://ncali5.daostreet.com/ws',
-             'wss://new-york.bitshares.apasia.tech/ws',
-             'wss://node.bitshares.eu/wss',
-             'wss://node.btscharts.com/ws',
-             'wss://node.market.rudex.org/wss',
-             'wss://nohistory.proxyhosts.info/wss',
-             'wss://ohio4.daostreet.com/ws',
-             'wss://openledger.hk/ws',
-             'wss://oregon2.daostreet.com/ws',
-             'wss://paris7.daostreet.com/ws',
-             'wss://relinked.com/ws',
-             'wss://sa-east-1.bts.crypto-bridge.org/wss',
-             'wss://scali10.daostreet.com/ws',
-             'wss://seattle.bitshares.apasia.tech/ws',
-             'wss://seoul9.daostreet.com/ws',
-             'wss://sg.nodes.bitshares.ws/wss',
-             'wss://singapore.bitshares.apasia.tech/ws',
-             'wss://slovenia.bitshares.apasia.tech/wss',
-             'wss://this.uptick.rocks/ws',
-             'wss://us-east-1.bts.crypto-bridge.org/wss',
-             'wss://us-la.bitshares.apasia.tech/ws',
-             'wss://us-ny.bitshares.apasia.tech/wss',
-             'wss://us-west-1.bts.crypto-bridge.org/wss',
-             'wss://us.nodes.bitshares.ws/wss',
-             'wss://valen-tin.fr:8090/wss',
-             'wss://valley.bitshares.apasia.tech/ws',
-             'wss://virginia3.daostreet.com/ws',
-             'wss://ws.gdex.io',
-             'wss://ws.gdex.top/wss',
-             'wss://ws.hellobts.com/',
-             'wss://ws.winex.pro/wss',
-             'wss://za.bitshares.africa/ws', ]
+    nodes = ['wss://api-ru.bts.blckchnd.com/wss', 'wss://api.bitshares.bhuz.info/wss', 'wss://api.bitsharesdex.com', 'wss://api.bts.ai/wss', 'wss://api.bts.blckchnd.com/ws', 'wss://api.bts.mobi/ws', 'wss://api.bts.network/wss', 'wss://api.btsgo.net/wss', 'wss://api.dex.trading/ws', 'wss://api.fr.bitsharesdex.com', 'wss://atlanta.bitshares.apasia.tech/wss', 'wss://b.mrx.im/ws', 'wss://bit.btsabc.org/ws', 'wss://bitshares.cyberit.io/wss', 'wss://bitshares.openledger.info/ws', 'wss://blockzms.xyz/wss', 'wss://bts-api.lafona.net/ws', 'wss://bts-seoul.clockwork.gr/wss', 'wss://bts.liuye.tech:4443', 'wss://bts.open.icowallet.net/wss', 'wss://bts.proxyhosts.info/wss', 'wss://btsfullnode.bangzi.info/wss', 'wss://btsws.roelandp.nl/wss', 'wss://chicago.bitshares.apasia.tech/wss', 'wss://crazybit.online/ws', 'wss://dexnode.net/wss', 'wss://england.bitshares.apasia.tech/ws', 'wss://eu.nodes.bitshares.ws/ws', 'wss://eu.openledger.info/wss', 'wss://kc-us-dex.xeldal.com/wss', 'wss://kimziv.com/ws', 'wss://la.dexnode.net/ws', 'wss://na.openledger.info/ws', 'wss://netherlands.bitshares.apasia.tech/ws', 'wss://new-york.bitshares.apasia.tech/wss', 'wss://node.bitshares.eu/wss', 'wss://node.market.rudex.org/wss', 'wss://openledger.hk/wss', 'wss://relinked.com/ws', 'wss://seattle.bitshares.apasia.tech/wss', 'wss://sg.nodes.bitshares.ws/ws', 'wss://us-la.bitshares.apasia.tech/ws', 'wss://us-ny.bitshares.apasia.tech/wss', 'wss://us.nodes.bitshares.ws/wss', 'wss://ws.gdex.io/wss', 'wss://ws.gdex.top/ws', 'wss://ws.hellobts.com/ws']
+
     node_count = len(nodes)
 
 def constants():
@@ -691,7 +603,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
         return sorted(orders, key=lambda k: k['price']) 
 
 
-    def dex_book(ws, currency, asset, depth=3):
+    def dex_book(ws, currency, asset, depth=20):
         get_order_book = Z + \
             '"get_order_book",["%s","%s","%s"]]}' % (
                 currency, asset, depth)
@@ -751,7 +663,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 now = to_iso_date(time.time())
                 then = to_iso_date(time.time() - 3 * 86400)
                 history = dex_market_history(ws, currency, asset, now, then)
-                askp, bidp, askv, bidv = dex_book(ws, currency, asset, depth=3)
+                askp, bidp, askv, bidv = dex_book(ws, currency, asset, depth=20)
                 balances = dex_account_balances(ws, account_name,
                         asset_ids=[asset_id, currency_id],
                         asset_precisions=[asset_precision, currency_precision])
@@ -1143,12 +1055,13 @@ def welcome():
     version()
     print("\033c")
     logo()
-    banner()
-    time.sleep(3)
-    for i in range(5):
-        print("\033c")
-        logo()
-        time.sleep(0.5)
+    if not SKIP_INTRO: 
+        banner()
+        time.sleep(3)
+        for i in range(5):
+            print("\033c")
+            logo()
+            time.sleep(0.5)
     
 def logo():
 
@@ -1176,7 +1089,7 @@ def version():
 
     global VERSION, version
 
-    version = 'v0.00000011'
+    version = 'v0.00000012'
     VERSION = 'metaNODE ' + version + ' - Bitshares Trustless Client'
 
     sys.stdout.write('\x1b]2;' + VERSION + '\x07')  # terminal #title
