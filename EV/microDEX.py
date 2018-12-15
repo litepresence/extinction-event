@@ -38,6 +38,15 @@ from bitshares.blockchain import Blockchain
 
 
 PAUSE = 0.5
+COLOR = True
+
+def version():
+
+    global VERSION
+
+    VERSION = 'v0.00000015'
+
+    sys.stdout.write('\x1b]2;' + 'Bitshares microDEX' + '\x07')  # terminal #title
 
 def Bitshares_Trustless_Client(): # Your access to the metaNODE
 
@@ -70,25 +79,19 @@ def Bitshares_Trustless_Client(): # Your access to the metaNODE
     return metaNODE
 
 
+
 def red(text):
-    return ('\033[91m' + text + '\033[0m')
-        
+    return ('\033[91m' + text + '\033[0m') if COLOR else text
 def green(text):
-    return ('\033[92m' + text + '\033[0m')
-
+    return ('\033[92m' + text + '\033[0m') if COLOR else text
 def yellow(text):
-    return ('\033[93m' + text + '\033[0m')
-
+    return ('\033[93m' + text + '\033[0m') if COLOR else text
 def blue(text):
-    return ('\033[94m' + text + '\033[0m')
-
-def version():
-
-    global VERSION
-
-    VERSION = 'microDEX v0.00000014 - Bitshares Minimalist UI'
-
-    sys.stdout.write('\x1b]2;' + VERSION + '\x07')  # terminal #title
+    return ('\033[94m' + text + '\033[0m') if COLOR else text
+def purple(text):
+    return ('\033[95m' + text + '\033[0m') if COLOR else text
+def cyan(text):
+    return ('\033[96m' + text + '\033[0m') if COLOR else text
 
 def constants():
 
@@ -222,6 +225,13 @@ def book():  # updates orderbook data
             asset = metaNODE['asset']
             history = metaNODE['history']
             book = metaNODE['book']
+            buy_sum = metaNODE['buy_sum']
+            sell_sum = metaNODE['sell_sum']
+
+            asset_total = (asset_balance + sell_sum)
+            currency_total = (currency_balance + buy_sum)
+            asset_value = asset_total + currency_total/last
+            currency_value = asset_value*last
 
             # format data
             history = history[:10]
@@ -242,13 +252,15 @@ def book():  # updates orderbook data
 
             # display orderbooks
             print("\033c")
-            print(time.ctime(), blue('    microDEX - Bishares Minimalist UI    '), 'RUN TIME',
-                 (int(time.time()) - BEGIN))
+            print(cyan(time.ctime()),
+                  blue('    microDEX - Bishares Minimalist UI    '),
+                  'RUN TIME', cyan(str(int(time.time()) - BEGIN)),
+                  '     ', blue(VERSION))
             #for k, v in metaNODE.items():
             #    print(k)
             print('')
-            print('                        PING', ('%.3f' % ping) ,
-                  '   ', 'TOTAL LATENCY',(latency),'   ', node)
+            print('                        PING', cyan('%.3f' % ping) ,
+                  '   ', 'BLOCK LATENCY',cyan(latency),'   ', purple(node))
             print('')
             print(
                 yellow('                        LAST'),
@@ -256,11 +268,11 @@ def book():  # updates orderbook data
                 '   ',
                 yellow(BitPAIR))
             print('')
-            print(
-                '            ', sbidv[0], '  ', (
-                    sbidp[0])[:10] + ',' + (sbidp[0])[10:],
-                '   ',
-                (saskp[0])[:10] + ',' + (saskp[0])[10:], (saskv[0]))
+            print('            ', purple(sbidv[0]), '  ',
+                  purple((sbidp[0])[:10] + ',' + (sbidp[0])[10:]),
+                  '   ',
+                  purple((saskp[0])[:10] + ',' + (saskp[0])[10:]),
+                  purple(saskv[0]))
             print('                                           ',
                   'BIDS',
                   '   ',
@@ -281,15 +293,23 @@ def book():  # updates orderbook data
                 print (yellow('                                  NO OPEN ORDERS'))
             
             print('')
-            print (blue('ASSET:'), asset_balance, asset, blue('  CURRENCY:'), currency_balance, currency, blue('  BITSHARES:'), bts_balance)
+            print (blue(' ASSETS: '), ('%.4f' % asset_balance).rjust(12, ' '), '          ',
+                   blue('  CURRENCY: '), ('%.4f' % currency_balance).rjust(12, ' '), 
+                   blue('             BITSHARES: '), bts_balance)
+            print(blue(' ORDERS: '),('%.4f' % sell_sum).rjust(12, ' '),
+                  '                       ',('%.4f' % buy_sum).rjust(12, ' '))
+            print(blue('  TOTAL: '),purple(('%.4f' % (asset_total)).rjust(12, ' ')),
+                  '                       ',purple(('%.4f' % (currency_total)).rjust(12, ' ')))
+            print(blue('    MAX: '),green(('%.4f' % (asset_value)).rjust(12, ' ')),yellow(asset.ljust(10, ' ')),'            ',       
+                  green(('%.4f' % (currency_value)).rjust(12, ' ')),yellow(currency.ljust(10, ' ')))
             print('')
-            now = int(time.time())
-            print(yellow(str(now)), yellow('MARKET HISTORY  -  STALE BY '), yellow(str(now-(history[0][0]-tz)))) #, stale, 'since last trade')
+            now = int(time.time())                             
+            print(cyan(str(now)), yellow('MARKET HISTORY - LAST TRADE '), cyan(str(now-(history[0][0]-tz)))) #, stale, 'since last trade')
             for transaction in history:
                 print ((transaction[0]-tz), transaction[1], transaction[2])
 
             print('')
-            print('ctrl+shift+\ will EXIT to terminal')
+            print(blue('ctrl+shift+\ will EXIT to terminal'))
             print('')         
 
         except Exception as e:
@@ -1046,12 +1066,13 @@ def main():
 
     # sign in - username/market/password
     print("\033c")
+
     # Encoded Compressed Bitshares ASCII Logo
     import zlib
     b = b'x\x9c\xad\xd4M\n\xc4 \x0c\x05\xe0}O1P\x12B\x10\xbc\x82\xf7?\xd5\xf8\xaf\x83F\xe3\xe0[t\xf9\xf5%\xda>\x9f\x1c\xf7\x7f\x9e\xb9\x01\x17\x0cc\xec\x05\xe3@Y\x18\xc6(\'Z\x1a\xca.\x1bC\xa5l\r\x85\xa20\xb6\x8a\xca\xd8,W0\xec\x05\xc3\xdf\xd4_\xe3\r\x11(q\x16\xec\x95l\x04\x06\x0f\x0c\xc3\xddD\x9dq\xd2#\xa4NT\x0c/\x10\xd1{b\xd4\x89\x92\x91\x84\x11\xd9\x9d-\x87.\xe4\x1cB\x15|\xe0\xc8\x88\x13\xa5\xbc\xd4\xa21\x8e"\x18\xdc\xd2\x0e\xd3\xb6\xa0\xc6h\xa3\xd4\xde\xd0\x19\x9a\x1e\xd8\xddr\x0e\xcf\xf8n\xe0Y\rq\x1fP:p\x92\xf2\xdbaB,v\xda\x84j\xc4.\x03\xb1>\x97\xee{\x99oSa\x00\x0f\xc6\x84\xd8\xdf\x0f\xb4e\xa7$\xfdE\xae\xde\xb1/\x1d\xfc\x96\x8a'
-    print(blue(zlib.decompress(b).decode()))
+    print(cyan(zlib.decompress(b).decode()))
 
-    print(yellow('''
+    print(blue('''
                                        ______   ________  ____  ____  
                                       (_   _ `.(_   __  |(_  _)(_  _)
        __  __  ____  ___  ____   ___    | | `. \ | |_ \_|  \ \__/ /  
@@ -1060,8 +1081,8 @@ def main():
       (_/\/\_)(____)\___)(_)\_) \___/ (______.'(________|(____)(____)
     ===================================================================
           '''))
-    print('           ' + VERSION)
-    print(yellow('''
+    print(cyan('           Bitshares Minimalist UI ' + VERSION))
+    print(blue('''
     ===================================================================
           '''))
     print('')
@@ -1081,7 +1102,7 @@ def main():
             print (type(e).__name__, 'try again...')
             pass
     print('')
-    print('      Welcome Back: ', yellow(str(account)))
+    print('      Welcome Back: ', account)
     print('')
     print(' Default market is: ', red(BitPAIR))
     print('')
