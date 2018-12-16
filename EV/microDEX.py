@@ -44,7 +44,7 @@ def version():
 
     global VERSION
 
-    VERSION = 'v0.00000015'
+    VERSION = 'v0.00000016'
 
     sys.stdout.write('\x1b]2;' + 'Bitshares microDEX' + '\x07')  # terminal #title
 
@@ -249,6 +249,16 @@ def book():  # updates orderbook data
             caskv = list(np.cumsum(book['askv']))
             cbidv = [('%.2f' % i).rjust(12, ' ') for i in cbidv]
             caskv = [('%.2f' % i).rjust(12, ' ') for i in caskv]
+
+            depth = 30
+            sbidp = sbidp[:depth]
+            saskp = saskp[:depth]
+            sbidv = sbidv[:depth]
+            saskv = saskv[:depth]
+            cbidv = cbidv[:depth]
+            caskv = caskv[:depth]
+
+
 
             # display orderbooks
             print("\033c")
@@ -811,148 +821,293 @@ def plot_format(log):
     plt.gcf().autofmt_xdate(rotation=30)
     plt.gcf().canvas.set_window_title('microDEX CHART')
 
+def dom_format():
+
+    warnings.filterwarnings("ignore", category=cbook.mplDeprecation)
+    ax = plt.gca()
+    ax.patch.set_facecolor('0.1')
+    ax.yaxis.tick_right()
+    ax.spines['bottom'].set_color('0.5')
+    ax.spines['top'].set_color(None)
+    ax.spines['right'].set_color('0.5')
+    ax.spines['left'].set_color(None)
+    ax.tick_params(axis='x', colors='0.7', which='both')
+    ax.tick_params(axis='y', colors='0.7', which='both')
+    ax.yaxis.label.set_color('0.9')
+    ax.xaxis.label.set_color('0.9')
+    plt.minorticks_on
+    plt.grid(b=True, which='major', color='0.2', linestyle='-')
+    plt.grid(b=True, which='minor', color='0.2', linestyle='-')
+    ax.yaxis.set_major_formatter(tkr.ScalarFormatter())
+    ax.yaxis.set_minor_formatter(tkr.ScalarFormatter())
+    ax.yaxis.set_major_formatter(tkr.FormatStrFormatter("%.0f"))
+    ax.yaxis.set_minor_formatter(tkr.FormatStrFormatter("%.0f"))
+    plt.autoscale(enable=True, axis='y')
+    plt.tight_layout()
+    plt.gcf().autofmt_xdate(rotation=30)
+    plt.gcf().canvas.set_window_title('microDEX DOM')
+
+def dom():
+
+    fig = plt.figure()
+    while 1:
+        try:
+            # gather data from the metaNODE
+            metaNODE = Bitshares_Trustless_Client()
+            # localize variables
+            book = metaNODE['book']
+            orders = metaNODE['orders']
+            history = metaNODE['history']
+            # orders comes to us from metaNODE sorted by price
+            # sort orders prices/volumes by bid/ask
+            obidp = []
+            oaskp = []
+            obidv = []
+            oaskv = []
+            for order in orders:
+                if order['orderType'] == 'buy':
+                    obidp.append(float(order['price']))
+                    obidv.append(float(order['amount']))
+                if order['orderType'] == 'sell':
+                    oaskp.append(float(order['price']))
+                    oaskv.append(float(order['amount']))
+            # we need to reverse bids before cumsum
+            obidp = obidp[::-1]
+            obidv = obidv[::-1]
+            # normal open order volume
+            sum_ov = sum(obidv+oaskv)
+            len_ov = len(obidv+oaskv)
+            oav = sum_ov/len_ov if len_ov else 1
+            # average of my open order volume
+            onbidv = [30*i/oav for i in obidv]
+            onaskv = [30*i/oav for i in oaskv]
+            # cumulative open order volume
+            ocbidv = list(np.cumsum(obidv))
+            ocaskv = list(np.cumsum(oaskv))
+            # quick list of zeros size of our cumulative order volume
+            obid0 = [0 for i in ocbidv]
+            oask0 = [0 for i in ocaskv]
+            # market bid ask price and volume lists
+            bidp = book['bidp']
+            askp = book['askp']
+            bidv = book['bidv']
+            askv = book['askv']
+            # cumulative volume
+            cbidv = list(np.cumsum(bidv))
+            caskv = list(np.cumsum(askv))
+            # limit the orderbook depth
+            depth = 30
+            bidp = bidp[:depth]
+            askp = askp[:depth]
+            bidv = bidv[:depth]
+            askv = askv[:depth]
+            cbidv = cbidv[:depth]
+            caskv = caskv[:depth]
+            # quick list of zeros size of cumulative volume
+            bid0 = [0 for i in cbidv]
+            ask0 = [0 for i in caskv]
+            # normalize recent trade history time and volue to fit dom
+            trade_price = []
+            trade_volume = []
+            for trade in history:
+                trade_price.append(float(trade[1]))
+                trade_volume.append(float(trade[2]))
+            # normalize trade time to scale of y axis
+            max_cv = max(cbidv+caskv)
+            sig_max_cv = float('%s' % float('%.1g' % max_cv))
+            trade_time = np.linspace(0, -max_cv, num=len(trade_price))
+            # normalize trade volume to use as marker size
+            stv = sum(trade_volume)
+            ltv = len(trade_volume)
+            atv = stv/ltv            
+            n_trade_volume = [i/atv for i in trade_volume]
+            # clear plot then add items
+            plt.cla()
+            # plot depth of market
+            plt.plot(bidp, cbidv,
+                     markersize=1, marker='.', color='lime')
+            plt.plot(askp, caskv,
+                     markersize=1, marker='.', color='red')
+            # shade depth of market
+            plt.fill_between(bidp, cbidv, bid0,
+                             facecolor='green', interpolate=True, alpha = 0.2)
+            plt.fill_between(askp, caskv, ask0,
+                             facecolor='red', interpolate=True, alpha = 0.2)
+            # plot depth of market
+            plt.plot(obidp, ocbidv,
+                     markersize=1, marker='.', color='orange')
+            plt.plot(oaskp, ocaskv,
+                     markersize=1, marker='.', color='orange')
+            # shade depth of market
+            plt.fill_between(obidp, ocbidv, obid0,
+                             facecolor='orange', interpolate=True, alpha = 0.2)
+            plt.fill_between(oaskp, ocaskv, oask0,
+                             facecolor='orange', interpolate=True, alpha = 0.2)
+            # scatter plot orders on cumulative volume line with normalized marker size
+            plt.scatter(obidp, ocbidv, s=onbidv, marker='o', color='yellow', alpha = 0.5)
+            plt.scatter(oaskp, ocaskv, s=onaskv, marker='o', color='yellow', alpha = 0.5)
+            # plot recent trade history
+            plt.plot(trade_price, trade_time,
+                     markersize=1, marker='.', color='magenta')
+            for i in range(len(trade_price)):
+                # plot recent trade history volume
+                plt.plot([trade_price[i]], [trade_time[i]],
+                     markersize=(3*n_trade_volume[i]), marker='.', color='yellow', alpha = 0.5)
+            # format the chart
+            fig.patch.set_facecolor('0.15')            
+            plt.yticks(np.linspace(0, sig_max_cv, 11))
+            dom_format()
+            # repeat process every second
+            for i in range(10):
+                plt.pause(0.1)
+        except Exception as e:
+            msg = msg_(e)
+            race_append(doc='microDEX_log.txt', text=msg)
+            time.sleep(10)
+            pass
+
 def charts():
 
     try:
-
         def draw_chart():
-            ASSET = BitASSET.replace('OPEN.', '')
-            CURRENCY = BitCURRENCY.replace('OPEN.', '')
-            PAIR = ('%s_%s' % (CURRENCY, ASSET))
-            ret = live_candles(PAIR, 300, 1000)
-            cex_5m_x = ret['unix']
-            cex_5m_close = ret['close']
-            cex_5m_high = ret['high']
-            cex_5m_low = ret['low']
-            cex_5m_x = [(i + 150) for i in cex_5m_x]
-            ret = live_candles(PAIR, 7200, 2000)
-            cex_2h_x = ret['unix']
-            cex_2h_close = ret['close']
-            cex_2h_high = ret['high']
-            cex_2h_low = ret['low']
-            cex_2h_x = [(i + 3600) for i in cex_2h_x]
-            ret = live_candles(PAIR, 86400, 1000)
-            cex_d_x = ret['unix']
-            cex_d_close = ret['close']
-            cex_d_high = ret['high']
-            cex_d_low = ret['low']
-            crop = len(cex_d_x) - 90
-            cex_d_x = cex_d_x[-crop:]
-            cex_d_close = cex_d_close[-crop:]
-            cex_d_high = cex_d_high[-crop:]
-            cex_d_low = cex_d_low[-crop:]
-            cex_d_x = [(i + 43400) for i in cex_d_x]
-            ma1_d_period = float(MA1.get())
-            ma2_d_period = float(MA2.get())
-            ma1_2h_period = 12.0 * ma1_d_period
-            ma2_2h_period = 12.0 * ma2_d_period
+            try:
+                ASSET = BitASSET.replace('OPEN.', '')
+                CURRENCY = BitCURRENCY.replace('OPEN.', '')
+                PAIR = ('%s_%s' % (CURRENCY, ASSET))
+                ret = live_candles(PAIR, 300, 1000)
+                cex_5m_x = ret['unix']
+                cex_5m_close = ret['close']
+                cex_5m_high = ret['high']
+                cex_5m_low = ret['low']
+                cex_5m_x = [(i + 150) for i in cex_5m_x]
+                ret = live_candles(PAIR, 7200, 2000)
+                cex_2h_x = ret['unix']
+                cex_2h_close = ret['close']
+                cex_2h_high = ret['high']
+                cex_2h_low = ret['low']
+                cex_2h_x = [(i + 3600) for i in cex_2h_x]
+                ret = live_candles(PAIR, 86400, 1000)
+                cex_d_x = ret['unix']
+                cex_d_close = ret['close']
+                cex_d_high = ret['high']
+                cex_d_low = ret['low']
+                crop = len(cex_d_x) - 90
+                cex_d_x = cex_d_x[-crop:]
+                cex_d_close = cex_d_close[-crop:]
+                cex_d_high = cex_d_high[-crop:]
+                cex_d_low = cex_d_low[-crop:]
+                cex_d_x = [(i + 43400) for i in cex_d_x]
+                ma1_d_period = float(MA1.get())
+                ma2_d_period = float(MA2.get())
+                ma1_2h_period = 12.0 * ma1_d_period
+                ma2_2h_period = 12.0 * ma2_d_period
 
-            selloff_ = float(SELLOFF.get())
-            support_ = float(SUPPORT.get())
-            resistance_ = float(RESISTANCE.get())
-            despair_ = float(DESPAIR.get())
-            cross_ = float(CROSS.get())
+                selloff_ = float(SELLOFF.get())
+                support_ = float(SUPPORT.get())
+                resistance_ = float(RESISTANCE.get())
+                despair_ = float(DESPAIR.get())
+                cross_ = float(CROSS.get())
 
-            ma1_2h = float_sma(cex_2h_close, ma1_2h_period)
-            ma2_2h = float_sma(cex_2h_close, ma2_2h_period)
-            min_len = min(len(ma1_2h), len(ma2_2h))
-            ma1_2h = ma1_2h[-min_len:]
-            ma2_2h = ma2_2h[-min_len:]
-            ma_x_2h = cex_2h_x[-min_len:]
-            ma2_2h = cross_ * ma2_2h
+                ma1_2h = float_sma(cex_2h_close, ma1_2h_period)
+                ma2_2h = float_sma(cex_2h_close, ma2_2h_period)
+                min_len = min(len(ma1_2h), len(ma2_2h))
+                ma1_2h = ma1_2h[-min_len:]
+                ma2_2h = ma2_2h[-min_len:]
+                ma_x_2h = cex_2h_x[-min_len:]
+                ma2_2h = cross_ * ma2_2h
 
-            if min(ma1_d_period, ma2_d_period) > 2:
+                if min(ma1_d_period, ma2_d_period) > 2:
 
-                ma1_d = float_sma(cex_d_close, ma1_d_period)
-                ma2_d = float_sma(cex_d_close, ma2_d_period)
-                min_len = min(len(ma1_d), len(ma2_d))
+                    ma1_d = float_sma(cex_d_close, ma1_d_period)
+                    ma2_d = float_sma(cex_d_close, ma2_d_period)
+                    min_len = min(len(ma1_d), len(ma2_d))
 
-                ma1_d = ma1_d[-min_len:]
-                ma2_d = ma2_d[-min_len:]
-                ma_x_d = cex_d_x = cex_d_x[-min_len:]
-                cex_d_high = cex_d_high[-min_len:]
-                cex_d_low = cex_d_low[-min_len:]
-                cex_d_close = cex_d_close[-min_len:]
+                    ma1_d = ma1_d[-min_len:]
+                    ma2_d = ma2_d[-min_len:]
+                    ma_x_d = cex_d_x = cex_d_x[-min_len:]
+                    cex_d_high = cex_d_high[-min_len:]
+                    cex_d_low = cex_d_low[-min_len:]
+                    cex_d_close = cex_d_close[-min_len:]
 
-                ma_x_d = np.array(ma_x_d)
-                ma1_d = np.array(ma1_d)
-                ma2_d = np.array(ma2_d)
-                cex_d_high = np.array(cex_d_high)
-                cex_d_low = np.array(cex_d_low)
+                    ma_x_d = np.array(ma_x_d)
+                    ma1_d = np.array(ma1_d)
+                    ma2_d = np.array(ma2_d)
+                    cex_d_high = np.array(cex_d_high)
+                    cex_d_low = np.array(cex_d_low)
 
-                ma_x_d      = ma_x_d + 86400
-                ma2_d       = ma2_d * cross_
-                selloff     = ma2_d * selloff_
-                support     = ma2_d * support_
-                resistance  = ma2_d * resistance_
-                despair     = ma2_d * despair_
+                    ma_x_d      = ma_x_d + 86400
+                    ma2_d       = ma2_d * cross_
+                    selloff     = ma2_d * selloff_
+                    support     = ma2_d * support_
+                    resistance  = ma2_d * resistance_
+                    despair     = ma2_d * despair_
 
-            account, market, nodes, chain = reconnect(
-                BitPAIR, USERNAME, PASS_PHRASE)
-            trades = market.trades(limit=100)
-            for t in range(len(trades)):
-                ts = time.strptime(str(trades[t]['time']), '%Y-%m-%d %H:%M:%S')
-                trades[t]['unix'] = int(time.mktime(ts))
-            dex_x, dex_y = [], []
-            for t in range(len(trades)):
-                if float(trades[t]['price']) > 0:
-                    dex_x.append(float(trades[t]['unix']))
-                    dex_y.append(float(trades[t]['price']))
+                metaNODE = Bitshares_Trustless_Client()
+                history = metaNODE['history']
+                dex_x, dex_y = [], []
+                for trade in history:
+                        dex_x.append(float(trade[0]))
+                        dex_y.append(float(trade[1]))
+                
 
-            plt.cla()
-            ax = plt.gca()
-            log = int((scale.var).get())
-            '''
-            for l in ax.get_lines():
-                    l.remove()
-            '''
-            fig.patch.set_facecolor('0.15')
+                plt.cla()
+                ax = plt.gca()
+                log = int((scale.var).get())
+                '''
+                for l in ax.get_lines():
+                        l.remove()
+                '''
+                fig.patch.set_facecolor('0.15')
 
-            plt.plot(cex_5m_x, cex_5m_high,
-                     markersize=1, marker='.', color='magenta')
-            plt.plot(cex_5m_x, cex_5m_low,
-                     markersize=1, marker='.', color='magenta')
-            plt.plot(cex_5m_x, cex_5m_close,
-                     markersize=1, marker='.', color='yellow')
-            plt.plot(cex_2h_x, cex_2h_high,
-                     markersize=1, marker='.', color='magenta')
-            plt.plot(cex_2h_x, cex_2h_low,
-                     markersize=1, marker='.', color='magenta')
-            plt.plot(cex_2h_x, cex_2h_close,
-                     markersize=1, marker='.', color='yellow')
-            plt.plot(cex_d_x, cex_d_high,
-                     markersize=1, marker='.', color='magenta')
-            plt.plot(cex_d_x, cex_d_low,
-                     markersize=1, marker='.', color='magenta')
-            plt.plot(cex_d_x, cex_d_close,
-                     markersize=1, marker='.', color='yellow')
+                plt.plot(cex_5m_x, cex_5m_high,
+                         markersize=1, marker='.', color='magenta')
+                plt.plot(cex_5m_x, cex_5m_low,
+                         markersize=1, marker='.', color='magenta')
+                plt.plot(cex_5m_x, cex_5m_close,
+                         markersize=1, marker='.', color='yellow')
+                plt.plot(cex_2h_x, cex_2h_high,
+                         markersize=1, marker='.', color='magenta')
+                plt.plot(cex_2h_x, cex_2h_low,
+                         markersize=1, marker='.', color='magenta')
+                plt.plot(cex_2h_x, cex_2h_close,
+                         markersize=1, marker='.', color='yellow')
+                plt.plot(cex_d_x, cex_d_high,
+                         markersize=1, marker='.', color='magenta')
+                plt.plot(cex_d_x, cex_d_low,
+                         markersize=1, marker='.', color='magenta')
+                plt.plot(cex_d_x, cex_d_close,
+                         markersize=1, marker='.', color='yellow')
 
-            if ma1_d_period > 3:
-                plt.plot(ma_x_d, ma1_d,
+                if ma1_d_period > 3:
+                    plt.plot(ma_x_d, ma1_d,
+                             markersize=1, marker='.', color='purple')
+                else:
+                    plt.plot(ma_x_2h, ma1_2h,
                          markersize=1, marker='.', color='purple')
-            else:
-                plt.plot(ma_x_2h, ma1_2h,
-                     markersize=1, marker='.', color='purple')
 
-            if ma2_d_period > 3:
-                plt.plot(ma_x_d, ma2_d,
+                if ma2_d_period > 3:
+                    plt.plot(ma_x_d, ma2_d,
+                             markersize=1, marker='.', color='aqua')
+                else:
+                    plt.plot(ma_x_2h, ma2_2h,
                          markersize=1, marker='.', color='aqua')
-            else:
-                plt.plot(ma_x_2h, ma2_2h,
-                     markersize=1, marker='.', color='aqua')
 
-            
-            if ma2_d_period > 3:
-                plt.fill_between(ma_x_d, support, selloff, where=(ma2_d > ma1_d),
-                                 facecolor='green', interpolate=True, alpha = 0.2)
-                plt.fill_between(ma_x_d, resistance, despair, where=(ma2_d < ma1_d),
-                                 facecolor='red', interpolate=True, alpha = 0.2)
+                
+                if ma2_d_period > 3:
+                    plt.fill_between(ma_x_d, support, selloff, where=(ma2_d > ma1_d),
+                                     facecolor='green', interpolate=True, alpha = 0.2)
+                    plt.fill_between(ma_x_d, resistance, despair, where=(ma2_d < ma1_d),
+                                     facecolor='red', interpolate=True, alpha = 0.2)
 
-            plt.plot(dex_x, dex_y, markersize=6, marker='.', color='white')
-            plot_format(log)
-            interface.after(300000, draw_chart)  # refresh in milliseconds
-            plt.show()
-            print("\033c")
+                plt.plot(dex_x, dex_y, markersize=6, marker='.', color='white')
+                plot_format(log)
+                interface.after(300000, draw_chart)  # refresh in milliseconds
+                plt.show()
+                print("\033c")
+            except Exception as e:
+                msg = msg_(e)
+                race_append(doc='microDEX_log.txt', text=msg)
+                pass
 
         # Create User interface for plot
         fig = plt.figure()
@@ -1061,6 +1216,7 @@ def main():
     version()
     constants()
 
+    race_write(doc='microDEX_log.txt', text='')
     msg = 'BEGIN SESSION ' + str(VERSION)
     race_append(doc='microDEX_log.txt', text=msg)
 
@@ -1155,7 +1311,6 @@ def main():
     BEGIN = int(time.time())
 
     # begin orderbooks
-    
     b = Process(target=book)
     b.daemon = False
     b.start()
@@ -1165,6 +1320,14 @@ def main():
         c = Process(target=charts)
         c.daemon = True
         c.start()
+    except:
+        print('WARN: plotting only available for crypto altcoins')
+
+    # begin live charts
+    try:
+        d = Process(target=dom)
+        d.daemon = True
+        d.start()
     except:
         print('WARN: plotting only available for crypto altcoins')
 
