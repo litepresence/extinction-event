@@ -26,6 +26,15 @@ try:
 except:
     raise ValueError('pip install websocket-client')
 
+def version():
+
+    global VERSION, version
+
+    version = 'v0.00000012'
+    VERSION = 'metaNODE ' + version + ' - Bitshares Trustless Client'
+
+    sys.stdout.write('\x1b]2;' + 'Bitshares metaNODE' + '\x07')  # terminal #title
+
 
 def banner():
     print("\033c")
@@ -603,7 +612,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
         return sorted(orders, key=lambda k: k['price']) 
 
 
-    def dex_book(ws, currency, asset, depth=20):
+    def dex_book(ws, currency, asset, depth=3):
         get_order_book = Z + \
             '"get_order_book",["%s","%s","%s"]]}' % (
                 currency, asset, depth)
@@ -663,7 +672,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 now = to_iso_date(time.time())
                 then = to_iso_date(time.time() - 3 * 86400)
                 history = dex_market_history(ws, currency, asset, now, then)
-                askp, bidp, askv, bidv = dex_book(ws, currency, asset, depth=20)
+                askp, bidp, askv, bidv = dex_book(ws, currency, asset, depth=50)
                 balances = dex_account_balances(ws, account_name,
                         asset_ids=[asset_id, currency_id],
                         asset_precisions=[asset_precision, currency_precision])
@@ -849,6 +858,7 @@ def bifurcation():  # statistically curate data
             blacklist = []
             blocktime = []
             orders = []
+
             # initialize the metaNODE dictionary
             metaNODE = {}
 
@@ -870,8 +880,8 @@ def bifurcation():  # statistically curate data
                 history.append(str(maven['market_history']))
                 orders.append(str(maven['orders']))
 
-            # find the oldest bitshares blocktime in our dataset
-            blocktime = min(blocktime)
+            # find the youngest bitshares blocktime in our dataset
+            blocktime = max(blocktime)
             # get the mode of the mavens for each metric
             # allow 1 or 2 less than total & most recent for mode
             # accept "no mode" statistics error as possibility
@@ -965,6 +975,15 @@ def bifurcation():  # statistically curate data
             askv = [float(i) for i in askv]
             book = {'bidp':bidp, 'bidv':bidv, 'askp':askp, 'askv':askv}
 
+            # calculate total outstanding orders
+            buy_sum = 0
+            sell_sum = 0
+            for order in orders:
+                if order['orderType'] == 'buy':
+                    buy_sum += float(order['amount'])*float(order['price'])
+                if order['orderType'] == 'sell':
+                    sell_sum += float(order['amount'])
+
             # if you made it this far without statistics error
             # truncate and rewrite the metaNODE with curated data
             metaNODE['book'] = book
@@ -985,6 +1004,8 @@ def bifurcation():  # statistically curate data
             metaNODE['currency'] = currency #STRING SYMBOL
             metaNODE['currency_id'] = currency_id #STRING A.B.C
             metaNODE['currency_precision'] = int(currency_precision)
+            metaNODE['buy_sum'] = float(buy_sum)
+            metaNODE['sell_sum'] = float(sell_sum)
 
             # solitary process with write access to metaNODE.txt            
             race_write(doc='metaNODE.txt', text=metaNODE)
@@ -1084,15 +1105,6 @@ Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \
                                                         ''' + version)
     print(y)
     print(z)
-
-def version():
-
-    global VERSION, version
-
-    version = 'v0.00000012'
-    VERSION = 'metaNODE ' + version + ' - Bitshares Trustless Client'
-
-    sys.stdout.write('\x1b]2;' + VERSION + '\x07')  # terminal #title
 
 def main(): # script primary backbone
 
