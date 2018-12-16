@@ -9,11 +9,11 @@ I have developed a suite of tools for the bitshares distributed exchange (DEX)
 
 they are all open source and free to use, license:
 
-Code:
-WTFPL v0 ca. 1765
+
+`WTFPL v0 ca. 1765
 
 if any([taxes,licenses]):
-    return (tar, feathers)
+    return (tar, feathers)`
 
 see 'Installation' in parent folder to begin trading
 -----------------------------------
