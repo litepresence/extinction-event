@@ -2,10 +2,10 @@ Extinction Event
 ====================
 I have developed a suite of tools for the bitshares distributed exchange (DEX)
 
-extinctionEVENT.py
-microDEX.py
-metaNODE.py
-latencyTEST.py
+- extinctionEVENT.py
+- microDEX.py
+- metaNODE.py
+- latencyTEST.py
 
 they are all open source and free to use, license:
 
