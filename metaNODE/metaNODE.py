@@ -612,7 +612,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
         return sorted(orders, key=lambda k: k['price']) 
 
 
-    def dex_book(ws, currency, asset, depth=20):
+    def dex_book(ws, currency, asset, depth=3):
         get_order_book = Z + \
             '"get_order_book",["%s","%s","%s"]]}' % (
                 currency, asset, depth)
@@ -672,7 +672,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 now = to_iso_date(time.time())
                 then = to_iso_date(time.time() - 3 * 86400)
                 history = dex_market_history(ws, currency, asset, now, then)
-                askp, bidp, askv, bidv = dex_book(ws, currency, asset, depth=20)
+                askp, bidp, askv, bidv = dex_book(ws, currency, asset, depth=50)
                 balances = dex_account_balances(ws, account_name,
                         asset_ids=[asset_id, currency_id],
                         asset_precisions=[asset_precision, currency_precision])
