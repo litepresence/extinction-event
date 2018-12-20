@@ -179,6 +179,8 @@ def public_nodes():
         'wss://ws.gdex.top/ws',
         'wss://ws.hellobts.com/ws']
 
+    nodes = race_read(doc='nodes.txt')
+
     node_count = len(nodes)
 
 
