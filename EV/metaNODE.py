@@ -348,7 +348,11 @@ def race_write(doc='', text=''):  # Concurrent Write to File Operation
 
 def race_append(doc='', text=''):  # Concurrent Append to File Operation
 
-    text = '\n' + str(time.ctime()) + ' ' + str(text) + '\n'
+    text = ('{"ctime":"' +
+            str(time.ctime()) +
+            '", "comment":' +
+            str(text) +
+            '}')
     i = 0
     while True:
         time.sleep(BLIP * i ** 2)
@@ -438,6 +442,33 @@ def watchdog():
 # ======================================================================
 
 
+def history():
+
+    # Tomorrow race_list():
+
+    while True:
+        metaNODE = Bitshares_Trustless_Client()
+        try:
+            keys = [
+                'currency',
+                'asset',
+                'currency_max',
+                'asset_max',
+                'invested']
+            snapshot = {k: metaNODE[k] for k in keys}
+            snapshot['unix'] = int(time.time())
+            race_append(doc='account_history.txt',
+                        text=json.dumps(snapshot))
+            time.sleep(3600)
+        except Exception as e:
+            msg = str(type(e).__name__) + str(e.args)
+            if DEV:
+                msg += str(traceback.format_exc())
+            print(msg)
+            race_append(doc='metaNODElog.txt', text=msg)
+            time.sleep(2)
+
+
 def inquire(call):  # single use public node database api call
 
     while True:
@@ -522,6 +553,11 @@ def spawn():  # multiprocessing handler
     b_process = Process(target=bifurcation)
     b_process.daemon = False
     b_process.start()
+
+    # initialize portfolio history log
+    h_process = Process(target=history)
+    h_process.daemon = False
+    h_process.start()
 
     # initialize multiple threshing processes
     b = 0
@@ -854,7 +890,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
 
                 print('                 ', [x.rjust(16, ' ')
                       for x in ['name', 'balance', 'orders', 'holding',
-                      'max', 'percent']])
+                                'max', 'percent']])
                 print(
                     'currency         ',
                     [str(x).rjust(16,
@@ -1338,9 +1374,9 @@ def logo():
     print(blue(w))
     print(blue(x))
     print(cyan(
-'''                             ____  _____   ___   ______   ________
-Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \   
-  __  __  ____  ____   __     |   \ | | /  .-.  \ | | `. \ | |_ \_|   
+          '''                             ____  _____   ___   ______   ________
+Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \
+  __  __  ____  ____   __     |   \ | | /  .-.  \ | | `. \ | |_ \_|
  (  \/  )( ___)(_  _) /  \    | |\ \| | | |   | | | |  | | |  _) _
   )    ( | __)   ||  / <> \  _| |_\   |_\  `-'  /_| |_.' /_| |__/ |
  (_/\/\_)(____) (__)(__)(__)(_____|\____)`.___.'(______.'(________/
