@@ -1,11 +1,16 @@
 
-# microDEX low latency UI for Bitshares Decentralized Exchange
+' microDEX '
 
-' (BTS) litpresence1 '
+# Low latency UI for Bitshares Decentralized Exchange
 
-# WTFPLv0 - March 1765 - stamps and licenses wut?
+' litepresence 2018 '
 
-
+def WTFPL_v0_March_1765():
+    if any([stamps, licenses, taxation, regulation, fiat, etat]):
+        try:
+            print('no thank you')
+        except:
+            return [tar, feathers]
 
 import os
 import sys
@@ -27,7 +32,7 @@ from random import random, shuffle
 from decimal import Decimal as decimal
 from ast import literal_eval as literal
 from multiprocessing import Process, Value, Array
-#warnings.simplefilter(action='ignore', category=FutureWarning)
+# warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Google Agorism
 from bitshares import BitShares
@@ -35,7 +40,6 @@ from bitshares.market import Market
 from bitshares.account import Account
 from bitshares.blockchain import Blockchain
 # bitshares.org/technology/industrial-performance-and-scalability/
-
 
 PAUSE = 0.5
 COLOR = True
@@ -46,26 +50,28 @@ def version():
 
     VERSION = 'v0.00000016'
 
-    sys.stdout.write('\x1b]2;' + 'Bitshares microDEX' + '\x07')  # terminal #title
+    sys.stdout.write(
+        '\x1b]2;' +
+        'Bitshares microDEX' +
+        '\x07')  # terminal #title
 
-def Bitshares_Trustless_Client(): # Your access to the metaNODE
-
+def Bitshares_Trustless_Client():  # Your access to the metaNODE
     # Include this definition in your script to access metaNODE.txt
     # Deploy your bot script in the same folder as metaNODE.py
-
-    'from ast import literal_eval as literal'
     i = 0
     while True:
         time.sleep(0.05 * i ** 2)
         i += 1
         try:
             with open('metaNODE.txt', 'r') as f:
-                ret = f.read()
+                ret = f.read()  # .replace("'",'"')
                 f.close()
-                metaNODE = literal(ret)
+                metaNODE = json.loads(ret)
                 break
         except Exception as e:
             msg = str(type(e).__name__) + str(e.args)
+            if DEV:
+                msg += str(traceback.format_exc())
             print(msg)
             try:
                 f.close()
@@ -78,18 +84,21 @@ def Bitshares_Trustless_Client(): # Your access to the metaNODE
                 pass
     return metaNODE
 
-
-
 def red(text):
     return ('\033[91m' + text + '\033[0m') if COLOR else text
+
 def green(text):
     return ('\033[92m' + text + '\033[0m') if COLOR else text
+
 def yellow(text):
     return ('\033[93m' + text + '\033[0m') if COLOR else text
+
 def blue(text):
     return ('\033[94m' + text + '\033[0m') if COLOR else text
+
 def purple(text):
     return ('\033[95m' + text + '\033[0m') if COLOR else text
+
 def cyan(text):
     return ('\033[96m' + text + '\033[0m') if COLOR else text
 
@@ -148,6 +157,7 @@ def race_read(doc=''):  # Concurrent Read from File Operation
     while not opened:
         try:
             with open(doc, 'r') as f:
+                #ret = json.loads(f.read())
                 ret = literal(f.read())
                 opened = 1
         except Exception as e:
@@ -203,15 +213,15 @@ def book():  # updates orderbook data
     node = nodes[0]
     begin = time.time()
 
-    while 1:
+    while True:
         try:
             time.sleep(PAUSE)
             metaNODE = Bitshares_Trustless_Client()
 
-            start=time.time()
+            start = time.time()
             chain.get_network()['chain_id']
             ping = time.time() - start
-            if ping > 2: 
+            if ping > 2:
                 raise ValueError('SLOW PING')
             # localize metaNODE data
             node = metaNODE['whitelist'][0]
@@ -225,22 +235,22 @@ def book():  # updates orderbook data
             asset = metaNODE['asset']
             history = metaNODE['history']
             book = metaNODE['book']
-            buy_sum = metaNODE['buy_sum']
-            sell_sum = metaNODE['sell_sum']
+            buy_orders = metaNODE['buy_orders']
+            sell_orders = metaNODE['sell_orders']
 
-            asset_total = (asset_balance + sell_sum)
-            currency_total = (currency_balance + buy_sum)
-            asset_value = asset_total + currency_total/last
-            currency_value = asset_value*last
+            asset_total = (asset_balance + sell_orders)
+            currency_total = (currency_balance + buy_orders)
+            asset_value = asset_total + currency_total / last
+            currency_value = asset_value * last
 
             # format data
             history = history[:10]
 
-            #for i in range(len(history)):
-            #history[0][0] = history[0][0] - time.timezone
+            # for i in range(len(history)):
+            # history[0][0] = history[0][0] - time.timezone
 
             slast = '%.16f' % last
-            latency = '%.3f' % (time.time()-blocktime+time.timezone)
+            latency = '%.3f' % (time.time() - blocktime + time.timezone)
             sbidp = [('%.16f' % i) for i in book['bidp']]
             saskp = [('%.16f' % i) for i in book['askp']]
             sbidv = [('%.2f' % i).rjust(12, ' ') for i in book['bidv']]
@@ -258,19 +268,17 @@ def book():  # updates orderbook data
             cbidv = cbidv[:depth]
             caskv = caskv[:depth]
 
-
-
             # display orderbooks
             print("\033c")
             print(cyan(time.ctime()),
                   blue('    microDEX - Bishares Minimalist UI    '),
                   'RUN TIME', cyan(str(int(time.time()) - BEGIN)),
                   '     ', blue(VERSION))
-            #for k, v in metaNODE.items():
+            # for k, v in metaNODE.items():
             #    print(k)
             print('')
-            print('                        PING', cyan('%.3f' % ping) ,
-                  '   ', 'BLOCK LATENCY',cyan(latency),'   ', purple(node))
+            print('                        PING', cyan('%.3f' % ping),
+                  '   ', 'BLOCK LATENCY', cyan(latency), '   ', purple(node))
             print('')
             print(
                 yellow('                        LAST'),
@@ -300,27 +308,43 @@ def book():  # updates orderbook data
             for o in orders:
                 print (yellow(str(o)))
             if len(orders) == 0:
-                print (yellow('                                  NO OPEN ORDERS'))
-            
+                print (
+                    yellow('                                  NO OPEN ORDERS'))
+
             print('')
-            print (blue(' ASSETS: '), ('%.4f' % asset_balance).rjust(12, ' '), '          ',
-                   blue('  CURRENCY: '), ('%.4f' % currency_balance).rjust(12, ' '), 
-                   blue('             BITSHARES: '), bts_balance)
-            print(blue(' ORDERS: '),('%.4f' % sell_sum).rjust(12, ' '),
-                  '                       ',('%.4f' % buy_sum).rjust(12, ' '))
-            print(blue('  TOTAL: '),purple(('%.4f' % (asset_total)).rjust(12, ' ')),
-                  '                       ',purple(('%.4f' % (currency_total)).rjust(12, ' ')))
-            print(blue('    MAX: '),green(('%.4f' % (asset_value)).rjust(12, ' ')),yellow(asset.ljust(10, ' ')),'            ',       
-                  green(('%.4f' % (currency_value)).rjust(12, ' ')),yellow(currency.ljust(10, ' ')))
+            print (
+                blue(
+                    ' ASSETS: '), ('%.4f' %
+                                   asset_balance).rjust(12, ' '), '          ',
+                blue(
+                    '  CURRENCY: '), ('%.4f' %
+                                      currency_balance).rjust(12, ' '),
+                blue('             BITSHARES: '), bts_balance)
+            print(blue(' ORDERS: '), ('%.4f' % sell_orders).rjust(12, ' '),
+                  '                       ', ('%.4f' % buy_orders).rjust(12, ' '))
+            print(
+                blue('  TOTAL: '), purple(('%.4f' %
+                (asset_total)).rjust(12, ' ')),
+                '                       ',
+                purple(('%.4f' % (currency_total)).rjust(12, ' ')))
+            print(
+                blue('    MAX: '),
+                green(('%.4f' % (asset_value)).rjust(12, ' ')),
+                yellow(asset.ljust(10, ' ')), '            ',
+                green(('%.4f' % (currency_value)).rjust(12, ' ')),
+                yellow(currency.ljust(10, ' ')))
             print('')
-            now = int(time.time())                             
-            print(cyan(str(now)), yellow('MARKET HISTORY - LAST TRADE '), cyan(str(now-(history[0][0]-tz)))) #, stale, 'since last trade')
+            now = int(time.time())
+            print(
+                cyan(str(now)),
+                yellow('MARKET HISTORY - LAST TRADE '),
+                cyan(str(now - (history[0][0] - tz))))  # , stale, 'since last trade')
             for transaction in history:
-                print ((transaction[0]-tz), transaction[1], transaction[2])
+                print ((transaction[0] - tz), transaction[1], transaction[2])
 
             print('')
             print(blue('ctrl+shift+\ will EXIT to terminal'))
-            print('')         
+            print('')
 
         except Exception as e:
             msg = msg_(e)
@@ -368,7 +392,7 @@ def dex_buy():
     confirm = Tk()
     if market.bitshares.wallet.unlocked():
 
-        ###############################################
+        #
         # gather the price and amount from tkinter gui
         price = buy_price.get()
         amount = buy_amount.get()
@@ -389,7 +413,7 @@ def dex_buy():
             means = 0.998 * currency / float(price)
             if amount > means:
                 amount = means
-            ###################################################
+            #
             sprice = str(price)[:16]
             samount = str(amount)[:16]
             sorder = str(
@@ -453,7 +477,8 @@ def dex_sell():
 
     # update wallet unlock to low latency node
     zprint('SELL')
-    account, market, nodes, chain = reconnect(BitPAIR, USERNAME, PASS_PHRASE)
+    account, market, nodes, chain = reconnect(
+        BitPAIR, USERNAME, PASS_PHRASE)
     # attempt to sell 10X or until satisfied
 
     def sell(price, amount, market):
@@ -850,7 +875,7 @@ def dom_format():
 def dom():
 
     fig = plt.figure()
-    while 1:
+    while True:
         try:
             # gather data from the metaNODE
             metaNODE = Bitshares_Trustless_Client()
@@ -875,12 +900,12 @@ def dom():
             obidp = obidp[::-1]
             obidv = obidv[::-1]
             # normal open order volume
-            sum_ov = sum(obidv+oaskv)
-            len_ov = len(obidv+oaskv)
-            oav = sum_ov/len_ov if len_ov else 1
+            sum_ov = sum(obidv + oaskv)
+            len_ov = len(obidv + oaskv)
+            oav = sum_ov / len_ov if len_ov else 1
             # average of my open order volume
-            onbidv = [30*i/oav for i in obidv]
-            onaskv = [30*i/oav for i in oaskv]
+            onbidv = [30 * i / oav for i in obidv]
+            onaskv = [30 * i / oav for i in oaskv]
             # cumulative open order volume
             ocbidv = list(np.cumsum(obidv))
             ocaskv = list(np.cumsum(oaskv))
@@ -913,14 +938,14 @@ def dom():
                 trade_price.append(float(trade[1]))
                 trade_volume.append(float(trade[2]))
             # normalize trade time to scale of y axis
-            max_cv = max(cbidv+caskv)
+            max_cv = max(cbidv + caskv)
             sig_max_cv = float('%s' % float('%.1g' % max_cv))
             trade_time = np.linspace(0, -max_cv, num=len(trade_price))
             # normalize trade volume to use as marker size
             stv = sum(trade_volume)
             ltv = len(trade_volume)
-            atv = stv/ltv            
-            n_trade_volume = [i/atv for i in trade_volume]
+            atv = stv / ltv
+            n_trade_volume = [i / atv for i in trade_volume]
             # clear plot then add items
             plt.cla()
             # plot depth of market
@@ -930,9 +955,9 @@ def dom():
                      markersize=1, marker='.', color='red')
             # shade depth of market
             plt.fill_between(bidp, cbidv, bid0,
-                             facecolor='green', interpolate=True, alpha = 0.2)
+                             facecolor='green', interpolate=True, alpha=0.2)
             plt.fill_between(askp, caskv, ask0,
-                             facecolor='red', interpolate=True, alpha = 0.2)
+                             facecolor='red', interpolate=True, alpha=0.2)
             # plot depth of market
             plt.plot(obidp, ocbidv,
                      markersize=1, marker='.', color='orange')
@@ -940,26 +965,38 @@ def dom():
                      markersize=1, marker='.', color='orange')
             # shade depth of market
             plt.fill_between(obidp, ocbidv, obid0,
-                             facecolor='orange', interpolate=True, alpha = 0.2)
+                             facecolor='orange', interpolate=True, alpha=0.2)
             plt.fill_between(oaskp, ocaskv, oask0,
-                             facecolor='orange', interpolate=True, alpha = 0.2)
-            # scatter plot orders on cumulative volume line with normalized marker size
-            plt.scatter(obidp, ocbidv, s=onbidv, marker='o', color='yellow', alpha = 0.5)
-            plt.scatter(oaskp, ocaskv, s=onaskv, marker='o', color='yellow', alpha = 0.5)
+                             facecolor='orange', interpolate=True, alpha=0.2)
+            # scatter plot orders on cumulative volume line with normalized
+            # marker size
+            plt.scatter(
+                obidp,
+                ocbidv,
+                s=onbidv,
+                marker='o',
+                color='yellow',
+                alpha=0.5)
+            plt.scatter(
+                oaskp,
+                ocaskv,
+                s=onaskv,
+                marker='o',
+                color='yellow',
+                alpha=0.5)
             # plot recent trade history
             plt.plot(trade_price, trade_time,
                      markersize=1, marker='.', color='magenta')
             for i in range(len(trade_price)):
                 # plot recent trade history volume
                 plt.plot([trade_price[i]], [trade_time[i]],
-                     markersize=(3*n_trade_volume[i]), marker='.', color='yellow', alpha = 0.5)
+                         markersize=(3 * n_trade_volume[i]), marker='.', color='yellow', alpha = 0.5)
             # format the chart
-            fig.patch.set_facecolor('0.15')            
+            fig.patch.set_facecolor('0.15')
             plt.yticks(np.linspace(0, sig_max_cv, 11))
             dom_format()
             # repeat process every second
-            for i in range(10):
-                plt.pause(0.1)
+            plt.pause(2)
         except Exception as e:
             msg = msg_(e)
             race_append(doc='microDEX_log.txt', text=msg)
@@ -1035,12 +1072,12 @@ def charts():
                     cex_d_high = np.array(cex_d_high)
                     cex_d_low = np.array(cex_d_low)
 
-                    ma_x_d      = ma_x_d + 86400
-                    ma2_d       = ma2_d * cross_
-                    selloff     = ma2_d * selloff_
-                    support     = ma2_d * support_
-                    resistance  = ma2_d * resistance_
-                    despair     = ma2_d * despair_
+                    ma_x_d = ma_x_d + 86400
+                    ma2_d = ma2_d * cross_
+                    selloff = ma2_d * selloff_
+                    support = ma2_d * support_
+                    resistance = ma2_d * resistance_
+                    despair = ma2_d * despair_
 
                 metaNODE = Bitshares_Trustless_Client()
                 history = metaNODE['history']
@@ -1048,7 +1085,6 @@ def charts():
                 for trade in history:
                         dex_x.append(float(trade[0]))
                         dex_y.append(float(trade[1]))
-                
 
                 plt.cla()
                 ax = plt.gca()
@@ -1083,21 +1119,22 @@ def charts():
                              markersize=1, marker='.', color='purple')
                 else:
                     plt.plot(ma_x_2h, ma1_2h,
-                         markersize=1, marker='.', color='purple')
+                             markersize=1, marker='.', color='purple')
 
                 if ma2_d_period > 3:
                     plt.plot(ma_x_d, ma2_d,
                              markersize=1, marker='.', color='aqua')
                 else:
                     plt.plot(ma_x_2h, ma2_2h,
-                         markersize=1, marker='.', color='aqua')
+                             markersize=1, marker='.', color='aqua')
 
-                
                 if ma2_d_period > 3:
-                    plt.fill_between(ma_x_d, support, selloff, where=(ma2_d > ma1_d),
-                                     facecolor='green', interpolate=True, alpha = 0.2)
-                    plt.fill_between(ma_x_d, resistance, despair, where=(ma2_d < ma1_d),
-                                     facecolor='red', interpolate=True, alpha = 0.2)
+                    plt.fill_between(
+                        ma_x_d, support, selloff, where=(ma2_d > ma1_d),
+                        facecolor='green', interpolate=True, alpha = 0.2)
+                    plt.fill_between(
+                        ma_x_d, resistance, despair, where=(ma2_d < ma1_d),
+                        facecolor='red', interpolate=True, alpha = 0.2)
 
                 plt.plot(dex_x, dex_y, markersize=6, marker='.', color='white')
                 plot_format(log)
@@ -1135,29 +1172,29 @@ def charts():
                     length=300)
 
         SELLOFF = Scale(f2,
-                      from_=0.333,
-                      to=3,
-                      resolution=0.01,
-                      orient=HORIZONTAL,
-                      length=200)
+                        from_=0.333,
+                        to=3,
+                        resolution=0.01,
+                        orient=HORIZONTAL,
+                        length=200)
         SUPPORT = Scale(f3,
-                      from_=0.333,
-                      to=3,
-                      resolution=0.01,
-                      orient=HORIZONTAL,
-                      length=200)
+                        from_=0.333,
+                        to=3,
+                        resolution=0.01,
+                        orient=HORIZONTAL,
+                        length=200)
         RESISTANCE = Scale(f2,
-                      from_=0.333,
-                      to=3,
-                      resolution=0.01,
-                      orient=HORIZONTAL,
-                      length=200)
+                           from_=0.333,
+                           to=3,
+                           resolution=0.01,
+                           orient=HORIZONTAL,
+                           length=200)
         DESPAIR = Scale(f3,
-                      from_=0.333,
-                      to=3,
-                      resolution=0.01,
-                      orient=HORIZONTAL,
-                      length=200)
+                        from_=0.333,
+                        to=3,
+                        resolution=0.01,
+                        orient=HORIZONTAL,
+                        length=200)
         CROSS = Scale(f1,
                       from_=0.333,
                       to=3,
@@ -1194,7 +1231,6 @@ def charts():
         DESPAIR.pack(side=LEFT)
         Button(f3, text='UPDATE CHART', command=draw_chart).pack(side=LEFT)
 
-
         interface.after(1, draw_chart)
         interface.title('microDEX plot updater')
         interface.geometry("0x0+0+0")
@@ -1229,11 +1265,11 @@ def main():
     print(cyan(zlib.decompress(b).decode()))
 
     print(blue('''
-                                       ______   ________  ____  ____  
+                                       ______   ________  ____  ____
                                       (_   _ `.(_   __  |(_  _)(_  _)
-       __  __  ____  ___  ____   ___    | | `. \ | |_ \_|  \ \__/ /  
-      (  \/  )(_  _)/ __)(  _ \ / _ \   | |  | | |  _) _    ) __ (   
-       )    (  _||_( (__  )   /( (_) ) _| |_.' /_| |__/ | _/ /  \ \_ 
+       __  __  ____  ___  ____   ___    | | `. \ | |_ \_|  \ \__/ /
+      (  \/  )(_  _)/ __)(  _ \ / _ \   | |  | | |  _) _    ) __ (
+       )    (  _||_( (__  )   /( (_) ) _| |_.' /_| |__/ | _/ /  \ \_
       (_/\/\_)(____)\___)(_)\_) \___/ (______.'(________|(____)(____)
     ===================================================================
           '''))
@@ -1262,7 +1298,8 @@ def main():
     print('')
     print(' Default market is: ', red(BitPAIR))
     print('')
-    print(yellow('Input new Bitshares DEX market below or press ENTER to skip'))
+    print(
+        yellow('Input new Bitshares DEX market below or press ENTER to skip'))
     print('e.g.: BTS:CNY, BTS:OPEN.BTC, OPEN.LTC:OPEN.BTC, OPEN.BTC:USD')
     print('')
     valid = 0
@@ -1304,7 +1341,8 @@ def main():
             print (type(e).__name__, 'try again...')
             pass
     print('')
-    print(blue('Connecting to the Bitshares Distributed Exchange, please wait...'))
+    print(
+        blue('Connecting to the Bitshares Distributed Exchange, please wait...'))
     print('')
 
     # begin several concurrent background processes of launch_book()
