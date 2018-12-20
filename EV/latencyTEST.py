@@ -1,24 +1,25 @@
-# Python3
-#
-# Returns list of live tested nodes sorted by latency
-# Prints list to file
+
+' latencyTEST'
+
+# Maintains a list of tested Bitshares public nodes
+
+' litepresence 2018 '
+
+def WTFPL_v0_March_1765():
+    if any([stamps, licenses, taxation, regulation, fiat, etat]):
+        try:
+            print('no thank you')
+        except:
+            return [tar, feathers]
+
+' features '
+# Prints list to file nodes.txt
+# Uploads list and other latency data to jsonbin.io
 # Includes Geolocation Data from ip-api.com
-# Uploads list to jsonbin.io
+# Creates map from geolocation data and uploads to vgy.me
 
-'''maintained live at https://api.jsonbin.io/b/5c06e4f71deea01014bd4261/latest#Bitshares_Latency'''
-
-# (BTS) litepresence1
-
-'''
-litepresence2018 WTFPLv0
-
-[tax, licenses] = [tar, feathers]
-'''
-
-# Encoded Compressed Bitshares ASCII Logo
-import zlib
-b = b'x\x9c\xad\xd4M\n\xc4 \x0c\x05\xe0}O1P\x12B\x10\xbc\x82\xf7?\xd5\xf8\xaf\x83F\xe3\xe0[t\xf9\xf5%\xda>\x9f\x1c\xf7\x7f\x9e\xb9\x01\x17\x0cc\xec\x05\xe3@Y\x18\xc6(\'Z\x1a\xca.\x1bC\xa5l\r\x85\xa20\xb6\x8a\xca\xd8,W0\xec\x05\xc3\xdf\xd4_\xe3\r\x11(q\x16\xec\x95l\x04\x06\x0f\x0c\xc3\xddD\x9dq\xd2#\xa4NT\x0c/\x10\xd1{b\xd4\x89\x92\x91\x84\x11\xd9\x9d-\x87.\xe4\x1cB\x15|\xe0\xc8\x88\x13\xa5\xbc\xd4\xa21\x8e"\x18\xdc\xd2\x0e\xd3\xb6\xa0\xc6h\xa3\xd4\xde\xd0\x19\x9a\x1e\xd8\xddr\x0e\xcf\xf8n\xe0Y\rq\x1fP:p\x92\xf2\xdbaB,v\xda\x84j\xc4.\x03\xb1>\x97\xee{\x99oSa\x00\x0f\xc6\x84\xd8\xdf\x0f\xb4e\xa7$\xfdE\xae\xde\xb1/\x1d\xfc\x96\x8a'
-print(zlib.decompress(b).decode())
+' maintained live at '
+# api.jsonbin.io/b/5c06e4f71deea01014bd4261/latest#Bitshares_Latency
 
 # Import modules
 from multiprocessing import Process, Value, Array
@@ -44,7 +45,7 @@ BLIP = 0.05
 
 # set to true to share your latency test
 JSONBIN = True
-# set to true to add geolocation data 
+# set to true to add geolocation data
 IPAPI = True
 # set to true to plot
 PLOT = True
@@ -76,18 +77,23 @@ def race_write(doc='', text=''):  # Concurrent Write to File Operation
             except:
                 pass
 
-def test_seeds(): # ping and geolocate seed nodes
-    
-    # scrape list of seed nodes from github:
-    url = 'https://raw.githubusercontent.com/bitshares/bitshares-core/master/libraries/app/application.cpp'
+def test_seeds():  # ping and geolocate seed nodes
 
-    # my ISP is currently blocking github 
+    # scrape list of seed nodes from github:
+    url = ('https://raw.githubusercontent.com/bitshares/' +
+            'bitshares-core/master/libraries/app/application.cpp')
+
+    # my ISP is currently blocking github
     uri = 'https://www.textise.net/showText.aspx?strURL=https%253A//'
-    url = uri + 'raw.githubusercontent.com/bitshares/bitshares-core/master/libraries/app/application.cpp'
+    url = uri + ('raw.githubusercontent.com/bitshares/bitshares-core/' +
+            'master/libraries/app/application.cpp')
     # so I hack quick hole in their bullshit...
 
     req = requests.get(url).text
-    ret = req.replace(" ", "").replace(",", "").split('seeds={')[1].split('}')[0]
+    ret = req.replace(
+        " ",
+        "").replace(",",
+                    "").split('seeds={')[1].split('}')[0]
     ret = ret.split('//')
     ret = [i for i in ret if '"' in i]
     ret = [i.split('"')[1] for i in ret]
@@ -98,8 +104,8 @@ def test_seeds(): # ping and geolocate seed nodes
     print('')
     for i in ret:
 
-        cmd='ping -c 1 ' + i
-        a=os.popen(cmd).read()
+        cmd = 'ping -c 1 ' + i
+        a = os.popen(cmd).read()
         try:
             ping = int(a.split('time=')[1].split(' ms')[0])
         except:
@@ -107,14 +113,24 @@ def test_seeds(): # ping and geolocate seed nodes
         geolocate = 'http://ip-api.com/json/'
         ip = i
 
-        # some ips are not recognized by ip-api.com; substitute ipinfo.info manually:
+        # some ips are not recognized by ip-api.com; substitute ipinfo.info
+        # manually:
         if ip == 'seeds.bitshares.eu':
             ip = '45.76.70.247'
         geolocate += ip
-                    
+
         req = requests.get(geolocate, headers={})
         ret = json.loads(req.text)
-        entriesToRemove =    ('isp','regionName','org','countryCode','timezone','region','as','status','zip')
+        entriesToRemove = (
+            'isp',
+            'regionName',
+            'org',
+            'countryCode',
+            'timezone',
+            'region',
+            'as',
+            'status',
+            'zip')
         for k in entriesToRemove:
             ret.pop(k, None)
         ret['ip'] = ret.pop('query')
@@ -132,7 +148,7 @@ def jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds):
     '''
     # run this commmented subscript to create a new jsonbin
 
-    headers = {'Content-Type': 'application/json', 
+    headers = {'Content-Type': 'application/json',
         'secret-key':key,
         'private':'false'}
 
@@ -146,26 +162,29 @@ def jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds):
     '''
     url = uri + BIN
 
-    headers = {'Content-Type': 'application/json', 
-        'secret-key':KEY,
-        'private':'false'}
+    headers = {'Content-Type': 'application/json',
+               'secret-key': KEY,
+               'private': 'false'}
 
     data = {
         "MISSION": "Bitshares Public Node Latency Testing",
         "LOCATION": "USA EAST",
-        "UNIVERSE": str(no_suffix), 
+        "UNIVERSE": str(no_suffix),
         "OWNER": 'litepresence',
-        "COUNT": ( str(len(unique)) + '/' + str(len(no_suffix)) ),
-        "LIVE": str(unique), 
+        "COUNT": (str(len(unique)) + '/' + str(len(no_suffix))),
+        "LIVE": str(unique),
         "PING": str(speed),
         "UNIX": str(int(time.time())),
-        "UTC":  str(time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())),
+        "UTC": str(time.strftime("%a, %d %b %Y %H:%M:%S",
+            time.gmtime())),
         "URLS": str(urls),
         "GEO": str(geo),
         "SEEDS": str(seeds),
         "MAP_URL": str(image_url),
-        "SOURCE_CODE": "https://github.com/litepresence/extinction-event/blob/master/EV/bitshares-latency.py"
-        }
+        "SOURCE_CODE":(
+        "https://github.com/litepresence/extinction-event/blob/" +
+        "master/EV/bitshares-latency.py")
+    }
 
     data["DICT_KEYS"] = str(list(data.keys()))
 
@@ -179,14 +198,14 @@ def jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds):
     req = requests.get(url, headers=headers)
     print(req.text)
 
-def clean(raw): # remove parenthesis and commas from strings
+def clean(raw):  # remove parenthesis and commas from strings
     return ((str(raw).replace('"', " "))
             .replace("'", " ")).replace(',', ' ')
 
-def parse(cleaned): # return list of words beginning with wss
+def parse(cleaned):  # return list of words beginning with wss
     return [t for t in cleaned.split() if t.startswith('wss')]
 
-def validate(parsed): # remove suffixes for each domain
+def validate(parsed):  # remove suffixes for each domain
     v = parsed
     for i in range(len(v)):
         if v[i].endswith('/'):
@@ -199,14 +218,14 @@ def validate(parsed): # remove suffixes for each domain
             v[i] = v[i][:-4]
     return sorted(list(set(v)))
 
-def suffix(v): # add suffixes for each domain
+def suffix(v):  # add suffixes for each domain
 
     wss = [(i + '/wss') for i in v]
     ws = [(i + '/ws') for i in v]
     v = v + wss + ws
     return sorted(v)
 
-def ping(n, num, arr): # ping the blockchain and return latency
+def ping(n, num, arr):  # ping the blockchain and return latency
 
     try:
         start = time.time()
@@ -236,21 +255,20 @@ def ping(n, num, arr): # ping the blockchain and return latency
         num.value = 222222
         pass
 
-def blockPrint(noprint): # temporarily disable printing
+def blockPrint(noprint):  # temporarily disable printing
     if noprint:
         sys.stdout = open(os.devnull, 'w')
 
-def enablePrint(noprint): # re-enable printing
+def enablePrint(noprint):  # re-enable printing
     if noprint:
         sys.stdout = sys.__stdout__
 
 def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
           include=False, exclude=False, master=False):
 
-    # this is the primary process to ping, validate, and geolocate 
-
+    # this is the primary process to ping, validate, and geolocate
     # timeout : seconds to ping until abort per node
-    # pings   : number of good nodes to find until satisfied (0 none, 999 all)
+    # pings   : nodes to find until satisfied (0 none, 999 all)
     # noprint : disables printing, only returns list of good nodes
     # master  : check only nodes listed in bitshares/ui/master
     # crop    : return only best nodes
@@ -261,19 +279,141 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
     # include and exclude custom nodes
     included, excluded = [], []
     if include:
-        included = ['wss://altcap.io', 'wss://ap-northeast-1.bts.crypto-bridge.org', 'wss://ap-northeast-2.bts.crypto-bridge.org', 'wss://ap-south-1.bts.crypto-bridge.org', 'wss://ap-southeast-1.bts.crypto-bridge.org', 'wss://ap-southeast-2.bts.crypto-bridge.org', 'wss://api-ru.bts.blckchnd.com', 'wss://api.bitshares.bhuz.info', 'wss://api.bitsharesdex.com', 'wss://api.bts.ai', 'wss://api.bts.blckchnd.com', 'wss://api.bts.mobi', 'wss://api.bts.network', 'wss://api.btsgo.net', 'wss://api.btsxchng.com', 'wss://api.dex.trading', 'wss://api.fr.bitsharesdex.com', 'wss://api.open-asset.tech', 'wss://atlanta.bitshares.apasia.tech', 'wss://australia.bitshares.apasia.tech', 'wss://b.mrx.im', 'wss://bit.btsabc.org', 'wss://bitshares-api.wancloud.io', 'wss://bitshares.apasia.tech', 'wss://bitshares.bts123.cc:15138', 'wss://bitshares.crypto.fans', 'wss://bitshares.cyberit.io', 'wss://bitshares.dacplay.org', 'wss://bitshares.dacplay.org:8089', 'wss://bitshares.neocrypto.io', 'wss://bitshares.nu', 'wss://bitshares.openledger.info', 'wss://bitshares.testnet.crypto-bridge.org', 'wss://blockzms.xyz', 'wss://bts-api.lafona.net', 'wss://bts-seoul.clockwork.gr', 'wss://bts.ai.la', 'wss://bts.liuye.tech:4443', 'wss://bts.open.icowallet.net', 'wss://bts.proxyhosts.info', 'wss://bts.to0l.cn:4443', 'wss://bts.transwiser.com', 'wss://btsfullnode.bangzi.info', 'wss://btsws.roelandp.nl', 'wss://btsza.co.za:8091', 'wss://ca-central-1.bts.crypto-bridge.org', 'wss://canada6.daostreet.com', 'wss://capetown.bitshares.africa', 'wss://chicago.bitshares.apasia.tech', 'wss://citadel.li/node', 'wss://crazybit.online', 'wss://croatia.bitshares.apasia.tech', 'wss://dallas.bitshares.apasia.tech', 'wss://de.bts.dcn.cx', 'wss://dele-puppy.com', 'wss://dex.rnglab.org', 'wss://dexnode.net', 'wss://england.bitshares.apasia.tech', 'wss://eu-central-1.bts.crypto-bridge.org', 'wss://eu-west-1.bts.crypto-bridge.org', 'wss://eu-west-2.bts.crypto-bridge.org', 'wss://eu-west-3.bts.crypto-bridge.org', 'wss://eu.nodes.bitshares.works', 'wss://eu.nodes.bitshares.ws', 'wss://eu.openledger.info', 'wss://fake.automatic-selection.com', 'wss://fi.bts.dcn.cx', 'wss://france.bitshares.apasia.tech', 'wss://frankfurt8.daostreet.com', 'wss://freedom.bts123.cc:15138', 'wss://japan.bitshares.apasia.tech', 'wss://kc-us-dex.xeldal.com', 'wss://kimziv.com', 'wss://la.dexnode.net', 'wss://miami.bitshares.apasia.tech', 'wss://na.openledger.info', 'wss://ncali5.daostreet.com', 'wss://netherlands.bitshares.apasia.tech', 'wss://new-york.bitshares.apasia.tech', 'wss://node.bitshares.eu', 'wss://node.btscharts.com', 'wss://node.market.rudex.org', 'wss://node.testnet.bitshares.eu', 'wss://nohistory.proxyhosts.info', 'wss://ohio4.daostreet.com', 'wss://openledger.hk', 'wss://oregon2.daostreet.com', 'wss://paris7.daostreet.com', 'wss://relinked.com', 'wss://sa-east-1.bts.crypto-bridge.org', 'wss://scali10.daostreet.com', 'wss://seattle.bitshares.apasia.tech', 'wss://secure.freedomledger.com', 'wss://seoul9.daostreet.com', 'wss://sg.nodes.bitshares.works', 'wss://sg.nodes.bitshares.ws', 'wss://singapore.bitshares.apasia.tech', 'wss://slovenia.bitshares.apasia.tech', 'wss://status200.bitshares.apasia.tech', 'wss://testnet-eu.bitshares.apasia.tech', 'wss://testnet.bitshares.apasia.tech', 'wss://testnet.bitshares.eu', 'wss://testnet.bts.dcn.cx', 'wss://testnet.dex.trading', 'wss://testnet.nodes.bitshares.ws', 'wss://this.uptick.rocks', 'wss://us-east-1.bts.crypto-bridge.org', 'wss://us-la.bitshares.apasia.tech', 'wss://us-ny.bitshares.apasia.tech', 'wss://us-west-1.bts.crypto-bridge.org', 'wss://us.nodes.bitshares.works', 'wss://us.nodes.bitshares.ws', 'wss://valen-tin.fr:8090', 'wss://valley.bitshares.apasia.tech', 'wss://virginia3.daostreet.com', 'wss://ws.aunite.com', 'wss://ws.gdex.io', 'wss://ws.gdex.top', 'wss://ws.hellobts.com', 'wss://ws.winex.pro', 'wss://wss.ioex.top', 'wss://za.bitshares.africa']
+        included = [
+            'wss://altcap.io',
+            'wss://ap-northeast-1.bts.crypto-bridge.org',
+            'wss://ap-northeast-2.bts.crypto-bridge.org',
+            'wss://ap-south-1.bts.crypto-bridge.org',
+            'wss://ap-southeast-1.bts.crypto-bridge.org',
+            'wss://ap-southeast-2.bts.crypto-bridge.org',
+            'wss://api-ru.bts.blckchnd.com',
+            'wss://api.bitshares.bhuz.info',
+            'wss://api.bitsharesdex.com',
+            'wss://api.bts.ai',
+            'wss://api.bts.blckchnd.com',
+            'wss://api.bts.mobi',
+            'wss://api.bts.network',
+            'wss://api.btsgo.net',
+            'wss://api.btsxchng.com',
+            'wss://api.dex.trading',
+            'wss://api.fr.bitsharesdex.com',
+            'wss://api.open-asset.tech',
+            'wss://atlanta.bitshares.apasia.tech',
+            'wss://australia.bitshares.apasia.tech',
+            'wss://b.mrx.im',
+            'wss://bit.btsabc.org',
+            'wss://bitshares-api.wancloud.io',
+            'wss://bitshares.apasia.tech',
+            'wss://bitshares.bts123.cc:15138',
+            'wss://bitshares.crypto.fans',
+            'wss://bitshares.cyberit.io',
+            'wss://bitshares.dacplay.org',
+            'wss://bitshares.dacplay.org:8089',
+            'wss://bitshares.neocrypto.io',
+            'wss://bitshares.nu',
+            'wss://bitshares.openledger.info',
+            'wss://bitshares.testnet.crypto-bridge.org',
+            'wss://blockzms.xyz',
+            'wss://bts-api.lafona.net',
+            'wss://bts-seoul.clockwork.gr',
+            'wss://bts.ai.la',
+            'wss://bts.liuye.tech:4443',
+            'wss://bts.open.icowallet.net',
+            'wss://bts.proxyhosts.info',
+            'wss://bts.to0l.cn:4443',
+            'wss://bts.transwiser.com',
+            'wss://btsfullnode.bangzi.info',
+            'wss://btsws.roelandp.nl',
+            'wss://btsza.co.za:8091',
+            'wss://ca-central-1.bts.crypto-bridge.org',
+            'wss://canada6.daostreet.com',
+            'wss://capetown.bitshares.africa',
+            'wss://chicago.bitshares.apasia.tech',
+            'wss://citadel.li/node',
+            'wss://crazybit.online',
+            'wss://croatia.bitshares.apasia.tech',
+            'wss://dallas.bitshares.apasia.tech',
+            'wss://de.bts.dcn.cx',
+            'wss://dele-puppy.com',
+            'wss://dex.rnglab.org',
+            'wss://dexnode.net',
+            'wss://england.bitshares.apasia.tech',
+            'wss://eu-central-1.bts.crypto-bridge.org',
+            'wss://eu-west-1.bts.crypto-bridge.org',
+            'wss://eu-west-2.bts.crypto-bridge.org',
+            'wss://eu-west-3.bts.crypto-bridge.org',
+            'wss://eu.nodes.bitshares.works',
+            'wss://eu.nodes.bitshares.ws',
+            'wss://eu.openledger.info',
+            'wss://fake.automatic-selection.com',
+            'wss://fi.bts.dcn.cx',
+            'wss://france.bitshares.apasia.tech',
+            'wss://frankfurt8.daostreet.com',
+            'wss://freedom.bts123.cc:15138',
+            'wss://japan.bitshares.apasia.tech',
+            'wss://kc-us-dex.xeldal.com',
+            'wss://kimziv.com',
+            'wss://la.dexnode.net',
+            'wss://miami.bitshares.apasia.tech',
+            'wss://na.openledger.info',
+            'wss://ncali5.daostreet.com',
+            'wss://netherlands.bitshares.apasia.tech',
+            'wss://new-york.bitshares.apasia.tech',
+            'wss://node.bitshares.eu',
+            'wss://node.btscharts.com',
+            'wss://node.market.rudex.org',
+            'wss://node.testnet.bitshares.eu',
+            'wss://nohistory.proxyhosts.info',
+            'wss://ohio4.daostreet.com',
+            'wss://openledger.hk',
+            'wss://oregon2.daostreet.com',
+            'wss://paris7.daostreet.com',
+            'wss://relinked.com',
+            'wss://sa-east-1.bts.crypto-bridge.org',
+            'wss://scali10.daostreet.com',
+            'wss://seattle.bitshares.apasia.tech',
+            'wss://secure.freedomledger.com',
+            'wss://seoul9.daostreet.com',
+            'wss://sg.nodes.bitshares.works',
+            'wss://sg.nodes.bitshares.ws',
+            'wss://singapore.bitshares.apasia.tech',
+            'wss://slovenia.bitshares.apasia.tech',
+            'wss://status200.bitshares.apasia.tech',
+            'wss://testnet-eu.bitshares.apasia.tech',
+            'wss://testnet.bitshares.apasia.tech',
+            'wss://testnet.bitshares.eu',
+            'wss://testnet.bts.dcn.cx',
+            'wss://testnet.dex.trading',
+            'wss://testnet.nodes.bitshares.ws',
+            'wss://this.uptick.rocks',
+            'wss://us-east-1.bts.crypto-bridge.org',
+            'wss://us-la.bitshares.apasia.tech',
+            'wss://us-ny.bitshares.apasia.tech',
+            'wss://us-west-1.bts.crypto-bridge.org',
+            'wss://us.nodes.bitshares.works',
+            'wss://us.nodes.bitshares.ws',
+            'wss://valen-tin.fr:8090',
+            'wss://valley.bitshares.apasia.tech',
+            'wss://virginia3.daostreet.com',
+            'wss://ws.aunite.com',
+            'wss://ws.gdex.io',
+            'wss://ws.gdex.top',
+            'wss://ws.hellobts.com',
+            'wss://ws.winex.pro',
+            'wss://wss.ioex.top',
+            'wss://za.bitshares.africa']
 
     if exclude:
         excluded = [
             'wss://bit.btzadazdsabc.org',
-            'wss://bitazdazdshares.openledger.info', 
+            'wss://bitazdazdshares.openledger.info',
             'wss://bitshaazdzares.openledger.info',
             'wss://bitshasdares.dacplay.org:8089',
             'wss://bitsqsdqsdhares.openledger.info',
             'wss://secuasdre.freedomledger.com',
-            'wss://testnet.bitshares.eu/wqsdsqs', 
-            ] # known typos found in webscraping methods, etc.
-    
+            'wss://testnet.bitshares.eu/wqsdsqs',
+        ]  # known typos found in webscraping methods, etc.
+
     # gather list of nodes from github
     blockPrint(noprint)
     begin = time.time()
@@ -292,9 +432,9 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
     # Bitshares Master
     url = git + '/bitshares/bitshares-ui/master/app/api/apiConfig.js'
     urls.append(url)
-    
+
     if not master:
-        
+
         gits = [
             '/bitshares/bitshares-ui/staging/app/api/apiConfig.js',
             '/CryptoBridge/cryptobridge-ui/e5214ad63a41bd6de1333fd98d717b37e1a52f77/app/api/apiConfig.js',
@@ -324,11 +464,11 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
             '/alldex/alldex-ui/61323a668783aa3609eb1e77b92348f5cffcba01/app/api/apiConfig.js',
             '/jwaiswa7/bit_shares_exknox/046a514a31d10dba38c0ea37f3dbd14b64abecad/app/api/apiConfig.js',
             '/theserranos/bitsharesAPINode/3a9a49cc566246e95a71b49389fe1eebffcfce81/config.js',
-            ]
+        ]
         for g in gits:
             url = git + g
             urls.append(url)
-    
+
     # include manually entered sites for Bitshares nodes
     validated = [] + included
 
@@ -353,17 +493,20 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
         print(('remove %s known bad nodes' % len(excluded)))
         validated = [i for i in validated if i not in excluded]
 
-    ########################################################
-    ########################################################
-    #manual timeout and validated list for quick custom test
+    #
+    #
+    # manual timeout and validated list for quick custom test
     if 0:
         timeout = 30
     if 0:
-        validated = ['wss://b.mrx.im', 'wss://b.mrx.im/ws', 'wss://b.mrx.im/wss']
+        validated = [
+            'wss://b.mrx.im',
+            'wss://b.mrx.im/ws',
+            'wss://b.mrx.im/wss']
     if 0:
         validated = validated[-5:]
-    ########################################################
-    ########################################################
+    #
+    #
 
     # final sanitization
     validated = sorted(list(set(validate(parse(clean(validated))))))
@@ -385,11 +528,12 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
             time.ctime(), pinging, timeout, timeout * len(validated) / 60.0)))
         blockPrint(noprint)
         print ('=====================================')
-        pinged, timed, down, stale, expired, testnet = [], [], [], [], [], []
+        pinged, timed, down = [], [], []
+        stale, expired, testnet = [], [], []
         i = 0
         for n in validated:
             if len(pinged) < pinging:
-                i +=1
+                i += 1
                 # use multiprocessing module to enforce timeout
                 num = Value('d', 999999)
                 arr = Array('i', list(range(0)))
@@ -427,18 +571,20 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
             geolocate = 'http://ip-api.com/json/'
             if pinged[i].strip('/ws') not in [j.strip('/ws') for j in unique]:
                 unique.append(pinged[i])
-                speed.append((pinged[i],int(timed[i]*1000)/1000.0))  
-                time.sleep(1) 
+                speed.append((pinged[i], int(timed[i] * 1000) / 1000.0))
+                time.sleep(1)
                 if IPAPI:
                     print('geolocating...')
-                    ip = (validate([pinged[i]])[0])[6:]  #strip wws://, /wss, /ws, and / 
+                    ip = (validate([pinged[i]])[0])[
+                        6:]  # strip wws://, /wss, /ws, and /
                     ip = ip.split(":")[0]
                     ip = ip.split("/")[0]
-                    # ip-api has trouble with these; parsed manually at ipinfo.info:
+                    # ip-api has trouble with these; parsed manually at
+                    # ipinfo.info:
                     if (ip == 'freedom.bts123.cc'):
                         ip = '121.42.8.104'
                     if (ip == 'ws.gdex.top'):
-                        ip = '106.15.82.97' 
+                        ip = '106.15.82.97'
                     if (ip == 'bitshares.dacplay.org'):
                         ip = '120.55.181.181'
                     if (ip == 'crazybit.online'):
@@ -446,70 +592,84 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
                     if (ip == 'citadel.li'):
                         ip = '37.228.129.75'
                     geolocate += ip
-                    print(geolocate)               
+                    print(geolocate)
                     req = requests.get(geolocate, headers={})
                     ret = json.loads(req.text)
-                    entriesToRemove =    ('isp','regionName','org','countryCode','timezone','region','as','status','zip')
+                    entriesToRemove = (
+                        'isp',
+                        'regionName',
+                        'org',
+                        'countryCode',
+                        'timezone',
+                        'region',
+                        'as',
+                        'status',
+                        'zip')
                     for k in entriesToRemove:
                         ret.pop(k, None)
                     ret['ip'] = ret.pop('query')
                     print (ret)
-                    geo.append((pinged[i],ret))
-
+                    geo.append((pinged[i], ret))
 
         # report outcome
         print('')
         print((len(pinged), 'of', len(validated),
                'nodes are active with latency less than', timeout))
         print('')
-        print(('fastest node', pinged[0], 'with latency', ('%.2f' % timed[0])))
+        print(('fastest node', pinged[0],
+               'with latency', ('%.2f' % timed[0])))
         if len(excluded):
             for i in range(len(excluded)):
-                print(((i+1), 'EXCLUDED', excluded[i]))
+                print(((i + 1), 'EXCLUDED', excluded[i]))
         if len(unknown):
             for i in range(len(unknown)):
-                print(((i+1), 'UNTESTED', unknown[i]))
+                print(((i + 1), 'UNTESTED', unknown[i]))
         if len(testnet):
             for i in range(len(testnet)):
-                print(((i+1), 'TESTNET', testnet[i]))
+                print(((i + 1), 'TESTNET', testnet[i]))
         if len(expired):
             for i in range(len(expired)):
-                print(((i+1), 'TIMEOUT', expired[i]))
+                print(((i + 1), 'TIMEOUT', expired[i]))
         if len(stale):
             for i in range(len(stale)):
-                print(((i+1), 'STALE', stale[i]))
+                print(((i + 1), 'STALE', stale[i]))
         if len(down):
             for i in range(len(down)):
-                print(((i+1),'DOWN', down[i]))
+                print(((i + 1), 'DOWN', down[i]))
         if len(pinged):
             for i in range(len(pinged)):
-                print(((i+1), 'GOOD PING', '%.2f' % timed[i], pinged[i]))
+                print(((i + 1), 'GOOD PING', '%.2f' %
+                        timed[i], pinged[i]))
         if len(unique):
             for i in range(len(unique)):
-                print(((i+1), 'UNIQUE:', unique[i]))
+                print(((i + 1), 'UNIQUE:', unique[i]))
         print('UNIQUE LIST:')
         print(unique)
 
     print ('')
     enablePrint(noprint)
-    elapsed = time.time()-begin
-    print ('elapsed:', ('%.1f' % elapsed), 
-            'fastest:', ('%.3f' % timed[0]), unique[0])
+    elapsed = time.time() - begin
+    print ('elapsed:', ('%.1f' % elapsed),
+           'fastest:', ('%.3f' % timed[0]), unique[0])
 
     if write:
         race_write(doc='nodes.txt', text=str(unique))
 
     if PLOT:
-
-        print('plotting...')
         import matplotlib.pyplot as plt
         import matplotlib.cbook as cbook
         import numpy as np
-        imageFile = cbook.get_sample_data('/home/oracle/extinction-event/EV/basemap.png')
+        try:
+            plt.close()
+        except:
+            pass
+        print('plotting...')
+        imageFile = cbook.get_sample_data(
+            '/home/oracle/extinction-event/EV/basemap.png')
         img = plt.imread(imageFile)
-        fig, ax = plt.subplots(figsize=(12,24))
-        #plt.xticks(np.arange(-180,180,30))
-        #plt.yticks(np.arange(-90,90,30))
+        fig, ax = plt.subplots(figsize=(12, 24))
+        # plt.xticks(np.arange(-180,180,30))
+        # plt.yticks(np.arange(-90,90,30))
         plt.xticks([])
         plt.yticks([])
         ax.imshow(img, extent=[-180, 180, -90, 90])
@@ -528,17 +688,17 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
                 l = geo[i][0]
                 try:
                     s = float(speed[i][1])
-                    m = 40/s              
+                    m = 40 / s
                 except:
                     m = 10
                     pass
-                print(x,y,l,s,m)
-                plt.plot([x],[y],'mo', markersize=m,alpha=0.25)
+                print(x, y, l, s, m)
+                plt.plot([x], [y], 'mo', markersize=m, alpha=0.25)
 
             except:
                 print('skipping', geo[i])
                 pass
-        plt.plot(xs,ys,'wo', markersize=4, alpha=0.25)
+        plt.plot(xs, ys, 'wo', markersize=4, alpha=0.25)
 
         # PLOT SEED NODES
         xs = []
@@ -553,28 +713,31 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
                 except:
                     print('skipping', seeds[i])
                     pass
-        plt.plot(xs,ys,'yo', markersize=4, alpha=1.0)   
+        plt.plot(xs, ys, 'yo', markersize=4, alpha=1.0)
 
-        utc = str(time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())) + ' UTC'
+        utc = str(
+            time.strftime("%a, %d %b %Y %H:%M:%S",
+                          time.gmtime())) + ' UTC'
 
-        plt.text(0, -60, utc, alpha=0.5, color='w', size=15)           
+        plt.text(0, -60, utc, alpha=0.5, color='w', size=15)
 
         location = '/home/oracle/extinction-event/EV/nodemap.png'
 
-        plt.savefig(location, 
-            dpi=100,
-            bbox_inches='tight',
-            pad_inches = 0)
+        plt.savefig(location,
+                    dpi=100,
+                    bbox_inches='tight',
+                    pad_inches=0)
 
         # SAVE HISTORY
         if 1:
-            location = '/home/oracle/extinction-event/EV/HISTORY/nodemap_' + str(int(time.time())) + '.png'
-            
-            plt.savefig(location, 
-                dpi=100,
-                bbox_inches='tight',
-                pad_inches = 0)
-        
+            location = '/home/oracle/extinction-event/EV/HISTORY/nodemap_' + \
+                str(int(time.time())) + '.png'
+
+            plt.savefig(location,
+                        dpi=100,
+                        bbox_inches='tight',
+                        pad_inches=0)
+
     if UPLOAD:
 
         image_url = ''
@@ -588,37 +751,43 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
             pass
         print (image_url)
 
-    if JSONBIN: jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds)
+    if JSONBIN:
+        jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds)
 
     if PLOT:
-        for i in range(9000):
-            plt.pause(0.1)
-    else: 
+        for i in range(180):
+            plt.pause(3)
+    else:
         time.sleep(900)
 
-def loop(): # repeat latency test indefinitely
+def loop():  # repeat latency test indefinitely
 
-    while 1:
+    while True:
+        print("\033c")
+        # Encoded Compressed Bitshares ASCII Logo
+        import zlib
+        b = b'x\x9c\xad\xd4M\n\xc4 \x0c\x05\xe0}O1P\x12B\x10\xbc\x82\xf7?\xd5\xf8\xaf\x83F\xe3\xe0[t\xf9\xf5%\xda>\x9f\x1c\xf7\x7f\x9e\xb9\x01\x17\x0cc\xec\x05\xe3@Y\x18\xc6(\'Z\x1a\xca.\x1bC\xa5l\r\x85\xa20\xb6\x8a\xca\xd8,W0\xec\x05\xc3\xdf\xd4_\xe3\r\x11(q\x16\xec\x95l\x04\x06\x0f\x0c\xc3\xddD\x9dq\xd2#\xa4NT\x0c/\x10\xd1{b\xd4\x89\x92\x91\x84\x11\xd9\x9d-\x87.\xe4\x1cB\x15|\xe0\xc8\x88\x13\xa5\xbc\xd4\xa21\x8e"\x18\xdc\xd2\x0e\xd3\xb6\xa0\xc6h\xa3\xd4\xde\xd0\x19\x9a\x1e\xd8\xddr\x0e\xcf\xf8n\xe0Y\rq\x1fP:p\x92\xf2\xdbaB,v\xda\x84j\xc4.\x03\xb1>\x97\xee{\x99oSa\x00\x0f\xc6\x84\xd8\xdf\x0f\xb4e\xa7$\xfdE\xae\xde\xb1/\x1d\xfc\x96\x8a'
+        print(zlib.decompress(b).decode())
         start = time.time()
         try:
             nodes(timeout=6, pings=999, crop=999, noprint=False, write=True,
-                include=True, exclude=True, master=False)
-            
-            print('elapsed: ', (time.time()-start))
+                  include=True, exclude=True, master=False)
+
+            print('elapsed: ', (time.time() - start))
         # no matter what happens just keep verifying book
         except Exception as e:
             print (type(e).__name__, e.args, e)
             pass
 
-def update(): # run one latency test
+def update():  # run one latency test
 
-    print('Acquiring low latency connection to Bitshares DEX'+
-            ', this may take a few minutes...')
+    print('Acquiring low latency connection to Bitshares DEX' +
+          ', this may take a few minutes...')
     updated = 0
     try:
         while not updated:
             nodes(timeout=7, pings=999, crop=999, noprint=False, write=True,
-                include=False, exclude=False, master=True)
+                  include=False, exclude=False, master=True)
             updated = 1
 
     # not satisfied until verified once
@@ -628,9 +797,8 @@ def update(): # run one latency test
 
 if __name__ == '__main__':
 
-
         loop()
 
         '''alternatively'''
 
-        #update()
+        # update()
