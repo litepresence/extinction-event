@@ -1,3 +1,8 @@
+
+' extinctionEVENT '
+
+# Algorithmic live trading and backtesting platform for Bitshares DEX
+
 ' litepresence 2018 '
 
 def WTFPL_v0_March_1765():
@@ -44,7 +49,252 @@ ANTISAT = 1 / SATOSHI
 
 def banner():
 
-    'NOTE THIS IS ALPHA RELEASE TO PUBLIC DOMAIN WITH NO WARRANTY'
+    print("\033c")
+    print('''
+
+        # EXTINCTION EVENT
+
+        # Backtesting and Live Algo Trading Framework for Bitshares DEX
+
+        ' (BTS) litpresence1 '
+
+        v0.00000003_beta
+
+        Ensure what I want happens,
+        when I want it to happen,
+        and assure me it actually happened.
+
+        * featuring trustless client side Bitshares public node access *
+
+        Installation:
+
+        https://github.com/litepresence/extinction-event/blob/master/README.md
+
+        ''')
+    time.sleep(0)
+    print("\033c")
+    print('''
+        Bitshares Decentralized Development April 2018
+
+        BitShares Core Release 2.0.180328
+        https://github.com/bitshares/bitshares-core/releases/tag/2.0.180328
+
+        PUBLIC NODES - 65 responding to east coast US; 2X in past 30 days
+
+        EASYDEX - Bitshares fiat gateway for USD and EUR
+        CITADEL - Bitshare UI and stealth wallet
+        PALMPAY - Chain Agnostic 3 Second Point of Sale App
+        MORPHIT - Fee Free app like shapeshift/blocktrades
+        LOCALBTS - Decentralized Local Bitshares to Fiat Reputation App
+        BENCH -
+        GRAPHENEJ - A Java library for mobile Bitsshares app Developers
+
+        DEXBOT - Scalping / Market Making UI
+        CARBON - Multichain Mobile Wallet
+        STEALTH - ??? sent ??? amount to ??? BTS Transactions
+
+        BTS added to HUOBI and COINTIGER exchanges
+
+        bitsharestalk.io new chat forum
+        apasia, leading public node provider, aquires bitshares.org
+        ''')
+
+    time.sleep(0)
+    print("\033c")
+    print('''
+
+        running metaNODE and EV concurrently live will use:
+
+        50kbit/s upload
+        600kbit/s download
+        <2 GB RAM
+        4 CPU cores at <10%
+
+        Initializing EV.py live:
+
+        3 GB RAM
+        100% of 1 cpu for a few minutes
+        ''')
+
+    #===================================================================
+    '''
+
+    March 2018:
+
+    Possible Hack Of Third-Party Tools Affects Binance Exchange Users.
+    : Cointelegraph
+
+    Statement on Potentially Unlawful Online Digital Asset Platforms
+    : SEC.gov
+
+    I stand upon the shoulders of giants and as such,
+    invite you to stand upon mine.
+    Use my work with or without attribution;
+    I make no claim of "intellectual property."
+    My ideas are the result of countless millenia of evolution
+    - they belong to humanity.
+    : Jameson Lopp @lopp
+
+    NOTE THIS IS ALPHA RELEASE TO PUBLIC DOMAIN WITH NO WARRANTY
+
+    #
+    # https://www.youtube.com/watch?v=5xouOnHxYUw
+    # https://www.youtube.com/watch?v=jJxKXOTNXjc
+    #
+    # Rated R Under 17 NOT Admitted Without Parent
+    #
+    # My liability is ZERO; "this script licenced: don't be a bitch^TM"
+    #
+    # WTFPLv0 March 1765
+    #
+
+    use this, get lambo, deposit 7.777% skriptbunny tithing here:
+
+    (BTS) litepresence1
+    (BTC) 374gjPuhokrWj8KJu8NnMBGzpbHWcVeE1k
+
+    #
+    # 0.05 BTC each for AI tuned to last 365 days of any alt/btc pair
+    # 1 BTC each for machine optimized algo for top 100 alt/btc pair
+
+    # !@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()
+
+    # this algo can be tuned to between:
+
+    # 50X and 50,000X
+
+    # in BOTH currency and asset terms
+    # for ANY* crypto-crypto pair, over past 365 days of data
+
+    # !@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()
+
+    # litepresence @ pastecoin.com for sales
+    # finitestate@tutamail for inquiries
+    #
+    ########################
+    #
+    # THE DESTROYER,
+    # litepresence - 2018
+    #
+
+    '''
+    #===================================================================
+    ''' FEATURES v0.00000001 alpha release March 8, 2018'''
+    #===================================================================
+    '''
+
+    ALT/BTC data from cryptocompare.com as signal
+
+    Bitshares DEX open.ALT/open.BTC for trading
+
+    - Play simple effective 4 state 50 day cross
+
+        - uses live 2h arrays to generate moving averages
+        - ma1xma2 is about 17x50 day simple moving average cross
+        - cross plus +/- threshold changes state logic from bull to bear
+        - Bull Logic
+            buy 17 day support
+            sell 17 day x ~1.5 selloff
+        - Bear logic
+            sell 17 day resistance
+            buy 17 day x ~0.75 despair
+        - dynamic stoploss upon market shift
+        - approximately 7-20 day trade frequency depending upon pair
+        - announces machine state on plot
+
+    - Make Markets, Close Margins, Support Trends
+
+    - Iceberg entry and exit
+
+    - Bot runs local
+
+    - Backtest Engine Included
+
+    - Maintains storage from backtest to live session
+    '''
+    #===================================================================
+    ''' FEATURES v0.00000002 alpha April 1, 2018 '''
+    #===================================================================
+    '''
+
+    Rogue Node Immunity:
+
+        A background daemon process maintains a list of low latency nodes
+        for buy/sell/cancel/orders ops in a text file
+
+        distributed exchange prices and orderbook are verified and curated
+        using multinode statistical approach with daemon processes
+
+        open orders are checked in triplicate on multiple nodes
+
+        dex() definitions have been upgraded after consultation with
+        Bitshares core developers and node admin
+
+    Move to github:
+
+        https://github.com/litepresence/extinction-event
+
+    New MODES:
+
+        SALES mode backtest only plots buy/sell actions; no state machine
+        LATENCY mode connect to all nodes and reports on latency
+        PAPER mode runs live, but does not trade
+
+    '''
+    #===================================================================
+    ''' FEATURES v0.00000003 dare I say beta April 20, 2018'''
+    #===================================================================
+    '''
+
+    - microDEX.py was created to monitor EV.py in realtime.
+    - solid doubletime week live testing and de bugging EV.py afterwards
+    - completely reworked all dex() calls
+    - reconnect() is a thing - client side wss handshake verification
+
+    - simplified scalp(), it works, enjoy
+    - do what I say, when I say, and announce when done: LIVE $$$ DEX'd
+    - new mode TEST ORDERS
+    - generates EV_log.py microDEX_log.py with stacktrace + buy/sell
+    - new easy install to virtual environment by @sschiessl
+
+    - with microDEX multinode animation and EV.py statistical curation
+        user and bots have VIP seats on public DEX network
+
+    '''
+    #===================================================================
+    ''' FEATURES v0.00000004 beta-alt-alt-meta May 23, 2018'''
+    #===================================================================
+    '''
+
+    - metaNODE
+        - data curation for public database calls
+        - stand alone app independently watches full public network
+        - performs statistical analysis on data feeds
+        - maintains whitelisted nodes list
+        - acts as 'monit' type duplex watchdog to EV
+
+    - dexBOT collaboration
+        - metaNODE framework built to work with other bot applications
+        - funding earmarked for metaNODE implementation into dexBOT
+
+    - altcoin-altcoin trading via btc common base
+        - ie simulated STEEM:BTS pair historic backtest data
+    '''
+
+    #===================================================================
+    ''' DEPENDENCIES'''
+    #===================================================================
+    '''
+    python 3
+
+    numpy
+    tkinter
+    matplotlib
+    pybitshares
+
+    *h/t @ cryptocompare.com w/ 2000+ altcoin pairs of market data
+    **h/t to crew at bitshares dev and node admin telegram
+    '''
 
 def version():
 
@@ -58,7 +308,7 @@ def version():
         '-',
         sys.platform,
         'OS')
-    sys.stdout.write('\x1b]2;' + VERSION + '\x07')
+    sys.stdout.write('\x1b]2;' + 'Bitshares extinctionEVENT' + '\x07')
     print('')
     print(VERSION)
     print('')
@@ -129,7 +379,7 @@ def control_panel():  # Advanced User Controls
     global DEPTH, BACKTEST, PAIR, MAX_ASSETS, SALES, SCALP_FUND
     global RESOLUTION, OPTIMIZATIONS, MARKET_CROSS, OPTIMIZE, SCALP
     global MANUAL_OVERRIDE, MANUAL_BUY, MANUAL_SELL, MIN_AMOUNT
-    global LIVE_PLOT_PROJECTION
+    global LIVE_PLOT_PROJECTION, SCALP_FUND_QTY, SCALP_SPREAD, GRAVITAS
 
     # optimizer
     RESOLUTION = 100
@@ -154,17 +404,23 @@ def control_panel():  # Advanced User Controls
 
     # scalp thresholds
     # ENTER OWN RISK &&&&
-    SCALP = True        # maintain market maker iceberg margins
-    SCALP_PIECES = 2    # number of pieces to break up scalp orders
-    SCALP_FUND = 0.100  # 0.010 = 1% of holdings reserved for scalping
-    MIN_MARGIN = 0.020  # about 0.030
-    MA3 = 0.500         # about 0.500
-    MA4 = 0.166         # about 0.166
+    SCALP = True         # maintain market maker iceberg margins
+    SCALP_PIECES = 2     # number of pieces to break up scalp orders
+    SCALP_FUND = 0.1     # 0.10 = 10% of holdings reserved for scalping
+    SCALP_FUND_QTY = 0.1 # 0.10 = 10% of scalp fund on books per tick
+    SCALP_SPREAD = 0.1   # 0.10 = disable scalping outer 10% of market
+    MIN_MARGIN = 0.030   # about 0.030
+    MA3 = 0.500          # about 0.500
+    MA4 = 0.166          # about 0.166
 
     # force buy/sell thresholds manually
     MANUAL_OVERRIDE = False
     MANUAL_BUY = SATOSHI
     MANUAL_SELL = ANTISAT
+
+    # override tune_install() thresholds conservatively by 0.01 = 1%
+    GRAVITAS = 0.04
+
     # Manual Override Alpha State when live
     FORCE_ALPHA = False  # Options: ( False, 'BULL', 'BEAR' )
 
@@ -240,7 +496,7 @@ def fee_maintainer():  # ensure 1 bitshare for fees
                 BitCURRENCY)
 
         pair = BitPAIR
-        qty = 2.00000001 # DO NOT CHANGE, used to override MIN_AMOUNT in dex_auth()
+        qty = 2.00000001  # DO NOT CHANGE, used to override MIN_AMOUNT in dex_auth()
 
         if BitCURRENCY == 'BTS':
             pair = 'BTS' + ":" + BitASSET
@@ -403,8 +659,8 @@ def dex_auth(command, pair='', amount=ANTISAT, price=0, expiration=ANTISAT):
 
     signal = Value('i', 1)
     i = 0
-    plt.pause(0.01)
     while signal.value:
+        plt.pause(0.01)
         i += 1
         print('')
         print('pybitshares authentication attempt:', i)
@@ -1530,7 +1786,6 @@ def scalp():  # Initiate secondary order placement
     plot_text()
     plt.pause(0.01)
 
-
     # from state_machine()
     market_cross = storage['market_cross']
 
@@ -1556,17 +1811,32 @@ def scalp():  # Initiate secondary order placement
     # expand scalp ops to dex just inside market bid/ask
     scalp_resistance = max(scalp_resistance, 0.99999 * ask_p)
     scalp_support = min(scalp_support, 1.000001 * bid_p)
-    # limit scalp ops to buying/selling window
-    max_scalp_support = ((1 - MIN_MARGIN) * selling)  # 97% of selling
-    min_scalp_resistance = ((1 + MIN_MARGIN) * buying)  # 103% of buying
-    scalp_support = min(scalp_support, max_scalp_support)
-    scalp_resistance = max(scalp_resistance, min_scalp_resistance)
+
     # adjust scalp margins if too thin
     scalp_margin = (scalp_resistance - scalp_support) / scalp_support
     if scalp_margin < MIN_MARGIN:
         midscalp = (scalp_resistance + scalp_support) / 2
         scalp_resistance = (1 + MIN_MARGIN / 2) * midscalp
         scalp_support = (1 - MIN_MARGIN / 2) * midscalp
+    # limit scalp ops to buying/selling window
+    market_spread = selling - buying
+    scalp_spread = market_spread * SCALP_SPREAD
+    max_scalp_buy = selling - scalp_spread
+    min_scalp_sell = buying + scalp_spread
+    if scalp_support < buying:
+        scalp_support = buying
+    if scalp_support > max_scalp_buy:
+        scalp_support = max_scalp_buy
+    if scalp_resistance > selling:
+        scalp_resistance = selling
+    if scalp_resistance < min_scalp_sell:
+        scalp_resistance = min_scalp_sell
+
+    # assure support under resistance
+    if scalp_support > scalp_resistance:
+        print('skip scalp, calculation error')
+        return
+
     # store scalp thresholds globally
     storage['scalp_resistance'] = scalp_resistance
     storage['scalp_support'] = scalp_support
@@ -1584,6 +1854,9 @@ def scalp():  # Initiate secondary order placement
 
     buy_qty = min(buy_qty, max_assets * SCALP_FUND)
     sell_qty = min(sell_qty, max_assets * SCALP_FUND)
+
+    buy_qty *= SCALP_FUND_QTY
+    sell_qty *= SCALP_FUND_QTY
 
     pieces = SCALP_PIECES
     pie = []
@@ -1603,23 +1876,27 @@ def scalp():  # Initiate secondary order placement
     buy_hold = dex_rate / storage['start_price']
     sell_wait = 1 / buy_hold
 
+    roi_gross = ((max_assets * max_currency) /
+                (storage['begin_max_assets'] * storage['begin_max_currency']))
+
     if SCALP:
         print('')
         print('begin scalp() ops')
         print('')
         print('assets        ', satoshi_str(assets))
         print('currency      ', satoshi_str(currency))
-        print('invested      ', ('%.2f' % invested))
+        print('invested      ', ('%.3f' % invested))
         print('means         ', satoshi_str(means))
         print('max assets    ', satoshi_str(max_assets))
         print('max currency  ', satoshi_str(max_currency))
         print('start assets  ', satoshi_str(storage['begin_max_assets']))
         print('start currency', satoshi_str(storage['begin_max_currency']))
         print('start price   ', satoshi_str(storage['start_price']))
-        print('roi assets    ', ('%.2f' % roi_assets))
-        print('roi currency  ', ('%.2f' % roi_currency))
-        print('buy_hold      ', ('%.2f' % buy_hold))
-        print('sell_wait     ', ('%.2f' % sell_wait))
+        print('roi gross     ', ('%.4f' % roi_gross))
+        print('roi assets    ', ('%.4f' % roi_assets))
+        print('roi currency  ', ('%.4f' % roi_currency))
+        print('buy_hold      ', ('%.4f' % buy_hold))
+        print('sell_wait     ', ('%.4f' % sell_wait))
         print('holding       ', holding)
         print('max_holding   ', max_holding)
         print('min holding   ', min_holding)
@@ -2252,7 +2529,8 @@ def test_chart():  # Add objects to backtest plot
 
     if info['tick'] == 0:
         chart_star()
-    if info['live']: plt.pause(0.01)
+    if info['live']:
+        plt.pause(0.01)
 
 def live_chart():  # Add objects to live plot
 
@@ -2336,6 +2614,12 @@ def live_chart():  # Add objects to live plot
                     despair = DESPAIR * ma1
                     support = max((SUPPORT * ma1), bull_stop)
                     resistance = min((RESISTANCE * ma1), bear_stop)
+
+                    selloff *= (1 - GRAVITAS)
+                    resistance *= (1 - GRAVITAS)
+                    support *= (1 + GRAVITAS)
+                    despair *= (1 + GRAVITAS)
+
                     if market_cross:
                         selling = selloff
                         buying = support
@@ -2393,7 +2677,8 @@ def chart_star():  # Plot a star at begin and end of backtest
              marker='4', color='y', label='cex_rate')
     plt.plot(now, cex_rate, markersize=15,
              marker='.', color='y', label='cex_rate')
-    if info['live']: plt.pause(0.01)
+    if info['live']:
+        plt.pause(0.01)
 
 def plot_format():  # Set plot colors and attributes
 
@@ -2475,7 +2760,8 @@ def plot_format():  # Set plot colors and attributes
     ax.title.set_color('darkorchid')
     # plt.title(('%s ' % PAIR) + VERSION)
     plt.tight_layout()
-    if info['live']: plt.pause(0.01)
+    if info['live']:
+        plt.pause(0.01)
 
 def plot_text():  # Display market condition on plot
 
@@ -2491,6 +2777,7 @@ def plot_text():  # Display market condition on plot
     pltxlim1 = float(plt.xlim()[1])
     pltylim0 = float(plt.ylim()[0])
     pltylim1 = float(plt.ylim()[1])
+
     def scale(axis, alpha):
         if axis == 'x':
             return alpha * (pltxlim1 - pltxlim0) + pltxlim0
@@ -2605,7 +2892,7 @@ def plot_text():  # Display market condition on plot
         text = 'RAW SIGNAL (MA1)' % storage['ma1poly'][-1]
         storage['text'].append(
             plt.text(textx, texty, text,
-                     color='gray', verticalalignment='center', size=8))       
+                     color='gray', verticalalignment='center', size=8))
 
         # label long and signal lines; include slope and concavity
         # display divergence and days to next crossing
@@ -2616,7 +2903,7 @@ def plot_text():  # Display market condition on plot
                     storage['ma2_slope'],
                     storage['ma2_concavity'])
         signal_text = 'SIGNAL (MA1*offset)\n%.8f f(x)\n%.8f f`(x)\n%.8f f``(x)' % (
-            storage['ma1poly'][-1],
+            storage['signal_line'],
             storage['ma1_slope'],
             storage['ma1_concavity'])
         divergence_text = ' Divergence %.8f\nNext Cross %.2f Days' % (
@@ -2648,7 +2935,7 @@ def plot_text():  # Display market condition on plot
             plt.text(textx, texty, text, horizontalalignment='center',
                      color='darkorange', verticalalignment='center', size=8))
 
-        # label triangle markers for last price at dex & cex on far right 
+        # label triangle markers for last price at dex & cex on far right
         textx = scale('x', 0.825)
         texty = (storage['dex_rate'] + storage['cex_rate']) / 2
         cex_align = 'top'
@@ -2667,74 +2954,88 @@ def plot_text():  # Display market condition on plot
         textx = scale('x', 1.0)
         texty = storage['cex_rate']
         storage['text'].append(
-            plt.text(textx, texty, '> ', alpha=0.5, horizontalalignment='right',
-                     color='magenta', verticalalignment='center', size=15))
+            plt.text(
+                textx, texty, '> ', alpha=0.5, horizontalalignment='right',
+                color='magenta', verticalalignment='center', size=15))
         texty = storage['dex_rate']
         storage['text'].append(
-            plt.text(textx, texty, '> ', alpha=0.5, horizontalalignment='right',
-                     color='teal', verticalalignment='center', size=15))
+            plt.text(
+                textx, texty, '> ', alpha=0.5, horizontalalignment='right',
+                color='teal', verticalalignment='center', size=15))
 
         # additional line color labels on upper right
-        # unicode 2588 prints a solid square 
+        # unicode 2588 prints a solid square
         textx = scale('x', 1.0)
         y = 0.95
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'EXTINCT EVENT \u2588 ', horizontalalignment='right',
-                     color='darkorchid', size=8))
+            plt.text(
+                textx, texty, 'EXTINCT EVENT \u2588 ', horizontalalignment='right',
+                color='darkorchid', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'CEX HIGH & LOW \u2588 ', horizontalalignment='right',
-                     color='magenta', size=8))
+            plt.text(
+                textx, texty, 'CEX HIGH & LOW \u2588 ', horizontalalignment='right',
+                color='magenta', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'CEX LAST \u2588 ', horizontalalignment='right',
-                     color='yellow', size=8))
+            plt.text(
+                textx, texty, 'CEX LAST \u2588 ', horizontalalignment='right',
+                color='yellow', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'DEX BID & ASK \u2588 ', horizontalalignment='right',
-                     color='teal', size=8))
+            plt.text(
+                textx, texty, 'DEX BID & ASK \u2588 ', horizontalalignment='right',
+                color='teal', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'DEX LAST \u2588 ', horizontalalignment='right',
-                     color='khaki', size=8))
+            plt.text(
+                textx, texty, 'DEX LAST \u2588 ', horizontalalignment='right',
+                color='khaki', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'SCALP SELL \u2588 ', horizontalalignment='right',
-                     color='tomato', size=8))
+            plt.text(
+                textx, texty, 'SCALP SELL \u2588 ', horizontalalignment='right',
+                color='tomato', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'SCALP BUY \u2588 ', horizontalalignment='right',
-                     color='palegreen', size=8))        
+            plt.text(
+                textx, texty, 'SCALP BUY \u2588 ', horizontalalignment='right',
+                color='palegreen', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'PRIMARY SELL \u2588 ', horizontalalignment='right',
-                     color='red', size=8))
+            plt.text(
+                textx, texty, 'PRIMARY SELL \u2588 ', horizontalalignment='right',
+                color='red', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'PRIMARY BUY \u2588 ', horizontalalignment='right',
-                     color='lime', size=8))
+            plt.text(
+                textx, texty, 'PRIMARY BUY \u2588 ', horizontalalignment='right',
+                color='lime', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'LONG AVERAGE \u2588 ', horizontalalignment='right',
-                    color='aqua', size=8))
+            plt.text(
+                textx, texty, 'LONG AVERAGE \u2588 ', horizontalalignment='right',
+                color='aqua', size=8))
         y *= 0.97
         texty = scale('y', y)
         storage['text'].append(
-            plt.text(textx, texty, 'SIGNAL LINE \u2588 ', horizontalalignment='right',
-                     color='cornsilk', size=8))  
+            plt.text(
+                textx, texty, 'SIGNAL LINE \u2588 ', horizontalalignment='right',
+                color='cornsilk', size=8))
 
     plt.tight_layout()
-    if info['live']: plt.pause(0.01)
+    if info['live']:
+        plt.pause(0.01)
 
 def test_plot():  # Display backtest plot
 
@@ -2861,7 +3162,7 @@ def print_tune():  # Display input thresholds
     z = '=' if OPTIMIZE else '='
 
     print('#######################################')
-    print('# %s' %  time.ctime())
+    print('# %s' % time.ctime())
     print('#######################################')
     print(('CURRENCY        = "%s"' % CURRENCY))
     print(('ASSET           = "%s"' % ASSET))
@@ -3051,7 +3352,6 @@ def float_sma(array, period):  # floating point period moving average
 
 def indicators():  # Post process data
 
-
     global storage
     global book
 
@@ -3126,7 +3426,7 @@ def polynomial_regression():
         if ((str(line.get_label()) in
             ['ma2poly', 'ma1poly', 'ma2linear', 'ma1linear', 'd_rate', 'c_rate']) or
             ((line.get_xdata()[0] < time.time()) and
-            (str(line.get_label()) in ['ma2poly_shadow', 'ma1poly_shadow']))):
+             (str(line.get_label()) in ['ma2poly_shadow', 'ma1poly_shadow']))):
                 line.remove()
                 del line
 
@@ -3266,7 +3566,7 @@ def arbitrage():
     depth = int(min(14400, (time.time() - info['begin'])))
     for line in ax.lines:
         if len(list(line.get_xdata())) == 1:
-            if list(line.get_xdata())[0] > (time.time()-depth):
+            if list(line.get_xdata())[0] > (time.time() - depth):
                 if str(line.get_label()) in ['cex_rate', 'high', 'low']:
                     CEXy = CEXy + list(line.get_ydata())
                 if str(line.get_label()) in ['dex_rate', 'bid', 'ask']:
@@ -3274,16 +3574,16 @@ def arbitrage():
     lenCEXy = len(CEXy)
     lenDEXy = len(DEXy)
     if lenCEXy and lenDEXy:
-        CEX = sum(CEXy)/lenCEXy
-        DEX = sum(DEXy)/lenDEXy
-        arb = DEX/CEX
+        CEX = sum(CEXy) / lenCEXy
+        DEX = sum(DEXy) / lenDEXy
+        arb = DEX / CEX
     else:
         arb = 1
     storage['arb'] = arb
     print('arbitrage', ('%.4f' % storage['arb']),
-            'lenCEX', lenCEXy,
-            'lenDEX', lenDEXy,
-            'depth', depth)
+          'lenCEX', lenCEXy,
+          'lenDEX', lenDEXy,
+          'depth', depth)
 
 def state_machine():  # Alpha and beta market finite state
 
@@ -3292,7 +3592,7 @@ def state_machine():  # Alpha and beta market finite state
     ma1 = storage['ma1'][-1]
     ma2 = storage['ma2'][-1]
     if info['live']:
-        print('state_machine')
+        print('state_machine()')
         ma1 = storage['ma1poly'][-1]
         ma2 = storage['ma2poly'][-1]
 
@@ -3327,6 +3627,11 @@ def state_machine():  # Alpha and beta market finite state
     storage['support'] = max(ma1 * SUPPORT, ma2 * BULL_STOP)
     storage['resistance'] = min(ma1 * RESISTANCE, ma2 * BEAR_STOP)
     storage['despair'] = (ma1 * DESPAIR)
+
+    storage['selloff'] *= (1 - GRAVITAS)
+    storage['resistance'] *= (1 - GRAVITAS)
+    storage['support'] *= (1 + GRAVITAS)
+    storage['despair'] *= (1 + GRAVITAS)
 
     # initialize backtest per MARKET_CROSS
     if (info['live'] is False) and (info['tick'] == 0):
@@ -3412,7 +3717,211 @@ def state_machine():  # Alpha and beta market finite state
             arbitrage()
 
 def optimizer():  # Stochastic ROI assent backpropagation
-    pass
+
+    now = int(time.time())
+
+    global MA1, MA2, SELLOFF, SUPPORT, RESISTANCE, DESPAIR
+    global MIN_CROSS, MAX_CROSS, BULL_STOP, BEAR_STOP
+    global optimize
+    global data
+
+    data = backtest_candles(PAIR, info['origin'], now, 86400)
+
+    initialize()
+
+    def drunkwalk():  # randomize step size / direction
+        step = 1 + random() * RESOLUTION ** (1 / 2.0) / 100.0
+        if randint(0, 1) == 0:
+            step = 1 / step
+        return step
+
+    optimize = True
+    dictionaries()
+    roi_currency = ROI
+    apy_currency = APY
+    dpt = DPT
+
+    test_initialize()
+    backtest()
+    test_stop()
+
+    for i in range(OPTIMIZATIONS):
+
+        MA1backup = MA1
+        MA2backup = MA2
+        SELLOFFbackup = SELLOFF
+        SUPPORTbackup = SUPPORT
+        RESISTANCEbackup = RESISTANCE
+        DESPAIRbackup = DESPAIR
+        MIN_CROSSbackup = MIN_CROSS
+        MAX_CROSSbackup = MAX_CROSS
+        BULL_STOPbackup = BULL_STOP
+        BEAR_STOPbackup = BEAR_STOP
+
+        print_tune()
+
+        types = 25
+        t = i % types
+
+        # t = 7
+        if t == 0:
+            MA1 *= drunkwalk()
+        elif t == 1:
+            MA2 *= drunkwalk()
+        elif t == 2:
+            MIN_CROSS *= drunkwalk()
+        elif t == 3:
+            MAX_CROSS *= drunkwalk()
+        elif t == 4:
+            SELLOFF *= drunkwalk()
+        elif t == 5:
+            SUPPORT *= drunkwalk()
+        elif t == 6:
+            RESISTANCE *= drunkwalk()
+        elif t == 7:
+            DESPAIR *= drunkwalk()
+        elif t == 8:
+            BULL_STOP *= drunkwalk()
+        elif t == 9:
+            BEAR_STOP *= drunkwalk()
+        elif t == 10:
+            MA1 *= drunkwalk()
+            MA2 *= drunkwalk()
+            MIN_CROSS *= drunkwalk()
+            MAX_CROSS *= drunkwalk()
+        elif t == 11:
+            SELLOFF *= drunkwalk()
+            SUPPORT *= drunkwalk()
+            RESISTANCE *= drunkwalk()
+            DESPAIR *= drunkwalk()
+        elif t == 12:
+            MA1 *= drunkwalk()
+            SELLOFF *= drunkwalk()
+            SUPPORT *= drunkwalk()
+            RESISTANCE *= drunkwalk()
+            DESPAIR *= drunkwalk()
+        elif t == 12:
+            MA2 *= drunkwalk()
+            BULL_STOP *= drunkwalk()
+            BEAR_STOP *= drunkwalk()
+        elif t == 13:
+            drunk1 = drunkwalk()
+            MA1 *= drunk1
+            MA2 *= drunk1
+        elif t == 14:
+            drunk1 = drunkwalk()
+            drunk2 = drunkwalk()
+            MA1 *= drunk1
+            SELLOFF *= drunk2
+            SUPPORT *= drunk2
+            RESISTANCE *= drunk2
+            DESPAIR *= drunk2
+        elif t == 15:
+            SELLOFF = (SELLOFF + 2) / 2.0
+        elif t == 16:
+            SUPPORT = (SUPPORT + 1) / 2.0
+        elif t == 17:
+            RESISTANCE = (RESISTANCE + 1) / 2.0
+        elif t == 18:
+            DESPAIR = (DESPAIR + 0.75) / 2.0
+        elif t == 19:
+            MIN_CROSS = (MIN_CROSS + 1) / 2.0
+        elif t == 20:
+            MAX_CROSS = (MAX_CROSS + 1) / 2.0
+        elif t == 21:
+            BULL_STOP = (BULL_STOP + 1) / 2.0
+        elif t == 22:
+            BEAR_STOP = (BEAR_STOP + 1) / 2.0
+
+        if i < 50:
+            MA1 = MA1backup
+            MA2 = MA2backup
+
+        else:
+            MA1 *= drunkwalk()
+            MA2 *= drunkwalk()
+            MIN_CROSS *= drunkwalk()
+            MAX_CROSS *= drunkwalk()
+            SELLOFF *= drunkwalk()
+            SUPPORT *= drunkwalk()
+            RESISTANCE *= drunkwalk()
+            DESPAIR *= drunkwalk()
+            BULL_STOP *= drunkwalk()
+            BEAR_STOP *= drunkwalk()
+        if MAX_CROSS < 1.0:
+            MAX_CROSS = 1.0
+        if MA1 < 6:
+            MA1 = (MA1 + 6) / 2
+        if MA2 < 30:
+            MA2 = (MA2 + 30) / 2
+        if SELLOFF > 2.25:
+            SELLOFF = (SELLOFF + 2.25) / 2
+        if DESPAIR < 0.6:
+            DESPAIR = (DESPAIR + 0.6) / 2
+        test_initialize()
+        backtest()
+        test_stop()
+
+        try:
+            print_tune()
+            for p in range(4):
+                print('')
+            print(('test', i, 'type', t))
+            print(('Start ROI...: %.1f' % ROI))
+
+            print((' Test ROI...: %.1f' % storage['roi_currency']))
+            print((' Best ROI...: %.1f' % roi_currency))
+
+            print ('')
+
+            print ('BEST:')
+            print ('')
+            if roi_currency >= storage['roi_currency']:
+                MA1 = MA1backup
+                MA2 = MA2backup
+                SELLOFF = SELLOFFbackup
+                SUPPORT = SUPPORTbackup
+                RESISTANCE = RESISTANCEbackup
+                DESPAIR = DESPAIRbackup
+                MIN_CROSS = MIN_CROSSbackup
+                MAX_CROSS = MAX_CROSSbackup
+                BULL_STOP = BULL_STOPbackup
+                BEAR_STOP = BEAR_STOPbackup
+                storage['roi_currency'] = roi_currency
+                storage['apy_currency'] = apy_currency
+                storage['dpt'] = dpt
+
+            else:
+                roi_currency = storage['roi_currency']
+                apy_currency = storage['apy_currency']
+                dpt = storage['dpt']
+                i -= 1
+
+                for p in range(12):
+                    print('')
+                print('-----==+=={{!!! KABOOM !!!}}==+==------')
+                for p in range(12):
+                    print('')
+                print_tune()
+        except:
+            pass
+
+    for i in range(4):
+        print('')
+    MA1 = MA1backup
+    MA2 = MA2backup
+    SELLOFF = SELLOFFbackup
+    SUPPORT = SUPPORTbackup
+    RESISTANCE = RESISTANCEbackup
+    DESPAIR = DESPAIRbackup
+    MIN_CROSS = MIN_CROSSbackup
+    MAX_CROSS = MAX_CROSSbackup
+    BULL_STOP = BULL_STOPbackup
+    BEAR_STOP = BEAR_STOPbackup
+    storage['roi_currency'] = roi_currency
+    storage['apy_currency'] = apy_currency
+    storage['dpt'] = dpt
+    print_tune()
 
 # PRIMARY PROCESS
 # ======================================================================
@@ -3436,8 +3945,9 @@ if __name__ == "__main__":
         backtest()
     print_tune()
     if BACKTEST:
-        while 1: # refresh backtest hourly
-            time.sleep(3600)
+        while True:  # refresh backtest hourly
+            for i in range(3600 * 4):
+                plt.pause(0.25)
             logo()
             plt.close()
             data = {}
@@ -3459,7 +3969,6 @@ if __name__ == "__main__":
         optimizer()
         print ('https://www.youtube.com/watch?v=5ydqjqZ_3oc')
         sys.exit()
-
 # ======================================================================
 ''' EXTINCTION EVENT '''
 # ======================================================================
