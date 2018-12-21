@@ -1,7 +1,7 @@
 
 
 
-print('WARN DEPRECATED VERSION use metaNODE.py from extinction-event/EV folder')
+raise ValueError('WARNING: DEPRECATED VERSION use metaNODE.py from extinction-event/EV folder')
 
 
 
