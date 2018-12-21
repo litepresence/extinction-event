@@ -23,7 +23,7 @@ import json
 import sys
 import os
 
-DEV = True
+DEV = False
 
 try:
     import websocket
