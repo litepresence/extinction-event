@@ -5,7 +5,6 @@
 
 ' litepresence 2018 '
 
-
 def WTFPL_v0_March_1765():
     if any([stamps, licenses, taxation, regulation, fiat, etat]):
         try:
@@ -24,7 +23,7 @@ import json
 import sys
 import os
 
-DEV = False
+DEV = True
 
 try:
     import websocket
@@ -32,7 +31,6 @@ try:
         websocket.enableTrace(True)
 except:
     raise ValueError('pip install websocket-client')
-
 
 def version():
 
@@ -45,7 +43,6 @@ def version():
         '\x1b]2;' +
         'Bitshares metaNODE' +  # terminal title bar
         '\x07')
-
 
 def banner():
     print("\033c")
@@ -93,7 +90,7 @@ def banner():
               " list; [0]=most recently blacklisted node \n")
         time.sleep(0.5)
         print("        metaNODE['blocktime'] #" +
-              " oldest blockchain time in metaNODE data \n\n\n\n")
+              " oldest blockchain time in metaNODE data \n\n\n")
         time.sleep(1)
         print("to watch data feed, in second terminal type:")
         print('')
@@ -107,7 +104,6 @@ def banner():
 
 # GLOBALS
 # ======================================================================
-
 
 def controls():
 
@@ -125,7 +121,6 @@ def controls():
     PAUSE = 4  # 4
     BLIP = 0.05  # 0.05
     SKIP_INTRO = False
-
 
 def public_nodes():
 
@@ -183,7 +178,6 @@ def public_nodes():
 
     node_count = len(nodes)
 
-
 def constants():
 
     global Z, TZ, MAINNET, BEGIN
@@ -193,7 +187,6 @@ def constants():
                '2310fc5dec06da467ee7905a8dad512c8')
     Z = '{"id":1,"method":"call","params":["database",'
     BEGIN = int(time.time())
-
 
 def sign_in():
 
@@ -224,7 +217,6 @@ def sign_in():
     if asset == '':
         asset = 'BTS'
 
-
 def initialize():
 
     now = int(time.time())
@@ -237,7 +229,6 @@ def initialize():
 
 # TEXT PIPE
 # ======================================================================
-
 
 def Bitshares_Trustless_Client():  # Your access to the metaNODE
     # Include this definition in your script to access metaNODE.txt
@@ -267,7 +258,6 @@ def Bitshares_Trustless_Client():  # Your access to the metaNODE
             except:
                 pass
     return metaNODE
-
 
 def race_read(doc=''):  # Concurrent Read from File Operation
 
@@ -315,7 +305,6 @@ def race_read(doc=''):  # Concurrent Read from File Operation
                 pass
     return ret
 
-
 def race_write(doc='', text=''):  # Concurrent Write to File Operation
 
     if not isinstance(text, str):
@@ -345,14 +334,13 @@ def race_write(doc='', text=''):  # Concurrent Write to File Operation
             except:
                 pass
 
-
 def race_append(doc='', text=''):  # Concurrent Append to File Operation
 
     text = ('{"ctime":"' +
             str(time.ctime()) +
             '", "comment":' +
             str(text) +
-            '}')
+            '}\n')
     i = 0
     while True:
         time.sleep(BLIP * i ** 2)
@@ -378,7 +366,6 @@ def race_append(doc='', text=''):  # Concurrent Append to File Operation
                 f.close()
             except:
                 pass
-
 
 def watchdog():
 
@@ -441,7 +428,6 @@ def watchdog():
 # CURATION
 # ======================================================================
 
-
 def history():
 
     # Tomorrow race_list():
@@ -467,7 +453,6 @@ def history():
             print(msg)
             race_append(doc='metaNODElog.txt', text=msg)
             time.sleep(2)
-
 
 def inquire(call):  # single use public node database api call
 
@@ -498,7 +483,6 @@ def inquire(call):  # single use public node database api call
             race_append(doc='metaNODElog.txt', text=msg)
             winnow('blacklist', node)
             pass
-
 
 def cache():  # acquire asset id and asset amount decimal place
 
@@ -545,7 +529,6 @@ def cache():  # acquire asset id and asset amount decimal place
     currency_precision = mode(currency_precisions)
     websocket.enableTrace(False)
     print_market()
-
 
 def spawn():  # multiprocessing handler
 
@@ -598,7 +581,6 @@ def spawn():  # multiprocessing handler
                 print('process() WARNING', msg)
                 race_append(doc='metaNODElog.txt', text=msg)
                 pass
-
 
 def thresh(process, epoch, pid):  # make calls, shake out errors
 
@@ -993,7 +975,6 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
 
     call = call.replace("'", '"')  # never use single quotes
 
-
 def winnow(x, node):  # seperate good nodes from bad
 
     if x == 'blacklist':
@@ -1018,7 +999,6 @@ def winnow(x, node):  # seperate good nodes from bad
         else:
             race_write(doc='whitelist.txt', text=[node])
 
-
 def nascent_trend(maven):  # append latest data
 
     mavens = race_read(doc='mavens.txt')
@@ -1028,7 +1008,6 @@ def nascent_trend(maven):  # append latest data
         race_write(doc='mavens.txt', text=json.dumps(mavens))
     else:
         race_write(doc='mavens.txt', text=json.dumps([maven]))
-
 
 def bifurcation():  # statistically curate data
 
@@ -1267,7 +1246,6 @@ def bifurcation():  # statistically curate data
             race_append(doc='metaNODElog.txt', text=msg)
             continue  # from top of while loop NOT pass through error
 
-
 # ALERT FUNCTIONS
 # ======================================================================
 
@@ -1278,7 +1256,6 @@ def bell(duration=2, frequency=432):  # Activate linux audible bell
     os.system('play --no-show-progress --null --channels 1 synth' +
                   ' %s sine %f' % (duration*1000, frequency))
     '''
-
 
 def gmail():  # Send Mail to a Gmail Account
 
@@ -1300,22 +1277,18 @@ def gmail():  # Send Mail to a Gmail Account
 # HELPER FUNCTIONS
 # ======================================================================
 
-
 def to_iso_date(unix):  # returns iso8601 datetime given unix epoch
 
     return datetime.utcfromtimestamp(int(unix)).isoformat()
-
 
 def from_iso_date(date):  # returns unix epoch given iso8601 datetime
 
     return int(time.mktime(time.strptime(str(date),
                                          '%Y-%m-%dT%H:%M:%S')))
 
-
 def precision(x, n):  # string representation of float to n decimal places
 
     return ('%.' + str(n) + 'f') % float(x)
-
 
 def print_market():  # terminal header with cached values
 
@@ -1330,7 +1303,6 @@ def print_market():  # terminal header with cached values
     print('=======================================')
     print('')
 
-
 def welcome():
 
     version()
@@ -1344,7 +1316,6 @@ def welcome():
             print("\033c")
             logo()
             time.sleep(0.5)
-
 
 def logo():
 
@@ -1374,9 +1345,9 @@ def logo():
     print(blue(w))
     print(blue(x))
     print(cyan(
-          '''                             ____  _____   ___   ______   ________
-Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \
-  __  __  ____  ____   __     |   \ | | /  .-.  \ | | `. \ | |_ \_|
+'''                             ____  _____   ___   ______   ________
+Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \   
+  __  __  ____  ____   __     |   \ | | /  .-.  \ | | `. \ | |_ \_|   
  (  \/  )( ___)(_  _) /  \    | |\ \| | | |   | | | |  | | |  _) _
   )    ( | __)   ||  / <> \  _| |_\   |_\  `-'  /_| |_.' /_| |__/ |
  (_/\/\_)(____) (__)(__)(__)(_____|\____)`.___.'(______.'(________/
@@ -1386,7 +1357,6 @@ Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \
     if DEV:
         print(
             red('DEV DEV DEV DEV DEV DEV DEV DEV DEV DEV DEV DEV DEV DEV DEV DEV DEV'))
-
 
 def main():  # script primary backbone
 
