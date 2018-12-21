@@ -1,4 +1,10 @@
 
+
+
+print('WARN DEPRECATED VERSION use metaNODE.py from extinction-event/EV folder')
+
+
+
 ' metaNODE '
 
 # Curates data from all known public API's in the Bitshares network
