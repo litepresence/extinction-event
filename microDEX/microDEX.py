@@ -1,4 +1,8 @@
 
+
+print('WARN DEPRECATED VERSION use microDEX.py from extinction-event/EV folder')
+
+
 ' microDEX '
 
 # Low latency UI for Bitshares Decentralized Exchange
