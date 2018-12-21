@@ -1,6 +1,5 @@
 
-
-print('WARN DEPRECATED VERSION use microDEX.py from extinction-event/EV folder')
+raise ValueError('WARNING: DEPRECATED VERSION use microDEX.py from extinction-event/EV folder')
 
 
 ' microDEX '
