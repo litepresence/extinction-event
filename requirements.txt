@@ -5,3 +5,4 @@ numpy
 requests
 bitshares>=0.1.12
 uptick
+psutil==5.4.8
