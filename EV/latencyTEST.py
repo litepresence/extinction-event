@@ -45,9 +45,6 @@ ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 BIN = 'get your bin id by creating a new bin with commented script above'
 KEY = 'get your api keys after signup at jsonbin.io'
 
-BIN = '5c06e4f71deea01014bd4261'
-KEY = '$2a$10$mCcfHBcNDOELjI/.2OMYWu24rP33Qy/4o6TWYwPxhkqb7nyqhyB.6'
-
 BLIP = 0.05
 
 # set to true to share your latency test
