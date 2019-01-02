@@ -24,8 +24,12 @@ def WTFPL_v0_March_1765():
 # Import modules
 from multiprocessing import Process, Value, Array
 from bitshares.blockchain import Blockchain
+import matplotlib.cbook as cbook
+import matplotlib.pyplot as plt
 from bitshares import BitShares
 from datetime import datetime
+from pympler import asizeof
+import numpy as np
 import requests
 import json
 import time
@@ -57,6 +61,8 @@ PLOT = True
 UPLOAD = True
 # test seed nodes?
 SEEDS = True
+
+
 
 def race_write(doc='', text=''):  # Concurrent Write to File Operation
 
@@ -147,6 +153,19 @@ def test_seeds():  # ping and geolocate seed nodes
             print(ret)
             seeds.append(ret)
         del ret
+
+        print('')
+        from pympler import asizeof
+        sizes = []
+        local = dict(locals())
+        for name, obj in local.items():
+            if name != 'asizeof':
+                sizes.append((('%.2f' %(asizeof.asizeof(obj) / 1024)), name))
+        print('')
+        print(sizes)
+        for s in sizes:
+            print(s)
+        race_write(doc='sizes.txt', text=str(sizes))
 
         return seeds
     else:
@@ -703,9 +722,6 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
     del timed
 
     if PLOT:
-        import matplotlib.pyplot as plt
-        import matplotlib.cbook as cbook
-        import numpy as np
         try:
             plt.close()
         except:
@@ -826,12 +842,38 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
     previous_unique = unique
     del unique
     
+    '''
+    print('pympler')
+    from pympler import asizeof
+    sizes = []
+    local = dict(locals())
+    print('locals')
+    for name, obj in local.items():
+        if name != 'asizeof':
+            sizes.append((('%.2f' % (asizeof.asizeof(obj) / 1024)), name))
+    print('sizes', len(sizes))
+    for s in sizes:
+        print(s)
+    '''
     race_write(doc='sizes.txt', text=str(sizes))
 
 
 
 def loop():  # repeat latency test indefinitely
 
+
+    print('')
+    from pympler import asizeof
+    sizes = []
+    local = dict(locals())
+    for name, obj in local.items():
+        if name != 'asizeof':
+            sizes.append((('%.2f' % (asizeof.asizeof(obj) / 1024)), name))
+    print('')
+    print(sizes)
+    for s in sizes:
+        print(s)
+    race_write(doc='sizes.txt', text=str(sizes))
 
     while True:
         print("\033c")
@@ -875,7 +917,17 @@ def update():  # run one latency test
 
 
 print('')
-
+from pympler import asizeof
+sizes = []
+local = dict(locals())
+for name, obj in local.items():
+    if name != 'asizeof':
+        sizes.append((name, (asizeof.asizeof(obj) / 1024)))
+print('')
+print(sizes)
+for s in sizes:
+    print(s)
+race_write(doc='sizes.txt', text=str(sizes))
 
 if __name__ == '__main__':
 
