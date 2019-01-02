@@ -3,7 +3,7 @@
 
 # Maintains a list of tested Bitshares public nodes
 
-' litepresence 2018 '
+' litepresence 2019 '
 
 def WTFPL_v0_March_1765():
     if any([stamps, licenses, taxation, regulation, fiat, etat]):
@@ -13,7 +13,7 @@ def WTFPL_v0_March_1765():
             return [tar, feathers]
 
 ' features '
-# Prints list to file nodes.txt
+# Prints list to file nodes.txt; which is used by metaNODE.py
 # Uploads list and other latency data to jsonbin.io
 # Includes Geolocation Data from ip-api.com
 # Creates map from geolocation data and uploads to vgy.me
@@ -26,11 +26,16 @@ from multiprocessing import Process, Value, Array
 from bitshares.blockchain import Blockchain
 from bitshares import BitShares
 from datetime import datetime
+from pympler import asizeof
 import requests
 import json
 import time
 import sys
 import os
+
+#import websocket
+#websocket.enableTrace(True)
+
 
 # terminal header
 sys.stdout.write('\x1b]2;' + 'Bitshares latencyTEST' + '\x07')
@@ -40,6 +45,9 @@ ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 
 BIN = 'get your bin id by creating a new bin with commented script above'
 KEY = 'get your api keys after signup at jsonbin.io'
+
+BIN = '5c06e4f71deea01014bd4261'
+KEY = '$2a$10$mCcfHBcNDOELjI/.2OMYWu24rP33Qy/4o6TWYwPxhkqb7nyqhyB.6'
 
 BLIP = 0.05
 
@@ -51,6 +59,8 @@ IPAPI = True
 PLOT = True
 # set true to upload final image to hosting service
 UPLOAD = True
+# test seed nodes?
+SEEDS = True
 
 def race_write(doc='', text=''):  # Concurrent Write to File Operation
 
@@ -79,72 +89,78 @@ def race_write(doc='', text=''):  # Concurrent Write to File Operation
 
 def test_seeds():  # ping and geolocate seed nodes
 
-    # scrape list of seed nodes from github:
-    url = ('https://raw.githubusercontent.com/bitshares/' +
-            'bitshares-core/master/libraries/app/application.cpp')
 
-    # my ISP is currently blocking github
-    uri = 'https://www.textise.net/showText.aspx?strURL=https%253A//'
-    url = uri + ('raw.githubusercontent.com/bitshares/bitshares-core/' +
-            'master/libraries/app/application.cpp')
-    # so I hack quick hole in their bullshit...
+    if SEEDS:
+        # scrape list of seed nodes from github:
+        url = ('https://raw.githubusercontent.com/bitshares/' +
+                'bitshares-core/master/libraries/app/application.cpp')
 
-    req = requests.get(url).text
-    ret = req.replace(
-        " ",
-        "").replace(",",
-                    "").split('seeds={')[1].split('}')[0]
-    ret = ret.split('//')
-    ret = [i for i in ret if '"' in i]
-    ret = [i.split('"')[1] for i in ret]
-    ret = [i.split(':')[0] for i in ret]
+        # my ISP is currently blocking github
+        uri = 'https://www.textise.net/showText.aspx?strURL=https%253A//'
+        url = uri + ('raw.githubusercontent.com/bitshares/bitshares-core/' +
+                'master/libraries/app/application.cpp')
+        # so I hack quick hole in their bullshit...
 
-    seeds = []
-    print('pinging and geolocating seed nodes...')
-    print('')
-    for i in ret:
+        req = requests.get(url).text
+        ret = req.replace(
+            " ",
+            "").replace(",",
+                        "").split('seeds={')[1].split('}')[0]
+        ret = ret.split('//')
+        ret = [i for i in ret if '"' in i]
+        ret = [i.split('"')[1] for i in ret]
+        ret = [i.split(':')[0] for i in ret]
 
-        cmd = 'ping -c 1 ' + i
-        a = os.popen(cmd).read()
-        try:
-            ping = int(a.split('time=')[1].split(' ms')[0])
-        except:
-            ping = 0
-        geolocate = 'http://ip-api.com/json/'
-        ip = i
+        seeds = []
+        print('pinging and geolocating seed nodes...')
+        print('')
+        for i in ret:
 
-        # some ips are not recognized by ip-api.com; substitute ipinfo.info
-        # manually:
-        if ip == 'seeds.bitshares.eu':
-            ip = '45.76.70.247'
-        geolocate += ip
+            cmd = 'ping -c 1 ' + i
+            a = os.popen(cmd).read()
+            try:
+                ping = int(a.split('time=')[1].split(' ms')[0])
+            except:
+                ping = 0
+            geolocate = 'http://ip-api.com/json/'
+            ip = i
 
-        req = requests.get(geolocate, headers={})
-        ret = json.loads(req.text)
-        entriesToRemove = (
-            'isp',
-            'regionName',
-            'org',
-            'countryCode',
-            'timezone',
-            'region',
-            'as',
-            'status',
-            'zip')
-        for k in entriesToRemove:
-            ret.pop(k, None)
-        ret['ip'] = ret.pop('query')
-        ret = (i, ping, ret)
-        print(ret)
-        seeds.append(ret)
+            # some ips are not recognized by ip-api.com; substitute ipinfo.info
+            # manually:
+            if ip == 'seeds.bitshares.eu':
+                ip = '45.76.70.247'
+            geolocate += ip
 
-    return seeds
+            req = requests.get(geolocate, headers={})
+            ret = json.loads(req.text)
+            del req
+            entriesToRemove = (
+                'isp',
+                'regionName',
+                'org',
+                'countryCode',
+                'timezone',
+                'region',
+                'as',
+                'status',
+                'zip')
+            for k in entriesToRemove:
+                ret.pop(k, None)
+            ret['ip'] = ret.pop('query')
+            ret = (i, ping, ret)
+            print(ret)
+            seeds.append(ret)
+        del ret
+
+        return seeds
+    else:
+        return []
 
 def jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds):
     # upload data from latency test to jsonbin.io
     # you will need to need to create an api key to use this feature
 
-    uri = 'https://api.jsonbin.io/b/'
+    url = 'https://api.jsonbin.io/b/'
     '''
     # run this commmented subscript to create a new jsonbin
 
@@ -160,7 +176,8 @@ def jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds):
     print (data)
     print(data['id'])
     '''
-    url = uri + BIN
+    url = url + BIN
+
 
     headers = {'Content-Type': 'application/json',
                'secret-key': KEY,
@@ -186,17 +203,24 @@ def jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds):
         "master/EV/bitshares-latency.py")
     }
 
+    del geo
+    del image_url
+    del seeds
+    del speed
+    del no_suffix
+    del unique
+    del urls
     data["DICT_KEYS"] = str(list(data.keys()))
-
     req = requests.put(url, json=data, headers=headers)
-
-    print('updating jsonbin...')
-    print(req.text)
+    del data
     print('reading jsonbin...')
     url += '/latest'
     print(url)
     req = requests.get(url, headers=headers)
+    del url
+    del headers
     print(req.text)
+    del req
 
 def clean(raw):  # remove parenthesis and commas from strings
     return ((str(raw).replace('"', " "))
@@ -265,6 +289,15 @@ def enablePrint(noprint):  # re-enable printing
 
 def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
           include=False, exclude=False, master=False):
+
+    
+    try:
+        print('')
+        print('previous unique list')
+        print(previous_unique)
+        print('')
+    except:
+        pass
 
     # this is the primary process to ping, validate, and geolocate
     # timeout : seconds to ping until abort per node
@@ -412,6 +445,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
             'wss://bitsqsdqsdhares.openledger.info',
             'wss://secuasdre.freedomledger.com',
             'wss://testnet.bitshares.eu/wqsdsqs',
+            'wss://fake.automatic-selection.com',
         ]  # known typos found in webscraping methods, etc.
 
     # gather list of nodes from github
@@ -468,9 +502,11 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
         for g in gits:
             url = git + g
             urls.append(url)
-
+        del gits
+    
     # include manually entered sites for Bitshares nodes
     validated = [] + included
+    del included
 
     if 1:
         for u in urls:
@@ -493,6 +529,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
         print(('remove %s known bad nodes' % len(excluded)))
         validated = [i for i in validated if i not in excluded]
 
+
     #
     #
     # manual timeout and validated list for quick custom test
@@ -500,9 +537,9 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
         timeout = 30
     if 0:
         validated = [
-            'wss://b.mrx.im',
-            'wss://b.mrx.im/ws',
-            'wss://b.mrx.im/wss']
+            'wss://dex.iobanker.com:9090',
+            'wss://dex.iobanker.com:9090/ws',
+            'wss://dex.iobanker.com:9090/wss']
     if 0:
         validated = validated[-5:]
     #
@@ -555,6 +592,9 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
                     pinged.append(n)        # connect success
                     timed.append(num.value)  # connect success time
                 print(('ping:', ('%.2f' % num.value), n))
+
+        
+        time.sleep(10)
 
         # sort websockets by latency
         pinged = [x for _, x in sorted(zip(timed, pinged))]
@@ -646,6 +686,15 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
         print('UNIQUE LIST:')
         print(unique)
 
+    del excluded
+    del unknown
+    del testnet
+    del expired
+    del stale
+    del down
+    del pinged
+
+
     print ('')
     enablePrint(noprint)
     elapsed = time.time() - begin
@@ -654,6 +703,8 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
 
     if write:
         race_write(doc='nodes.txt', text=str(unique))
+
+    del timed
 
     if PLOT:
         import matplotlib.pyplot as plt
@@ -699,8 +750,14 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
                 print('skipping', geo[i])
                 pass
         plt.plot(xs, ys, 'wo', markersize=4, alpha=0.25)
+        del x
+        del y
+        del xs
+        del ys
 
-        # PLOT SEED NODES
+
+    # PLOT SEED NODES
+    if SEEDS:
         xs = []
         ys = []
         for i in range(len(seeds)):
@@ -714,7 +771,6 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
                     print('skipping', seeds[i])
                     pass
         plt.plot(xs, ys, 'yo', markersize=4, alpha=1.0)
-
         utc = str(
             time.strftime("%a, %d %b %Y %H:%M:%S",
                           time.gmtime())) + ' UTC'
@@ -745,6 +801,7 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
             url = 'https://vgy.me/upload'
             files = {'file': open('nodemap.png', 'rb')}
             r = requests.post(url, files=files)
+            del files
             image_url = json.loads(r.text)['image']
         except:
             print('vgy failed')
@@ -754,13 +811,31 @@ def nodes(timeout=20, pings=999999, crop=99, noprint=False, write=True,
     if JSONBIN:
         jsonbin(no_suffix, unique, speed, geo, urls, image_url, seeds)
 
-    if PLOT:
-        for i in range(180):
-            plt.pause(3)
-    else:
-        time.sleep(900)
+    del no_suffix
+
+    del speed
+    del geo
+    del urls
+    del image_url
+    del seeds
+
+    
+    try:
+        print('')
+        print('live now, not live last round')
+        print([i for i in unique if i not in previous_unique])
+    except:
+        pass
+
+    previous_unique = unique
+    del unique
+    
+    race_write(doc='sizes.txt', text=str(sizes))
+
+
 
 def loop():  # repeat latency test indefinitely
+
 
     while True:
         print("\033c")
@@ -768,15 +843,22 @@ def loop():  # repeat latency test indefinitely
         import zlib
         b = b'x\x9c\xad\xd4M\n\xc4 \x0c\x05\xe0}O1P\x12B\x10\xbc\x82\xf7?\xd5\xf8\xaf\x83F\xe3\xe0[t\xf9\xf5%\xda>\x9f\x1c\xf7\x7f\x9e\xb9\x01\x17\x0cc\xec\x05\xe3@Y\x18\xc6(\'Z\x1a\xca.\x1bC\xa5l\r\x85\xa20\xb6\x8a\xca\xd8,W0\xec\x05\xc3\xdf\xd4_\xe3\r\x11(q\x16\xec\x95l\x04\x06\x0f\x0c\xc3\xddD\x9dq\xd2#\xa4NT\x0c/\x10\xd1{b\xd4\x89\x92\x91\x84\x11\xd9\x9d-\x87.\xe4\x1cB\x15|\xe0\xc8\x88\x13\xa5\xbc\xd4\xa21\x8e"\x18\xdc\xd2\x0e\xd3\xb6\xa0\xc6h\xa3\xd4\xde\xd0\x19\x9a\x1e\xd8\xddr\x0e\xcf\xf8n\xe0Y\rq\x1fP:p\x92\xf2\xdbaB,v\xda\x84j\xc4.\x03\xb1>\x97\xee{\x99oSa\x00\x0f\xc6\x84\xd8\xdf\x0f\xb4e\xa7$\xfdE\xae\xde\xb1/\x1d\xfc\x96\x8a'
         print(zlib.decompress(b).decode())
+        del b
         start = time.time()
         try:
             nodes(timeout=6, pings=999, crop=999, noprint=False, write=True,
                   include=True, exclude=True, master=False)
 
             print('elapsed: ', (time.time() - start))
+
+            if PLOT:
+                plt.pause(7200)
+            else:
+                time.sleep(7200)
         # no matter what happens just keep verifying book
         except Exception as e:
             print (type(e).__name__, e.args, e)
+            time.sleep(7200)
             pass
 
 def update():  # run one latency test
@@ -794,6 +876,10 @@ def update():  # run one latency test
     except Exception as e:
         print (type(e).__name__, e.args, e)
         pass
+
+
+print('')
+
 
 if __name__ == '__main__':
 
