@@ -26,7 +26,6 @@ from multiprocessing import Process, Value, Array
 from bitshares.blockchain import Blockchain
 from bitshares import BitShares
 from datetime import datetime
-from pympler import asizeof
 import requests
 import json
 import time
