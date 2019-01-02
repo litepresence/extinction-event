@@ -1,9 +1,9 @@
 
-' metaNODE '
+' metaNODE = Bitshares_Trustless_Client()'
 
-# Curates data from all known public API's in the Bitshares network
+# multiprocess public api statistical curation utility
 
-' litepresence 2018 '
+' litepresence 2019 '
 
 def WTFPL_v0_March_1765():
     if any([stamps, licenses, taxation, regulation, fiat, etat]):
@@ -12,11 +12,41 @@ def WTFPL_v0_March_1765():
         except:
             return [tar, feathers]
 
+# 99.99% uptime
+# no rogue data, no stale data
+# no hung processes, no runaway processes
+# maintains whitelist of validated tested nodes for buy/sell/cancel ops
+
+' metaNODE '
+
+# is a dict of account history and market conditions for one DEX pair
+# stored in json format in file metaNODE.txt
+# it can be accessed by ANY script in ANY language
+# this statistically curated data is updated every few seconds
+# you can tail any of these live updated texts:
+
+'metaNODE.txt'
+'metaNODElog.txt'
+'whitelist.txt'
+'blacklist.txt'
+'account_history.txt'  # you may wish to back this up from time to time
+
+'latencyTEST.py'
+# will reduce brittleness in extreme network circumstances
+# it is recommended that you also run latencyTEST in same folder
+# metaNODE and latencyTEST communicate via nodes.txt
+# a hardcoded list of nodes is also provided as backup
+
+# to access metaNODE data from any python scirpt just import via:
+
+''' metaNODE = Bitshares_Trustless_Client() '''
+
 from random import random, shuffle, randint, choice
 from multiprocessing import Process
 from datetime import datetime
 from statistics import mode
 import traceback
+import psutil
 import numpy
 import time
 import json
@@ -24,25 +54,53 @@ import sys
 import os
 
 DEV = False
+COLOR = True
+
+'''
+# Development tool for namespace object size
+try:
+    from pympler import asizeof
+
+    sizes = []
+    for name, obj in locals().items():
+        if name != 'asizeof':
+            sizes.append((name, (asizeof.asizeof(obj) / 1024)))
+    race_write(doc='sizes.txt', text=str(sizes))
+except:
+    pass
+'''
 
 try:
     import websocket
     if DEV:
         websocket.enableTrace(True)
 except:
-    raise ValueError('pip install websocket-client')
+    raise ValueError('pip3 install websocket-client')
 
 def version():
 
     global VERSION, version
 
-    version = 'v0.00000013-JSON'
+    version = 'v0.00000014-DEL'
     VERSION = 'metaNODE ' + version + ' - Bitshares Trustless Client'
 
     sys.stdout.write(
         '\x1b]2;' +
         'Bitshares metaNODE' +  # terminal title bar
         '\x07')
+
+def blue(text):
+    return ('\033[94m' + text + '\033[0m') if COLOR else text
+
+def cyan(text):
+    return ('\033[96m' + text + '\033[0m') if COLOR else text
+
+def red(text):
+    return ('\033[91m' + text + '\033[0m') if COLOR else text
+
+def purple(text):
+    return ('\033[95m' + text + '\033[0m') if COLOR else text
+
 
 def banner():
     print("\033c")
@@ -91,6 +149,9 @@ def banner():
         time.sleep(0.5)
         print("        metaNODE['blocktime'] #" +
               " oldest blockchain time in metaNODE data \n\n\n")
+        print('')
+        print('...and MORE!')
+        print('')
         time.sleep(1)
         print("to watch data feed, in second terminal type:")
         print('')
@@ -113,7 +174,7 @@ def controls():
     # suggested values
     WHITE = 10  # 20
     BLACK = 10  # 30
-    TIMEOUT = 300  # 300
+    TIMEOUT = 100  # 300
     PROCESSES = 20  # 20
     MAVENS = 7  # 7
     BOOK_DEPTH = 10  # 10
@@ -174,7 +235,11 @@ def public_nodes():
         'wss://ws.gdex.top/ws',
         'wss://ws.hellobts.com/ws']
 
-    nodes = race_read(doc='nodes.txt')
+    try:
+        nodes = race_read(doc='nodes.txt')
+    except:
+        print('nodes.txt not found using list stored in public_nodes()')
+        pass
 
     node_count = len(nodes)
 
@@ -247,7 +312,7 @@ def Bitshares_Trustless_Client():  # Your access to the metaNODE
             msg = str(type(e).__name__) + str(e.args)
             if DEV:
                 msg += str(traceback.format_exc())
-            print(msg)
+            print(msg + 'metaNODE = Bitshares_Trustless_Client')
             try:
                 f.close()
             except:
@@ -430,8 +495,6 @@ def watchdog():
 
 def history():
 
-    # Tomorrow race_list():
-
     while True:
         metaNODE = Bitshares_Trustless_Client()
         try:
@@ -555,7 +618,10 @@ def spawn():  # multiprocessing handler
 
     # kill and respawn threshing processes periodically for durability
     # even if anything gets hung metaNODE always moves on
+    # a = process of PROCESSES; b = respawn epoch; c = process id
+    # every time a process is respawned it gets new process id
     while True:
+        public_nodes()
         b += 1
         race_write(doc='metaNODElog.txt', text='')
         for a in range(PROCESSES):
@@ -764,6 +830,14 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
             # CHECK BLACK AND WHITE LISTS
             black = race_read(doc='blacklist.txt')
             white = race_read(doc='whitelist.txt')
+            try:
+                metaNODE = Bitshares_Trustless_Client()
+                if len(metaNODE['blacklist']) > len(black):
+                    black = metaNODE['blacklist']
+                if len(metaNODE['whitelist']) > len(white):
+                    white = metaNODE['whitelist']
+            except:
+                pass
             shuffle(nodes)
             node = nodes[0]
             if node in black:
@@ -797,7 +871,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                                          currency, currency_id, currency_precision)
 
                 try:
-                    import psutil  # REQUIRES MODULE INSTALL
+                    # REQUIRES MODULE INSTALL
                     proc = psutil.Process()
                     descriptors = proc.num_fds()
                     cpu = '%.3f' % (
@@ -849,11 +923,17 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 print(keys)
                 print('')
                 print('runtime:epoch:pid', runtime, epoch, pid)
-                print('fds:processes    ',
-                      descriptors,
-                      process,
-                      'of',
-                      PROCESSES)
+                try:
+                    print('fds:processes    ',
+                          descriptors,
+                          process,
+                          'of',
+                          PROCESSES)
+                except:
+                    print('processes    ',
+                          process,
+                          'of',
+                          PROCESSES)
                 try:
                     print('cpu:ram:io       ', cpu, ram, io)
                 except:
@@ -934,8 +1014,42 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 maven['blocktime'] = blocktime  # INT
                 nascent_trend(maven)
 
-                # winnow whitelist this node
+                # winnow this node to the whitelist
                 winnow('whitelist', node)
+
+                # clear namespace
+                del metaNODE
+                del maven
+                del bidv
+                del askv
+                del bidp
+                del askp
+                del bts_balance
+                del currency_balance
+                del asset_balance
+                del history
+                del orders
+                del last
+                del io
+                del alert
+                del currency_max
+                del balances
+                del buy_orders
+                del ram
+                del sell_orders
+                del cpu
+                del i
+                del asset_max
+                del keys
+                del watchdog_latency
+                del asset_holding
+                del divested
+                del now
+                del invested
+                del runtime
+                del currency_holding
+                del descriptors
+                del proc
 
             try:
                 time.sleep(BLIP)
@@ -971,6 +1085,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
             if 'listed' not in msg:
                 race_append(doc='metaNODElog.txt', text=msg)
             winnow('blacklist', node)
+            del msg
             continue
 
     call = call.replace("'", '"')  # never use single quotes
@@ -998,6 +1113,12 @@ def winnow(x, node):  # seperate good nodes from bad
             race_write(doc='whitelist.txt', text=white)
         else:
             race_write(doc='whitelist.txt', text=[node])
+    try:
+        del white
+        del black
+        del node
+    except:
+        pass
 
 def nascent_trend(maven):  # append latest data
 
@@ -1008,13 +1129,16 @@ def nascent_trend(maven):  # append latest data
         race_write(doc='mavens.txt', text=json.dumps(mavens))
     else:
         race_write(doc='mavens.txt', text=json.dumps([maven]))
+    del mavens
 
 def bifurcation():  # statistically curate data
 
     while True:
         try:
 
-            # initialize / clear the metaNODE dictionary
+            time.sleep(2)  # take a deep breath
+
+            # initialize the metaNODE dictionary
             metaNODE = {}
             # initialize lists to sort data from each maven by key
             bidp = []
@@ -1030,8 +1154,6 @@ def bifurcation():  # statistically curate data
             blacklist = []
             blocktime = []
             orders = []
-
-            time.sleep(1)  # take a deep breath
 
             # gather list of maven opinions from the nascent_trend()
             mavens = race_read(doc='mavens.txt')
@@ -1062,6 +1184,7 @@ def bifurcation():  # statistically curate data
                 blocktime = max(blocktime)
             except:
                 raise ValueError('validating the nascent trend...')
+                continue
             # get the mode of the mavens for each metric
             # allow 1 or 2 less than total & most recent for mode
             # accept "no mode" statistics error as possibility
@@ -1237,6 +1360,37 @@ def bifurcation():  # statistically curate data
             race_write(doc='metaNODE.txt', text=metaNODE)
             print ('metaNODE.txt updated')
 
+            # clear namespace
+            del metaNODE
+            del mavens
+            del maven
+            del bidp
+            del askp
+            del bidv
+            del askv
+            del bts_balance
+            del currency_balance
+            del asset_balance
+            del history
+            del last
+            del whitelist
+            del blacklist
+            del blocktime
+            del orders
+            del l
+            del currency_max
+            del i
+            del book
+            del bl
+            del wl
+            del currency_holding
+            del asset_max
+            del divested
+            del invested
+            del buy_orders
+            del asset_holding
+            del sell_orders
+
         except Exception as e:  # wait a second and try again
             # common msg is "no mode statistics error"
             msg = str(type(e).__name__) + str(e.args)
@@ -1247,7 +1401,7 @@ def bifurcation():  # statistically curate data
             continue  # from top of while loop NOT pass through error
 
 # ALERT FUNCTIONS
-# ======================================================================
+# =================== DEVELOPER SUGGESTIONS ============================
 
 def bell(duration=2, frequency=432):  # Activate linux audible bell
 
@@ -1257,7 +1411,7 @@ def bell(duration=2, frequency=432):  # Activate linux audible bell
                   ' %s sine %f' % (duration*1000, frequency))
     '''
 
-def gmail():  # Send Mail to a Gmail Account
+def email():  # Send Email to a Gmail Account
 
     # sorry no subject lines with this API
     pass
@@ -1273,6 +1427,21 @@ def gmail():  # Send Mail to a Gmail Account
     server.sendmail(send_from, send_to, msg)
     server.quit()
     '''
+
+def image():  # Display Warning Image in new window
+    os.system("start " + "your_warning_image.png")
+    pass
+
+def sms():  # Send SMS Message via Twilio Account
+    # Download the twilio-python library from http://twilio.com/docs/libraries
+    from twilio.rest import Client
+    # Find these values at https://twilio.com/user/account
+    account_sid = "ACXXXXXXXXXXXXXXXXX"
+    auth_token = "YYYYYYYYYYYYYYYYYY"
+    client = Client(account_sid, auth_token)
+    message = client.api.account.messages.create(to="+12316851234",
+                                                 from_="+15555555555",
+                                                 body="Hello there!")
 
 # HELPER FUNCTIONS
 # ======================================================================
@@ -1319,20 +1488,6 @@ def welcome():
 
 def logo():
 
-    COLOR = True
-
-    def blue(text):
-        return ('\033[94m' + text + '\033[0m') if COLOR else text
-
-    def cyan(text):
-        return ('\033[96m' + text + '\033[0m') if COLOR else text
-
-    def red(text):
-        return ('\033[91m' + text + '\033[0m') if COLOR else text
-
-    def purple(text):
-        return ('\033[95m' + text + '\033[0m') if COLOR else text
-
     def wxyz():
         a = 'abcdef1234567890'
         b = ''
@@ -1352,6 +1507,7 @@ Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \
   )    ( | __)   ||  / <> \  _| |_\   |_\  `-'  /_| |_.' /_| |__/ |
  (_/\/\_)(____) (__)(__)(__)(_____|\____)`.___.'(______.'(________/
                                                         ''' + version))
+
     print(blue(y))
     print(blue(z))
     if DEV:
