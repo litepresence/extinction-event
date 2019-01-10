@@ -23,6 +23,7 @@ from bitshares.market import Market
 from bitshares.account import Account
 from bitshares.blockchain import Blockchain
 
+
 # standard python modules
 import os
 import sys
