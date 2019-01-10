@@ -239,7 +239,15 @@ def control_panel():  # Advanced User Controls
     global RESOLUTION, OPTIMIZATIONS, MARKET_CROSS, OPTIMIZE, SCALP
     global MANUAL_OVERRIDE, MANUAL_BUY, MANUAL_SELL, MIN_AMOUNT
     global LIVE_PLOT_PROJECTION, SCALP_FUND_QTY, SCALP_SPREAD, GRAVITAS
+    global CC_API_KEY
 
+    CC_API_KEY = ''
+
+    if CC_API_KEY == '':
+        print('WARN: YOU MUST GET API KEY FROM cryptocompare.com')
+        raise
+    
+    
     # optimizer
     RESOLUTION = 100
     OPTIMIZATIONS = 10000
@@ -266,11 +274,11 @@ def control_panel():  # Advanced User Controls
     SCALP = True         # maintain market maker iceberg margins
     SCALP_PIECES = 2     # number of pieces to break up scalp orders
     SCALP_FUND = 0.1     # 0.10 = 10% of holdings reserved for scalping
-    SCALP_FUND_QTY = 0.3  # 0.10 = 10% of scalp fund on books per tick
+    SCALP_FUND_QTY = 0.1  # 0.10 = 10% of scalp fund on books per tick
     SCALP_SPREAD = 0.1   # 0.10 = disable scalping outer 10% of market
-    MIN_MARGIN = 0.007   # about 0.030
-    MA3 = 0.200          # about 0.500
-    MA4 = 0.066          # about 0.166
+    MIN_MARGIN = 0.030   # about 0.030
+    MA3 = 0.500          # about 0.500
+    MA4 = 0.166          # about 0.166
 
     # force buy/sell thresholds manually
     MANUAL_OVERRIDE = False
@@ -278,7 +286,7 @@ def control_panel():  # Advanced User Controls
     MANUAL_SELL = ANTISAT
 
     # override tune_install() thresholds conservatively by 0.01 = 1%
-    GRAVITAS = 0.04
+    GRAVITAS = 0.01
 
     # Manual Override Alpha State when live
     FORCE_ALPHA = False  # Options: ( False, 'BULL', 'BEAR' )
@@ -1122,8 +1130,8 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
 
     #{"time","close","high","low","open","volumefrom","volumeto"}
     # docs at https://www.cryptocompare.com/api/
-    # print(('API call for chartdata %s %ss %se CANDLE %s DAYS %s' % (
-    #    pair, start, stop, period, int((stop - start) / 86400.0))))
+    print(('API call for chartdata %s %ss %se CANDLE %s DAYS %s' % (
+        pair, start, stop, period, int((stop - start) / 86400.0))))
     connected = 0
     while not connected:
         try:
@@ -1150,7 +1158,13 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
                     limit = 2000
                 params = {'fsym': fsym, 'tsym': tsym, 'limit': 2000,
                           'aggregate': aggregate, 'toTs': toTs}
-                ret = requests.get(uri, params=params).json()
+                headers = {'Apikey' : CC_API_KEY}
+
+                #print (uri)
+                #print (params)
+                #print (headers)
+
+                ret = requests.get(uri, params=params, headers=headers).json()
                 d = ret['Data']
                 # print(params)
                 # print(ret)
@@ -1159,8 +1173,10 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
                 if (period == 7200) and ((stop - start) / 7200.0 > 1000):
                     toTs -= period * len(clean_d)
                     params = {'fsym': fsym, 'tsym': tsym, 'limit': 2000,
-                              'aggregate': aggregate, 'toTs': toTs}
-                    ret = requests.get(uri, params=params).json()
+                              'aggregate': aggregate, 'toTs': toTs,
+                                'api_key': CC_API_KEY
+                                }
+                    ret = requests.get(uri, params=params, headers=headers).json()
                     d = ret['Data']
                     clean_d2 = [i for i in d if i['close'] > 0]
                     clean_d = clean_d2 + clean_d1
@@ -1184,11 +1200,14 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
 
 def currencies():  # Public API cryptocompare
 
+    print('API call currencies')
+
     try:
         plt.pause(0.01)
         uri = 'https://min-api.cryptocompare.com/data/all/coinlist'
         params = {}
-        ret = requests.get(uri, params=params).json()
+        headers = {'Apikey' : CC_API_KEY}
+        ret = requests.get(uri, params=params, headers=headers).json()
         print(('API currencies', len(ret['Data']),
                'coins at cryptocompare'))
         return ret['Data']
@@ -1200,12 +1219,15 @@ def currencies():  # Public API cryptocompare
 
 def cryptocompare_time():  # CEX latency test
 
+    print('API call cryptocompare_time')
+
     try:
         plt.pause(0.01)
         # print('Cryptocompare API candle time')
         uri = 'https://www.cryptocompare.com/api/data/coinsnapshot'
         params = {'fsym': ASSET, 'tsym': CURRENCY}
-        ret = requests.get(uri, params=params).json()
+        headers = {'Apikey' : CC_API_KEY}
+        ret = requests.get(uri, params=params, headers=headers).json()
         timestamps = []
         for i in range(len(ret['Data']['Exchanges'])):
             timestamps.append(float(
@@ -1223,6 +1245,8 @@ def cryptocompare_time():  # CEX latency test
 
 def cryptocompare_last():  # CEX last price
 
+    print('API call cryptocompare_last')
+
     connected = 0
     while not connected:
         try:
@@ -1230,7 +1254,8 @@ def cryptocompare_last():  # CEX last price
             # print('Cryptocompare API last')
             uri = 'https://min-api.cryptocompare.com/data/pricemultifull'
             params = {'fsyms': ASSET, 'tsyms': CURRENCY}
-            ret = requests.get(uri, params=params).json()
+            headers = {'Apikey' : CC_API_KEY}
+            ret = requests.get(uri, params=params, headers=headers).json()
             raw = ret['RAW'][ASSET][CURRENCY]
             del ret
             price = float(raw['PRICE'])
@@ -1250,13 +1275,23 @@ def cryptocompare_last():  # CEX last price
 
 def marketcap():  # Public API coinmarketcap
 
+    print('API call marketcap')
+
     try:
-        plt.pause(0.01)
-        asset_cap = asset_dominance = asset_rank = 0
-        print('API marketcap')
-        uri = 'https://api.coinmarketcap.com/v1/ticker/'
-        params = {'limit': 0}
-        caps = requests.get(uri, params=params).json()
+
+        try:
+            plt.pause(0.01)
+            asset_cap = asset_dominance = asset_rank = 0
+
+            uri = 'https://api.coinmarketcap.com/v1/ticker/'
+            params = {'limit': 0 }
+            headers = {'Apikey' : CC_API_KEY}
+            caps = requests.get(uri, params=params, headers=headers).json()
+
+        except Exception as e:
+            print(str(traceback.format_exc()))
+
+        print(caps)
         asset_cap = 0
         total_cap = 0
         for c in caps:
@@ -3425,6 +3460,10 @@ def arbitrage():
 
     print('arbitrage()')
 
+    # scalp ops are maintained relative to cex markets
+    # we'll use an arbitrage calculation
+    # to offset scalp ops dex margins
+
     global storage
     ax = plt.gca()
 
@@ -3586,10 +3625,10 @@ def state_machine():  # Alpha and beta market finite state
         if info['live']:
             arbitrage()
 
-def optimizer()
+def optimizer():  # Stochastic ROI assent backpropagation
 
-    pass
-
+    now = int(time.time())
+    print_tune()
 
 # PRIMARY PROCESS
 # ======================================================================
@@ -3601,10 +3640,11 @@ if __name__ == "__main__":
     version()
     tune_install()
     keys_install()
-    asset_cap, asset_dominance, asset_rank = marketcap()
+
     optimize = False
     data = {}
     control_panel()
+    asset_cap, asset_dominance, asset_rank = marketcap()
     dictionaries()
     initialize()
     test_initialize()
