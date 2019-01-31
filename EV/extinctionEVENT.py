@@ -1,7 +1,9 @@
 
-' extinctionEVENT '
+#=======================================================================
+VERSION = 'Bitshares extinctionEVENT v0.00000008'
+#=======================================================================
 
-# Algorithmic live trading and backtesting platform for Bitshares DEX
+# Algorithmic Trading and Backtesting Platform
 
 ' litepresence 2019 '
 
@@ -12,22 +14,16 @@ def WTFPL_v0_March_1765():
         except:
             return [tar, feathers]
 
+' ********** ALPHA RELEASE TO PUBLIC DOMAIN WITH NO WARRANTY ********* '
+
 # dependencies
 import matplotlib
 import numpy as np
 from tkinter import *
 
-# pybitshares modules
-from bitshares import BitShares
-from bitshares.market import Market
-from bitshares.account import Account
-from bitshares.blockchain import Blockchain
-
-
 # standard python modules
 import os
 import sys
-import json
 import time
 import math
 import warnings
@@ -39,10 +35,14 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.cbook as cbook
 import matplotlib.dates as mdates
-from ast import literal_eval as literal
-from statistics import mean, median, mode
+from json import loads as json_loads
+from json import dumps as json_dumps
+from ast import literal_eval as literal # race read and watchdog
 from random import random, shuffle, randint, sample
-from multiprocessing import Process, Value, Array
+
+# litepresence/extinction-event utilities
+from manualSIGNING import broker, prototype_order
+from metaNODE import Bitshares_Trustless_Client
 
 # Google Agorism
 SATOSHI = 0.00000001
@@ -50,78 +50,9 @@ ANTISAT = 1 / SATOSHI
 
 def banner():
 
-    print("\033c")
-    print('''
-
-        # EXTINCTION EVENT
-
-        # Backtesting and Live Algo Trading Framework for Bitshares DEX
-
-        ' (BTS) litpresence1 '
-
-        Installation:
-
-        https://github.com/litepresence/extinction-event/blob/master/README.md
-        ''')
-
     '''
-    I stand upon the shoulders of giants and as such,
-    invite you to stand upon mine.
-    Use my work with or without attribution;
-    I make no claim of "intellectual property."
-    My ideas are the result of countless millenia of evolution
-    - they belong to humanity. :: Jameson Lopp @lopp
-
-    NOTE THIS IS ALPHA RELEASE TO PUBLIC DOMAIN WITH NO WARRANTY
-
-    #
-    # https://www.youtube.com/watch?v=5xouOnHxYUw
-    # https://www.youtube.com/watch?v=jJxKXOTNXjc
-    #
-    # Rated R Under 17 NOT Admitted Without Parent
-    #
-    # My liability is ZERO; "this script licenced: don't be a bitch^TM"
-    #
-    # WTFPLv0 March 1765
-    #
-
-    use this, get lambo, deposit 7.777% skriptbunny tithing here:
-
-    (BTS) litepresence1
-    (BTC) 374gjPuhokrWj8KJu8NnMBGzpbHWcVeE1k
-
-    #
-    # AI optimized algo inquiries to finitestate@tutamail.com
-
-    # !@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()
-
-    # this algo can be tuned to between:
-
-    # 50X and 50,000X
-
-    # in BOTH currency and asset terms
-    # for ANY* crypto-crypto pair, over past 365 days of data
-
-    # !@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()!@#$%^&*()
-
-    # litepresence @ pastecoin.com for sales
-    # finitestate@tutamail for inquiries
-    #
-    ########################
-    #
-    # THE DESTROYER,
-    # litepresence - 2018
-    #
-
-    '''
-    #===================================================================
-    ''' FEATURES v0.00000001 alpha release March 8, 2018'''
-    #===================================================================
-    '''
-
-    ALT/BTC data from cryptocompare.com as signal
-
-    Bitshares DEX open.ALT/open.BTC for trading
+    Cryptocompare API for signal
+    Bitshares DEX for trading
 
     - Play simple effective 4 state 50 day cross
 
@@ -142,21 +73,16 @@ def banner():
 
     - Bot runs local
 
-    - Backtest Engine Included
+    - Backtest Engine included for optimizing thresholds
 
     - Maintains storage from backtest to live session
 
-
-    *h/t @ cryptocompare.com w/ 2000+ altcoin pairs of market data
-    **h/t to crew at bitshares dev and node admin telegram
+    h/t @ cryptocompare.com w/ 2000+ altcoin pairs of market data
+    h/t to crew at BitsharesDEV telegram
     '''
 
 def version():
 
-    global VERSION
-    #===================================================================
-    VERSION = 'EXTINCTION EVENT v0.00000007 niceties'
-    #===================================================================
     print (
         'Python3 and Linux Required; your system: Python',
         sys.version.split(' ')[0],
@@ -196,6 +122,7 @@ def logo():
      (________/    (__)    (________/(____)\___)  (_____)
         ''')
         time.sleep(0.1)
+
 # USER CONTROLS
 # ======================================================================
 
@@ -211,8 +138,6 @@ def tune_install():  # Basic User Controls
     METHOD = 0
     #===================================================================
 
-
-
     CURRENCY = "BTC"
     ASSET = "BTS"
     MA1 = 10
@@ -225,8 +150,6 @@ def tune_install():  # Basic User Controls
     MAX_CROSS = 1
     BULL_STOP = 1
     BEAR_STOP = 1
-
-
 
 
 def control_panel():  # Advanced User Controls
@@ -247,8 +170,7 @@ def control_panel():  # Advanced User Controls
     if CC_API_KEY == '':
         print('WARN: YOU MUST GET API KEY FROM cryptocompare.com')
         raise
-    
-    
+
     # optimizer
     RESOLUTION = 100
     OPTIMIZATIONS = 10000
@@ -268,17 +190,17 @@ def control_panel():  # Advanced User Controls
     MAX_CURRENCY = 100
 
     # minimum order size in asset terms
-    MIN_AMOUNT = 2
+    MIN_AMOUNT = 10
 
     # scalp thresholds
     # ENTER OWN RISK &&&&
     SCALP = True         # maintain market maker iceberg margins
     SCALP_PIECES = 2     # number of pieces to break up scalp orders
     SCALP_FUND = 0.1     # 0.10 = 10% of holdings reserved for scalping
-    SCALP_FUND_QTY = 0.1  # 0.10 = 10% of scalp fund on books per tick
+    SCALP_FUND_QTY = 0.1 # 0.10 = 10% of scalp fund on books per tick
     SCALP_SPREAD = 0.1   # 0.10 = disable scalping outer 10% of market
-    MIN_MARGIN = 0.030   # about 0.030
-    MA3 = 0.500          # about 0.500
+    MIN_MARGIN = 0.005   # about 0.005
+    MA3 = 0.300          # about 0.300
     MA4 = 0.166          # about 0.166
 
     # force buy/sell thresholds manually
@@ -287,7 +209,7 @@ def control_panel():  # Advanced User Controls
     MANUAL_SELL = ANTISAT
 
     # override tune_install() thresholds conservatively by 0.01 = 1%
-    GRAVITAS = 0.01
+    GRAVITAS = 0.04
 
     # Manual Override Alpha State when live
     FORCE_ALPHA = False  # Options: ( False, 'BULL', 'BEAR' )
@@ -344,46 +266,16 @@ def control_panel():  # Advanced User Controls
 
     DEPTH = int(max(MA1, MA2) * (86400 / CANDLE) + 50)
     PAIR = ('%s_%s' % (CURRENCY, ASSET))
+    if 'BTS' in BitPAIR:
+        MIN_AMOUNT = 2  # DO NOT CHANGE
 
 # BITSHARES DEX TRADING API
 # ======================================================================
 
-def fee_maintainer():  # ensure 1 bitshare for fees
-    '*************************************'
-    metaNODE = Bitshares_Trustless_Client()
-    '*************************************'
-    bts_balance = metaNODE['bts_balance']
-    del metaNODE
-    print('fee_maintainer() BTS balance:', bts_balance)
-
-    # if I have less than half a bitshare, then buy half a bitshare
-    while bts_balance < 0.5:
-        print('maintaining 1 bitshare for fees')
-        if 'BTS' not in [BitASSET, BitCURRENCY]:
-            print(
-                'WARN placing dust market order in supplemental market BTS :',
-                BitCURRENCY)
-
-        pair = BitPAIR
-        qty = 2.00000001  # DO NOT CHANGE, used to override MIN_AMOUNT in dex_auth()
-
-        if BitCURRENCY == 'BTS':
-            pair = 'BTS' + ":" + BitASSET
-        else:
-            pair = 'BTS' + ":" + BitCURRENCY
-
-        dex_auth('buy', pair, amount=qty)
-        time.sleep(4)
-        '*************************************'
-        metaNODE = Bitshares_Trustless_Client()
-        '*************************************'
-        bts_balance = metaNODE['bts_balance']
-        del metaNODE
-
 def keys_install():  # Bitshares Keys
 
-    global BitCURRENCY, BitASSET, ACCOUNT, PASS_PHRASE
-    global BitPAIR, MARKET, CHAIN, MODE, USERNAME, ID, LATENCY_LOOP
+    global BitCURRENCY, BitASSET, wif
+    global BitPAIR, MODE, USERNAME, ID, LATENCY_LOOP
     ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
     MODE = 999
     print('0:OPTIMIZE, 1:BACKTEST, 2:PAPER, 3:LIVE, 4:SALES, 6: TEST ORDERS')
@@ -396,397 +288,132 @@ def keys_install():  # Bitshares Keys
             'This mode will repeatedly LIVE TEST buy/sell/cancel 0.1 assets on 20% spread.')
         print('Monitor with microDEX.py')
         print('')
-    if CURRENCY in ['BTS', 'USD', 'CNY']:
-        BitCURRENCY = CURRENCY
-    else:
-        BitCURRENCY = 'OPEN.' + CURRENCY
-    if ASSET in ['BTS', 'USD', 'CNY']:
-        BitASSET = ASSET
-    else:
-        BitASSET = 'OPEN.' + ASSET
-    BitPAIR = BitASSET + ":" + BitCURRENCY
-    if MODE in [2, 3, 6]:
-        nodes = nodes_fetch()
-        shuffle(nodes)
-        try:
-            USERNAME = input('     account: ')
-            print('')
-            print('accessing account...')
-            print('')
-            ACCOUNT = Account(USERNAME,
-                              bitshares_instance=BitShares(nodes))
-        except Exception as ex:
-            print (type(ex).__name__)
-            sys.exit()
-        if MODE in [3, 6]:
-            print('DO NOT ENTER PASSWORD WITHOUT READING, UNDERSTANDING,')
-            print('AND TAKING PERSONAL RESPONSIBILITY FOR THE CODE')
-            print('')
-            PASS_PHRASE = getpass(prompt=' pass phrase: ')
+
+    if MODE in [0, 1, 4]:
+
+        if CURRENCY in ['BTS', 'USD', 'CNY']:
+            BitCURRENCY = CURRENCY
         else:
-            PASS_PHRASE = ''
-        MARKET = Market(
-            BitPAIR,
-            bitshares_instance=BitShares(nodes),
-            mode='head')
-        if MODE in [3, 6]:
-            try:
-                MARKET.bitshares.wallet.unlock(PASS_PHRASE)
-                print('')
-                print('AUTHENTICATED')
-                time.sleep(1)
-                print("\033c")
-            except Exception as ex:
-                print (type(ex).__name__)
-                sys.exit()
-        CHAIN = Blockchain(bitshares_instance=BitShares(nodes), mode='head')
-        ACCOUNT = MARKET = CHAIN = 0
-
-def reconnect(  # client side, validate wss handshake
-        pair, USERNAME, PASS_PHRASE):
-
-    # create fresh websocket connection
-    i = 0
-    while True:
-        try:
-            time.sleep(0.05 * i ** 2)
-            i += 1
-            print(time.ctime(), 'connecting, attempt:', i)
-            # fetch fresh nodes list from subprocess and shuffle it
-            '*************************************'
-            metaNODE = Bitshares_Trustless_Client()
-            '*************************************'
-            nodes = metaNODE['whitelist']
-            del metaNODE
-            shuffle(nodes)
-            node = nodes[0]
-
-            # create a temporary handshake to confirm good node
-            def chain_test(node, num):
-                try:
-                    chain = Blockchain(
-                        bitshares_instance=BitShares(node, num_retries=0), mode='head')
-                    num.value = 1
-                except:
-                    pass
-            num = Value('i', 0)
-            p = Process(target=chain_test, args=(node, num,))
-            p.daemon = False
-            p.start()
-            p.join(6)
-            if num.value == 0:
-                raise ValueError('reconnect timed out')
-
-            # create handshake
-            chain = Blockchain(
-                bitshares_instance=BitShares(node, num_retries=0), mode='head')
-            market = Market(pair,
-                            bitshares_instance=BitShares(node, num_retries=0), mode='head')
-            account = Account(USERNAME,
-                              bitshares_instance=BitShares(node, num_retries=0))
-
-            current_block = chain.get_current_block_num()
-            start = time.time()
-            blocktimestamp = chain.block_timestamp(current_block)
-            ping = time.time() - start
-            block_latency = start - blocktimestamp
-
-            # Confirm the connection is good
-            if ping > 2:
-                raise ValueError('ping > 2')
-            if block_latency > 5:
-                raise ValueError('block latency > 5')
-            if chain.get_network()['chain_id'] != ID:
-                raise ValueError('Not Mainnet Chain')
-            if float(market.ticker()['latest']) == 0:
-                raise ValueError('ZERO price')
-
-            break
-        except Exception as e:
-            msg = msg_(e) + str(node)
-            race_append(doc='EV_log.txt', text=msg)
-            print(time.ctime(), type(e).__name__, e.args, node)
-            continue
-    try:
-        market.bitshares.wallet.unlock(PASS_PHRASE)
-    except:
-        pass
-
-    print(time.time(), node, market, str(chain).split(' ')[-1])
-
-    return account, market, node, chain
-
-def dex_auth(command, pair='', amount=ANTISAT, price=0, expiration=ANTISAT):
-
-    # insistent timed process wrapper for dex_auth2()
-    # covers all buy/sell/cancel pybitshares authenticated requests
-    # if command does not execute in time: kill process, start anew
-    # serves to force disconnect websockets if done; also if hung
-    # signal.value is switched to 0 at end of dex_auth2()
-
-    if pair == '':
-        pair = BitPAIR
-    timeout = 60
-
-    signal = Value('i', 1)
-    i = 0
-    while signal.value:
-        plt.pause(0.01)
-        i += 1
-        print('')
-        print('pybitshares authentication attempt:', i)
-        process = Process(target=dex_auth2,
-                          args=(signal, command, pair, amount, price, expiration))
-        process.daemon = False
-        process.start()
-        process.join(timeout)
-        print('pybitshares authentication terminated')
-        print('')
-    watchdog()
-    plt.pause(0.01)
-
-def dex_auth2(signal, command, pair, amount, price, expiration):
-
-    if 'BTS' in BitPAIR:
-        MIN_AMOUNT = 2
-    attempt = 1
-    # BUY/SELL/CANCEL OPS
-    if amount > MIN_AMOUNT:
-        if command == 'buy':
-            # buy relentlessly until satisfied or currency exhausted
-            print(
-                ('Bitshares API',
-                 command,
-                 satoshi_str(amount),
-                 'at',
-                 satoshi_str(price)))
-            while True:
-                try:
-                    time.sleep(0.05 * attempt ** 2)
-                    if attempt > 1:
-                        print('buy attempt:', attempt)
-                    # Gather curated public data
-                    '*************************************'
-                    metaNODE = Bitshares_Trustless_Client()
-                    '*************************************'
-                    last = metaNODE['last']
-                    currency = metaNODE['currency_balance']
-                    assets = metaNODE['asset_balance']
-                    del metaNODE
-                    # Authenticate via pybitshares
-                    account, market, node, chain = reconnect(
-                        pair, USERNAME, PASS_PHRASE)
-                    # Final check, buy no more than 110% market price
-                    if (price is 0) or (price > 1.1 * last):
-                        price = 1.1 * last
-                    # Save last bitshare for fees
-                    if BitCURRENCY == 'BTS':
-                        currency -= 1
-                    # No negative currency
-                    currency = max(0, currency)
-                    # means to buy is currency in hand divided by order price
-                    means = currency / price
-                    # order amount no more than 99.8% means
-                    if amount > 0.998 * means:
-                        print('not enough currency')
-                        amount = 0.998 * means
-                    # if order amounts to more than dust, place order
-                    if (amount > MIN_AMOUNT) or (amount == 1.00000001):
-                        print(
-                            ('order final check',
-                             command,
-                             satoshi_str(amount),
-                                'at',
-                                satoshi_str(price)))
-                        print('Currency: ', currency, 'Means: ', means)
-                        print(market, price, amount, expiration)
-                        details = (market.buy(price, amount, expiration))
-                        print (details)
-                        break
-                except Exception as e:
-                    if 'balance' in str(e).lower():
-                        print('Insufficient Balance')
-                        break
-                    else:
-                        msg = msg_(e)
-                        msg += ('\n\n' + str(attempt) + ' ' + ' BUY FAILED, RECONNECTING '
-                                + str(node) + ' ' + str(price) + ' ' + str(amount))
-                        race_append(doc='EV_log.txt', text=msg)
-                        print("buy attempt %s failed" % attempt)
-                        attempt += 1
-                        if attempt > 10:
-                            diagnostics(level=[1, 2, 3])
-                            print(("buy attempt %s WARN: ABORTED" % attempt))
-                            break
-                        continue
-                else:
-                    print('no currency to buy')
-                    break
-
-        if command == 'sell':
-            # sell relentlessly until satisfied or assets exhausted
-            print(
-                ('Bitshares API',
-                 command,
-                 satoshi_str(amount),
-                 'at',
-                 satoshi_str(price)))
-            while True:
-                try:
-                    time.sleep(0.05 * attempt ** 2)
-                    if attempt > 1:
-                        print('sell attempt:', attempt)
-                    # Gather curated public data
-                    '*************************************'
-                    metaNODE = Bitshares_Trustless_Client()
-                    '*************************************'
-                    last = metaNODE['last']
-                    currency = metaNODE['currency_balance']
-                    assets = metaNODE['asset_balance']
-                    del metaNODE
-                    # Authenticate via pybitshares
-                    account, market, node, chain = reconnect(
-                        pair, USERNAME, PASS_PHRASE)
-                    # Final check, sell no less than 90% market price
-                    if (price is 0) or (price < 0.9 * last):
-                        price = 0.9 * last
-                    # Final check, amount no more than 99.8% assets
-                    if BitASSET == 'BTS':
-                        assets -= 1  # Save last bitshare for fees
-                    assets = max(0, assets)
-                    if amount > 0.998 * assets:
-                        print('not enough assets')
-                        amount = 0.998 * assets
-                    # Final Check, min bid size
-                    if (amount > MIN_AMOUNT) or (amount == 1.00000001):
-                        print(
-                            ('order final check',
-                             command,
-                             satoshi_str(amount),
-                                'at',
-                                satoshi_str(price)))
-                        details = (market.sell(price, amount, expiration))
-                        details = str(details)
-                        print (details)
-                        race_append(doc='EV_log.txt', text=details)
-                        break
-                except Exception as e:
-                    if 'balance' in str(e).lower():
-                        print('Insufficient Balance')
-                        break
-                    else:
-                        msg = msg_(e)
-                        msg += ('\n\n' + str(attempt) + ' ' + ' SELL FAILED, RECONNECTING '
-                                + str(node) + ' ' + str(price) + ' ' + str(amount))
-                        race_append(doc='EV_log.txt', text=msg)
-                        print(("sell attempt %s failed" % attempt))
-                        attempt += 1
-                        if attempt > 10:
-                            diagnostics(level=[1, 2, 3])
-                            print(("sell attempt %s WARN: ABORTED" % attempt))
-                            break
-                        continue
-                else:
-                    print('no assets to sell')
-                    break
-
+            BitCURRENCY = 'OPEN.' + CURRENCY
+        if ASSET in ['BTS', 'USD', 'CNY']:
+            BitASSET = ASSET
+        else:
+            BitASSET = 'OPEN.' + ASSET
     else:
-        print('buy/sell request under MIN_AMOUNT')
+        metaNODE = Bitshares_Trustless_Client()
+        BitASSET = metaNODE['asset']
+        BitCURRENCY = metaNODE['currency']
+        USERNAME = metaNODE['account_name']
 
-    if command == 'cancel':
-        # cancel reapeatedly until arrive at server with nothing to cancel
-        print(('Bitshares API', command))
-        i = 0
-        while True:
+        del metaNODE
+    BitPAIR = BitASSET + ":" + BitCURRENCY
+    if MODE in [3, 6]:
+        print('DO NOT ENTER PASSWORD WITHOUT READING, UNDERSTANDING,')
+        print('AND TAKING PERSONAL RESPONSIBILITY FOR THE CODE')
+        print('')
+        print('welcome back %s' % USERNAME)
+        print('')
+        default = ''
+        authenticated = False
+        while not authenticated:
             try:
-                i += 1
-                time.sleep(0.05 * i ** 2)
-                '*************************************'
-                metaNODE = Bitshares_Trustless_Client()
-                '*************************************'
-                orders = metaNODE['orders']
-                del metaNODE
-                break
-            except:
-                continue
-        while len(orders):
-            time.sleep(0.05 * attempt ** 2)
-            if attempt > 1:
-                print('cancel attempt:', attempt)
-            try:
-                account, market, node, chain = reconnect(
-                    BitPAIR, USERNAME, PASS_PHRASE)
-                '*************************************'
-                metaNODE = Bitshares_Trustless_Client()
-                '*************************************'
-                orders = metaNODE['orders']
-                del metaNODE
-                i += 1
-                print((len(orders), 'open orders to cancel'))
-                order_list = []
-                for order in orders:
-                    order_list.append(order['orderNumber'])
-                details = market.cancel(order_list)
-                print (details)
+                wif = getpass(prompt='               wif: ') or default
+                print(
+                    "\033[F              wif: " + 
+                        '********************************')
+                print('')
+                print('AUTHENTICATING to DEX wallet...')
+                try:
+                    authenticated = log_in()
+                except Exception as e:
+                    trace(e)
+                if authenticated:
+                    print('')
+                    print(('*****************'))
+                    print(('**AUTHENTICATED**') +
+                          (' YOUR WALLET IS UNLOCKED'))
+                    print(('*****************'))
+                else:
+                    wif = ''
+                    print(('wif DOES NOT MATCH USERNAME'))
             except Exception as e:
-                msg = msg_(e)
-                race_append(doc='EV_log.txt', text=msg)
-                print(("cancel attempt %s failed" % attempt))
-                attempt += 1
-                if attempt > 10:
-                    diagnostics(level=[1, 2, 3])
-                    print ('cancel aborted')
-                continue
-        print('no orders to cancel')
+                print(e.args)
+                pass
+    else:
+        wif = ''
 
-    signal.value = 0
+# DEX OPS
+# ======================================================================
 
-def nodes_fetch():
+def cancel_all():
 
+    global edicts
+    edicts = [{'op': 'cancel', 'ids': ['1.7.X']}]
+    order = json_loads(prototype_order())
+    order['header']['wif'] = wif
+    order['edicts'] = edicts
+    broker(order)
+    edicts = []
+
+def log_in():
+
+    global edicts
+    edicts = [{'op': 'login'}]
+    order = json_loads(prototype_order())
+    order['header']['wif'] = wif
+    order['edicts'] = edicts
+    authenticated = broker(order)
+    edicts = []
+    return authenticated
+
+def place_order():
+
+    global edicts
+    order = json_loads(prototype_order())
+    order['header']['wif'] = wif
+    order['edicts'] = edicts
+    broker(order)
+    edicts = []
+
+def fee_maintainer():
+
+    # if holding less than 0.5 BTS, then buy 1.5 BTS
     metaNODE = Bitshares_Trustless_Client()
-    return metaNODE['whitelist']
+    nodes = metaNODE['whitelist']
+    precision = metaNODE['currency_precision']
+    account_name = metaNODE['account_name']
+    account_id = metaNODE['account_id']
+    bts = metaNODE['bts_balance']
+    # pay with market currency, unless bts then pay with assets
+    cid = metaNODE['currency_id']    
+    if metaNODE['currency'] == 'BTS':
+        cid = metaNODE['asset_id']
+        precision = metaNODE['asset_precision']
+    # if low on fee funds create custom order to buy some BTS
+    del metaNODE
+    print('fee_maintainer() BTS: %.2f' % bts)
+    if bts < 0.5:
+        order = {
+            'edicts': [
+                            {'op': 'buy',
+                            'amount': 1.5,
+                            'price': 99999,
+                            'expiration': 0},
+
+            ],
+            'header': {'asset_id': '1.3.0',
+                       'currency_id': cid,
+                       'asset_precision': 5,
+                       'currency_precision': precision,
+                       'account_id': account_id,
+                       'account_name': account_name,
+                       'wif': wif,
+                       },
+            'nodes': nodes}
+        broker(order)
 
 # TEXT PIPE
 # ======================================================================
-
-def Bitshares_Trustless_Client():  # Your access to the metaNODE
-    # Include this definition in your script to access metaNODE.txt
-    # Deploy your bot script in the same folder as metaNODE.py
-    i = 0
-    while True:
-        time.sleep(0.05 * i ** 2)
-        i += 1
-        try:
-            with open('metaNODE.txt', 'r') as f:
-                ret = f.read()  # .replace("'",'"')
-                f.close()
-                metaNODE = json.loads(ret)
-                if metaNODE == {}:
-                    raise ValueError('metaNODE is blank')
-                break
-        except Exception as e:
-            msg = str(
-                time.ctime(
-                ) + ' ' + type(
-                    e).__name__) + ' ' + str(
-                e.args)
-            race_condition = ['Unterminated', "Expecting"]
-            if any([x in str(e.args) for x in race_condition]):
-                print('metaNODE = Bitshares_Trustless_Client() RACE READ')
-            elif 'metaNODE is blank' in str(e.args):
-                continue
-            else:
-                print('metaNODE = Bitshares_Trustless_Client() ' + msg)
-            try:
-                f.close()
-            except:
-                pass
-        finally:
-            try:
-                f.close()
-            except:
-                pass
-    return metaNODE
 
 def race_read(doc=''):  # Concurrent Read from File Operation
 
@@ -916,8 +543,6 @@ def watchdog():
 
                 msg = str(latency)
                 if latency > max_latency:
-                    bell()
-                    gmail()
                     msg += ' !!!!! WARNING: the other app is not responding !!!!!'
                 return msg
 
@@ -942,7 +567,7 @@ def watchdog():
             except:
                 pass
 
-# CANDLES and CEX DATA
+# CEX DATA
 # ======================================================================
 
 def backtest_candles(pair, start, stop, candle):  # HLOCV arrays
@@ -1041,8 +666,8 @@ def chartdata(pair, start, stop, period):
     # METHOD in tune_install allows for reconstruction method control
 
     if CURRENCY in ['BTC', 'USD', 'CNY']:
-
         return chartdata2(pair, start, stop, period)
+
     else:
 
         PAIR1 = ('%s_%s' % ('BTC', ASSET))
@@ -1133,8 +758,8 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
     # docs at https://www.cryptocompare.com/api/
     print(('API call for chartdata %s %ss %se CANDLE %s DAYS %s' % (
         pair, start, stop, period, int((stop - start) / 86400.0))))
-    connected = 0
-    while not connected:
+
+    while 1:
         try:
             plt.pause(0.01)
             if period in [60, 300, 900, 1800, 3600, 7200, 14400, 43200, 86400]:
@@ -1159,11 +784,11 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
                     limit = 2000
                 params = {'fsym': fsym, 'tsym': tsym, 'limit': 2000,
                           'aggregate': aggregate, 'toTs': toTs}
-                headers = {'Apikey' : CC_API_KEY}
+                headers = {'Apikey': CC_API_KEY}
 
-                #print (uri)
-                #print (params)
-                #print (headers)
+                # print (uri)
+                # print (params)
+                # print (headers)
 
                 ret = requests.get(uri, params=params, headers=headers).json()
                 d = ret['Data']
@@ -1175,9 +800,13 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
                     toTs -= period * len(clean_d)
                     params = {'fsym': fsym, 'tsym': tsym, 'limit': 2000,
                               'aggregate': aggregate, 'toTs': toTs,
-                                'api_key': CC_API_KEY
-                                }
-                    ret = requests.get(uri, params=params, headers=headers).json()
+                              'api_key': CC_API_KEY
+                              }
+                    ret = requests.get(
+                        uri,
+                        params=params,
+                        headers=headers).json(
+                    )
                     d = ret['Data']
                     clean_d2 = [i for i in d if i['close'] > 0]
                     clean_d = clean_d2 + clean_d1
@@ -1196,66 +825,20 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
             msg = msg_(e)
             race_append(doc='EV_log.txt', text=msg)
             print (msg, 'chartdata() failed; try again...')
-            plt.pause(5)
-            pass
-
-def currencies():  # Public API cryptocompare
-
-    print('API call currencies')
-
-    try:
-        plt.pause(0.01)
-        uri = 'https://min-api.cryptocompare.com/data/all/coinlist'
-        params = {}
-        headers = {'Apikey' : CC_API_KEY}
-        ret = requests.get(uri, params=params, headers=headers).json()
-        print(('API currencies', len(ret['Data']),
-               'coins at cryptocompare'))
-        return ret['Data']
-    except Exception as e:
-        msg = msg_(e)
-        race_append(doc='EV_log.txt', text=msg)
-        print ('currencies() failed; skipping...')
-        return {}
-
-def cryptocompare_time():  # CEX latency test
-
-    print('API call cryptocompare_time')
-
-    try:
-        plt.pause(0.01)
-        # print('Cryptocompare API candle time')
-        uri = 'https://www.cryptocompare.com/api/data/coinsnapshot'
-        params = {'fsym': ASSET, 'tsym': CURRENCY}
-        headers = {'Apikey' : CC_API_KEY}
-        ret = requests.get(uri, params=params, headers=headers).json()
-        timestamps = []
-        for i in range(len(ret['Data']['Exchanges'])):
-            timestamps.append(float(
-                ret['Data']['Exchanges'][i]['LASTUPDATE']))
-        del ret
-        cc_time = max(timestamps)
-        latency = time.time() - cc_time
-        print(('candle latency      :', ('%.2f' % latency)))
-        return latency
-    except Exception as e:
-        msg = msg_(e)
-        race_append(doc='EV_log.txt', text=msg)
-        print ('cryptocompare_time() failed; skipping...')
-        return -1
+            plt.pause(1)
+            continue
 
 def cryptocompare_last():  # CEX last price
 
     print('API call cryptocompare_last')
 
-    connected = 0
-    while not connected:
+    while 1:
         try:
             plt.pause(0.01)
             # print('Cryptocompare API last')
             uri = 'https://min-api.cryptocompare.com/data/pricemultifull'
             params = {'fsyms': ASSET, 'tsyms': CURRENCY}
-            headers = {'Apikey' : CC_API_KEY}
+            headers = {'Apikey': CC_API_KEY}
             ret = requests.get(uri, params=params, headers=headers).json()
             raw = ret['RAW'][ASSET][CURRENCY]
             del ret
@@ -1265,70 +848,29 @@ def cryptocompare_last():  # CEX last price
             del raw
             latency = time.time() - cc_time
             print(('cex_rate latency    :', ('%.2f' % latency)))
-            connected = 1
             return price, volume, latency
         except Exception as e:
             msg = msg_(e)
             race_append(doc='EV_log.txt', text=msg)
             print ('cryptocompare_last() failed; try again...')
-            plt.pause(5)
-            pass
-
-def marketcap():  # Public API coinmarketcap
-
-    print('API call marketcap')
-
-    try:
-
-        try:
-            plt.pause(0.01)
-            asset_cap = asset_dominance = asset_rank = 0
-
-            uri = 'https://api.coinmarketcap.com/v1/ticker/'
-            params = {'limit': 0 }
-            headers = {'Apikey' : CC_API_KEY}
-            caps = requests.get(uri, params=params, headers=headers).json()
-
-        except Exception as e:
-            print(str(traceback.format_exc()))
-
-        print(caps)
-        asset_cap = 0
-        total_cap = 0
-        for c in caps:
-            if c['market_cap_usd'] is None:
-                cap = 0
-            else:
-                cap = float(c['market_cap_usd']) / 1000000.0
-            if c['symbol'] == ASSET:
-                asset_cap = cap
-                asset_rank = c['rank']
-            total_cap += cap
-        del caps
-        asset_dominance = 100 * asset_cap / total_cap
-        return asset_cap, asset_dominance, asset_rank
-    except Exception as e:
-        msg = msg_(e)
-        race_append(doc='EV_log.txt', text=msg)
-        print ('marketcap() failed; skip...')
-        return 999, 999, 999
+            plt.pause(1)
+            continue
 
 # LIVE
 # ======================================================================
 
 def live_initialize():  # Begin live session
 
+    global storage, portfolio, info, data, edicts
     logo()
     print(VERSION)
     print('~====== BEGIN LIVE SESSION =====================~')
     plt.pause(0.01)
-    global storage
-    global portfolio
-    global info
-    global data
     info = {}
     data = {}
     portfolio = {}
+    edicts = []
+
     if STORAGE_RESET:
         storage = {}
 
@@ -1367,6 +909,7 @@ def live():  # Primary live event loop
 
     global storage
     global info
+
     live_initialize()
     attempt = 0
     msg = ''
@@ -1394,16 +937,16 @@ def live():  # Primary live event loop
             price, volume, latency = cryptocompare_last()
             storage['cc_last'] = {
                 'price': price, 'volume': volume, 'latency': latency}
-            cryptocompare_time()
             live_data()
             polynomial_regression()
             indicators()
             state_machine()
             hourly()
             daily()
-            dex_auth('cancel')
+            cancel_all()
             scalp()
             trade()
+            place_order()
             live_chart()
             plot_format()
             live_plot()
@@ -1424,9 +967,8 @@ def live():  # Primary live event loop
                 print(
                     ('%s FAIL @@@@@@@ ATTEMPT: %s %s' %
                      (msg, attempt, time_msg)))
-                if BELL:
-                    bell(attempt, 432)
             # GATHER AND POST PROCESS DATA
+            start = time.time()
             try:
                 plt.pause(0.05)
                 price, volume, latency = cryptocompare_last()
@@ -1436,14 +978,8 @@ def live():  # Primary live event loop
                 msg += msg_(e) + 'cryptocompare_last() '
                 attempt += 1
                 continue
-            try:
-                plt.pause(0.05)
-                cryptocompare_time()
-            except Exception as e:
-                msg += msg_(e) + 'cryptocompare_time() '
-                attempt += 1
-                continue
-            print('')
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             try:
                 plt.pause(0.05)
                 live_data()
@@ -1451,6 +987,8 @@ def live():  # Primary live event loop
                 msg += msg_(e) + 'live_data() '
                 attempt += 1
                 continue
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             try:
                 plt.pause(0.05)
                 indicators()
@@ -1458,6 +996,8 @@ def live():  # Primary live event loop
                 msg += msg_(e) + 'indicators() '
                 attempt += 1
                 continue
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             try:
                 plt.pause(0.05)
                 polynomial_regression()
@@ -1465,7 +1005,8 @@ def live():  # Primary live event loop
                 msg += msg_(e) + 'polynomial_regression() '
                 attempt += 1
                 continue
-
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             try:
                 plt.pause(0.05)
                 state_machine()
@@ -1473,6 +1014,8 @@ def live():  # Primary live event loop
                 msg += msg_(e) + 'state_machine() '
                 attempt += 1
                 continue
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             # LOWER FREQENCY EVENTS
             plt.pause(0.05)
             check_hour = (info['current_time'] - info['begin']) / 3600.0
@@ -1485,6 +1028,8 @@ def live():  # Primary live event loop
                     msg += msg_(e) + 'hourly() '
                     attempt += 1
                     continue
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             check_day = (info['current_time'] - info['begin']) / 86400.0
             if check_day > info['day']:
                 try:
@@ -1494,7 +1039,14 @@ def live():  # Primary live event loop
                     msg += msg_(e) + 'daily() '
                     attempt += 1
                     continue
-
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
+            # CANCEL ALL OUTSTANDING ORDERS IN THIS MARKET
+            # resets global edicts list with cancel all
+            cancel_all()
+            plt.pause(3) # allow acct balance to update on dex
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             # MAINTAIN 1 BITSHARE FOR FEES
             plt.pause(0.05)
             try:
@@ -1503,54 +1055,51 @@ def live():  # Primary live event loop
                 msg += msg_(e) + 'fee_maintainer() '
                 attempt += 1
                 continue
-
-            # CANCEL ALL OUTSTANDING ORDERS IN THIS MARKET
-            plt.pause(0.05)
-            try:
-                dex_auth('cancel')
-            except Exception as e:
-                msg += msg_(e) + 'cancel() '
-                attempt += 1
-                continue
-
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             if 1.02 * storage['buying'] < price < 0.98 * storage['selling']:
-
                 # SCALP OPS
-                plt.pause(0.05)
+                plt.pause(0.01)
                 try:
                     scalp()
                 except Exception as e:
                     msg += msg_(e) + 'scalp() '
                     attempt += 1
                     continue
-
                 # TRADE OPS
-                plt.pause(0.05)
+                plt.pause(0.01)
                 try:
                     trade()
                 except Exception as e:
                     msg += msg_(e) + 'trade() '
                     attempt += 1
                     continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
             else:
-
                 # TRADE OPS
-                plt.pause(0.05)
+                plt.pause(0.01)
                 try:
                     trade()
                 except Exception as e:
                     msg += msg_(e) + 'trade() '
                     attempt += 1
                     continue
-
                 # SCALP OPS
-                plt.pause(0.05)
+                plt.pause(0.01)
                 try:
                     scalp()
                 except Exception as e:
                     msg += msg_(e) + 'scalp() '
                     attempt += 1
                     continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+
+            order = json_loads(prototype_order())
+            order['header']['wif'] = wif
+            order['edicts'] = edicts
+            broker(order)
 
             # PLOT
             plt.pause(0.05)
@@ -1560,18 +1109,24 @@ def live():  # Primary live event loop
                 msg += msg_(e) + 'live_chart() '
                 attempt += 1
                 continue
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             try:
                 plot_format()
             except Exception as e:
                 msg += msg_(e) + 'plot_format() '
                 attempt += 1
                 continue
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
             try:
                 live_plot()
             except Exception as e:
                 msg += msg_(e) + 'live_plot() '
                 attempt += 1
                 continue
+            print('elapsed: %.3f' % (time.time()-start))
+            start = time.time()
 
             # END PRIMARY TICK
             plt.pause(0.05)
@@ -1604,7 +1159,7 @@ def set_timing(tick_size):  # Limits live tick interval (seconds)
     offset = TICK_TIMING - seconds_past
     if offset < 0:
         offset += 60
-    time.sleep(offset)
+    plt.pause(offset)
 
 def live_data():  # Gather live data from public and private api
 
@@ -1644,18 +1199,11 @@ def live_data():  # Gather live data from public and private api
     print('')
 
 def scalp():  # Initiate secondary order placement
-    '''
-    cexdexoffset is average of dex ask+bid
-    divided by average of cex high and low
-    as plotted over past 4 hours
-    '''
 
-    plt.pause(0.01)
+    global storage, edicts
+
     # localize data
-    global storage
     now = int(time.time())
-
-    time.sleep(3)
     # from metaNODE
     '*************************************'
     metaNODE = Bitshares_Trustless_Client()
@@ -1663,7 +1211,12 @@ def scalp():  # Initiate secondary order placement
     currency = portfolio['currency'] = metaNODE['currency_balance']
     assets = portfolio['assets'] = metaNODE['asset_balance']
     dex_rate = storage['dex_rate'] = metaNODE['last']
+    invested = metaNODE['invested']
+    divested = metaNODE['divested']
+    max_assets = metaNODE['asset_max']
+    max_currency = metaNODE['currency_max']
     book = metaNODE['book']
+    nodes = metaNODE['whitelist']
     del metaNODE
 
     ask_p = book['askp'][0]
@@ -1696,18 +1249,11 @@ def scalp():  # Initiate secondary order placement
     market_cross = storage['market_cross']
 
     # means to buy and percent invested
-    means = storage['means'] = currency / \
-        dex_rate  # quantity of assets I can afford
-    max_assets = storage['max_assets'] = (assets + means)
-    invested = asset_ratio = storage['asset_ratio'] = assets / max_assets
-    max_currency = storage['max_currency'] = max_assets * dex_rate
+    means = storage['means'] = currency / dex_rate  # assets can afford
+    storage['max_assets'] = max_assets
+    storage['asset_ratio'] = invested
+    storage['max_currency'] = max_currency
 
-    '''
-    # force dex market under/over cex market per market cross
-    offset = 0.98
-    if market_cross:
-        offset = 1.02
-    '''
     # force dex market under/over cex market per 4h dex/cex arbitrage
     offset = storage['arb']
 
@@ -1737,16 +1283,14 @@ def scalp():  # Initiate secondary order placement
         scalp_resistance = selling
     if scalp_resistance < min_scalp_sell:
         scalp_resistance = min_scalp_sell
-
     # assure support under resistance
     if scalp_support > scalp_resistance:
         print('skip scalp, calculation error')
-        return
-
+        raise
     # store scalp thresholds globally
     storage['scalp_resistance'] = scalp_resistance
     storage['scalp_support'] = scalp_support
-
+    # scale scalp orders to alpha market state and SCALP FUND
     holding = storage['holding']
     if holding:  # from primary trade() function
         max_holding = 1
@@ -1755,15 +1299,29 @@ def scalp():  # Initiate secondary order placement
         max_holding = SCALP_FUND
         min_holding = 0
 
-    buy_qty = max(0, max_assets * (max_holding - invested))
-    sell_qty = max(0, max_assets * (invested - min_holding))
+    '''
+    print('max_assets', max_assets)
+    print('max_holding', max_holding)
+    print('invested', invested)
+    print('min_holding', min_holding)
+    print('SCALP_FUND', SCALP_FUND)
+    '''
+    buy_qty = max(0, max_assets * (max_holding - invested / 100))
+    sell_qty = max(0, max_assets * (invested / 100 - min_holding))
+
+    # print('b s qty', buy_qty, sell_qty)
 
     buy_qty = min(buy_qty, max_assets * SCALP_FUND)
     sell_qty = min(sell_qty, max_assets * SCALP_FUND)
 
+    # print('b s qty', buy_qty, sell_qty)
+
     buy_qty *= SCALP_FUND_QTY
     sell_qty *= SCALP_FUND_QTY
 
+    # print('b s qty', buy_qty, sell_qty)
+
+    # break up scalp orders into smaller pieces
     pieces = SCALP_PIECES
     pie = []
     for i in range(pieces):
@@ -1771,19 +1329,18 @@ def scalp():  # Initiate secondary order placement
     total = sum(pie)
     for i in range(pieces):
         pie[i] = pie[i] / total
-
+    # initialize starting max holdings and start price
     if info['tick'] == 0:
         storage['begin_max_assets'] = max_assets
         storage['begin_max_currency'] = max_currency
         storage['start_price'] = dex_rate
 
+    # return on investment vs buy/hold vs sell/wait
     roi_assets = max_assets / storage['begin_max_assets']
     roi_currency = max_currency / storage['begin_max_currency']
+    roi_gross = roi_assets * roi_currency
     buy_hold = dex_rate / storage['start_price']
     sell_wait = 1 / buy_hold
-
-    roi_gross = ((max_assets * max_currency) /
-                (storage['begin_max_assets'] * storage['begin_max_currency']))
 
     if SCALP:
         print('')
@@ -1813,31 +1370,45 @@ def scalp():  # Initiate secondary order placement
         print('pieces        ', pieces, pie)
         print('')
 
+        # SCALP BUY
         for i in range(pieces):
-
-            # SCALP BUY
             qty = buy_qty * pie[i]
+            print('bqty', qty)
             scalp = scalp_support - i * 2 * random() * SATOSHI
             try:
-                print(
-                    ('scalp buy',
-                     satoshi_str(qty),
-                        'at',
-                        satoshi_str(scalp)))
-                dex_auth('buy', price=scalp, amount=qty)
+                if (qty > MIN_AMOUNT):
+                    print('scalp buy',
+                          satoshi_str(qty),
+                          'at',
+                          satoshi_str(scalp))
+
+                    edicts.append({
+                        'op': 'buy',
+                        'price': scalp,
+                        'amount': qty,
+                        'expiration': 0
+                    })
             except:
                 pass
 
-            # SCALP SELL
+        # SCALP SELL
+        for i in range(pieces):
             qty = sell_qty * pie[i]
+            print('sqty', qty)
             scalp = scalp_resistance + i * 2 * random() * SATOSHI
             try:
-                print(
-                    ('scalp sell',
-                     satoshi_str(qty),
-                        'at',
-                        satoshi_str(scalp)))
-                dex_auth('sell', price=scalp, amount=qty)
+
+                if (qty > MIN_AMOUNT):
+                    print('scalp sell',
+                          satoshi_str(qty),
+                          'at',
+                          satoshi_str(scalp))
+                    edicts.append({
+                        'op': 'sell',
+                        'price': scalp,
+                        'amount': qty,
+                        'expiration': 0
+                    })
             except:
                 pass
 
@@ -1855,32 +1426,37 @@ def scalp():  # Initiate secondary order placement
 
 def trade():  # Initiate primary order placement
 
-    global storage
-    # localize data
+    global storage, edicts
 
+    # localize storage data
     buying = storage['buying']
     selling = storage['selling']
     mid_market = storage['mid_market']
     market_cross = storage['market_cross']
-    buying_r = buying
-    selling_r = selling
+    cex_rate = storage['cex_rate']
 
     if info['live']:  # localize additional data for live session
 
-        print('')
-        print('begin trade() ops')
-        print('')
-
-        book = storage['book']
+        # load metaNODE data
+        '*************************************'
+        metaNODE = Bitshares_Trustless_Client()
+        '*************************************'
+        currency = metaNODE['currency_balance']
+        assets = metaNODE['asset_balance']
+        dex_rate = metaNODE['last']
+        book = metaNODE['book']
         ask_p = book['askp'][0]
         bid_p = book['bidp'][0]
-        dex_rate = storage['dex_rate']
-        cex_rate = storage['cex_rate']
-
-        mesh_max = max(storage['long_average'], storage['signal_line'])
-        mesh_min = min(storage['long_average'], storage['signal_line'])
+        invested = metaNODE['invested']
+        divested = metaNODE['divested']
+        max_assets = metaNODE['asset_max']
+        max_currency = metaNODE['currency_max']
+        nodes = metaNODE['whitelist']
+        del metaNODE
 
         # plot zoom in to trade decision
+        mesh_max = max(storage['long_average'], storage['signal_line'])
+        mesh_min = min(storage['long_average'], storage['signal_line'])
         now = time.time()
         past = now - LIVE_PLOT_DEPTH
         future = now + LIVE_PLOT_PROJECTION
@@ -1890,31 +1466,31 @@ def trade():  # Initiate primary order placement
         plot_text()
         plt.pause(0.01)
 
-        assets = portfolio['assets']
-        currency = portfolio['currency']
-        asset_ratio = storage['asset_ratio']
-        means = storage['means']
-        invested = portfolio['percent_invested']
-        divested = portfolio['percent_divested']
-        min_order = 0.00011 / dex_rate
-        max_assets = (MAX_ASSETS / 100.0) * (assets + (currency / dex_rate))
-        max_currency = (MAX_CURRENCY / 100.0) * (
-            currency + (assets * dex_rate))
-
         print(('assets %.1f, max assets %.1f' % (assets, max_assets)))
         pieces = 10.0  # order size
 
         if MANUAL_OVERRIDE:
             storage['selling'] = selling = MANUAL_SELL
             storage['buying'] = buying = MANUAL_BUY
-
-        storage['HFT'] = False
-        if SCALP or RECYCLE:
-            storage['HFT'] = True
-
         if ORDER_TEST:
-            dex_auth('buy', price=0.9 * dex_rate, amount=1)
-            dex_auth('sell', price=1.1 * dex_rate, amount=1)
+            edicts.append({
+                'op': 'cancel',
+                'ids': ['1.7.X']
+            })
+
+            edicts.append({
+                'op': 'buy',
+                'price': 0.8 * dex_rate,
+                'amount': 0.0001 / dex_rate,
+                'expiration': 0
+            })
+
+            edicts.append({
+                'op': 'sell',
+                'price': 1.2 * dex_rate,
+                'amount': 0.0001 / dex_rate,
+                'expiration': 0
+            })
 
         if dex_rate > selling:
             storage['holding'] = False
@@ -1922,31 +1498,43 @@ def trade():  # Initiate primary order placement
             storage['holding'] = True
 
         qty = max_assets / pieces
-        if (dex_rate > 0.90 * selling):
+        if (dex_rate > 0.90 * selling) and not ORDER_TEST:
             print('')
             print('APPROACHING SELL POINT')
-            if BELL:
-                bell(0.5, 800)
-            if (portfolio['assets'] > 0.1):
+            if assets > 0.1:
                 if (divested < MAX_CURRENCY):
                     storage['HFT'] = True
                     selling_r = max(selling, (dex_rate + ask_p) / 2)
                     try:
-                        # iceberg
-                        print(
-                            ('SELLING', PAIR, 'RATE', ('%.8f' %
-                             selling_r), 'AMOUNT', ('%.1f' %
-                             qty)))
-                        dex_auth('sell', price=selling_r, amount=qty)
+                        if (qty > MIN_AMOUNT):
+                            # iceberg
+                            print(
+                                ('SELLING', PAIR, 'RATE', ('%.8f' %
+                                 selling_r), 'AMOUNT', ('%.1f' %
+                                 qty)))
+
+                            edicts.append({
+                                'op': 'sell',
+                                'price': selling_r,
+                                'amount': qty,
+                                'expiration': 0
+                            })
+
                         # iceberg front limit
                         selling_r *= 1.0 - 0.015 * random()
                         qty /= randint(69, 99)
-                        if random() > 0.5:
+                        if (qty > MIN_AMOUNT) and (random() > 0.5):
                             print(
                                 ('SELLING MINI', PAIR, 'RATE', ('%.8f' %
                                  selling_r), 'AMOUNT', ('%.1f' %
                                  qty)))
-                            dex_auth('sell', price=selling_r, amount=qty)
+
+                            edicts.append({
+                                'op': 'sell',
+                                'price': selling_r,
+                                'amount': qty,
+                                'expiration': 0
+                            })
                     except:
                         print('SELL FAILED')
                         pass
@@ -1956,29 +1544,41 @@ def trade():  # Initiate primary order placement
                 print('NO ASSETS')
 
         qty = max_assets / pieces
-        if dex_rate < 1.20 * buying:
+        if (dex_rate < 1.20 * buying) and not ORDER_TEST:
             print('')
             print('APPROACHING BUY POINT')
-            if BELL:
-                bell(0.5, 800)
-            if (portfolio['currency'] > 0.1):
+            if currency > 0.1:
                 if (invested < MAX_ASSETS):
                     storage['HFT'] = True
                     buying_r = min(buying, (dex_rate + bid_p) / 2)
                     try:
-                        print(
-                            ('BUYING', PAIR, 'RATE', ('%.8f' %
-                             buying_r), 'AMOUNT', ('%.1f' %
-                             qty)))
-                        dex_auth('buy', price=buying_r, amount=qty)
+                        if (qty > MIN_AMOUNT):
+                            print(
+                                ('BUYING', PAIR, 'RATE', ('%.8f' %
+                                 buying_r), 'AMOUNT', ('%.1f' %
+                                 qty)))
+
+                            edicts.append({
+                                'op': 'buy',
+                                'price': buying_r,
+                                'amount': qty,
+                                'expiration': 0
+                            })
+
                         buying_r *= 1.0 + 0.015 * random()
                         qty /= randint(69, 99)
-                        if random() > 0.5:
+                        if (qty > MIN_AMOUNT) and (random() > 0.5):
                             print(
                                 ('BUYING MINI', PAIR, 'RATE', ('%.8f' %
                                  buying_r), 'AMOUNT', ('%.1f' %
                                  qty)))
-                            dex_auth('buy', price=buying_r, amount=qty)
+
+                            edicts.append({
+                                'op': 'buy',
+                                'price': buying_r,
+                                'amount': qty,
+                                'expiration': 0
+                            })
                     except:
                         print('buy FAIL')
                         pass
@@ -2023,13 +1623,10 @@ def daily():  # Do this every day
 
 def initialize():  # Open plot, set backtest days
 
-    global DAYS
+    global DAYS, edicts
 
     if LIVE:
-        watchdog()
-        print('')
-        print('cancel open orders before live session...')
-        dex_auth('cancel')
+        cancel_all()
         print('checking with metaNODE watchdog before live session...')
         watchdog()
     if MODE == 0:
@@ -2161,21 +1758,15 @@ def backtest():  # Primary backtest event loop; the cost function
     #===================================================================
     global storage
     while True:
-        # print(info['current_time'], 'current_time')
-        # print(info['end'], 'end')
+
         if info['current_time'] < info['end']:
 
-            # print info['current_time'], time.ctime(info['current_time'])
-            # print (data)
-            # print (len(data['unix']))
-
-            # print (data)
-            # print (info['current_time'])
             data_slice = slice_candles(info['current_time'], data)
             storage['high'] = data_slice['high']
             storage['low'] = data_slice['low']
             storage['open'] = data_slice['open']
             storage['close'] = data_slice['close']
+            storage['cex_rate'] = data_slice['close']
 
             holdings()
             indicators()
@@ -3014,6 +2605,7 @@ def test_stop():  # Display results of backtest session
     roi_assets = end_max_assets / storage['begin_max_assets']
     roi_currency = end_max_currency / storage['begin_max_currency']
     storage['roi_currency'] = roi_currency
+    storage['roi_assets'] = roi_assets
     days = (info['end'] - info['begin']) / 86400.0
     frequency = (SATOSHI + storage['trades']) / days
     storage['dpt'] = 1.0 / frequency
@@ -3086,37 +2678,10 @@ def print_tune():  # Display input thresholds
     # print(('# RESOLUTION    : %s' % RESOLUTION))
     print(('# DAYS          : %s' % DAYS))
     print(('# DPT           : %.1f' % storage['dpt']))
-    print(('# MARKET CAP    : %.1fM' % asset_cap))
-    print(('# DOMINANCE     : %.4f - RANK %s' % (asset_dominance, asset_rank)))
     print(('# ROI           : %.2fX' % storage['roi_currency']))
     # print(('APY             = %.2f' % storage['apy_currency']))
     print(('# TUNE DATE     : %s' % time.ctime()))
     print('#######################################')
-
-def bell(duration=2, frequency=432):  # Activate linux audible bell
-
-    pass
-    '''
-    os.system('play --no-show-progress --null --channels 1 synth' +
-                  ' %s sine %f' % (duration*1000, frequency))
-    '''
-
-def gmail():
-
-    pass
-    '''
-    send_to     = "THE EMAIL ADDRESS TO SEND TO"
-    send_from   = "YOUR EMAIL ADDRESS"
-    pass        = "YOUR PASSWORD"
-    msg         = "YOUR MESSAGE!"
-
-    import smtplib
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(send_from, pass)
-    server.sendmail(send_from, send_to, msg)
-    server.quit()
-    '''
 
 # DIAGNOSTICS
 # ======================================================================
@@ -3183,10 +2748,12 @@ def diagnostics(level=[]):
 def clock():  # 24 hour clock formatted HH:MM:SS
     return str(time.ctime())[11:19]
 
-def satoshi(n):  # format prices to satoshi type
+def satoshi(n):
+    # prices rounded to satoshi
     return float('%.8f' % float(n))
 
 def satoshi_str(n):
+    # string prices rounded to satoshi
     return ('%.8f' % float(n))
 
 def dictionaries():  # Global info, data, portfolio, and storage
@@ -3199,17 +2766,8 @@ def dictionaries():  # Global info, data, portfolio, and storage
 
 def coin_name():  # Convert ticker symbols to coin names
 
-    curr = currencies()
-    if ASSET in ['USD', 'CNY']:
-        storage['asset_name'] = ASSET
-    else:
-        storage['asset_name'] = curr[ASSET]['CoinName']
-
-    if CURRENCY in ['USD', 'CNY']:
-        storage['currency_name'] = CURRENCY
-    else:
-        storage['currency_name'] = curr[CURRENCY]['CoinName']
-    print((storage['asset_name']), storage['currency_name'])
+    storage['asset_name'] = ASSET
+    storage['currency_name'] = CURRENCY
 
 def ctime_tick_labels():  # X axis timestamp formatting
     ax = plt.gca()
@@ -3626,11 +3184,6 @@ def state_machine():  # Alpha and beta market finite state
         if info['live']:
             arbitrage()
 
-def optimizer():  # Stochastic ROI assent backpropagation
-
-    now = int(time.time())
-    print_tune()
-
 # PRIMARY PROCESS
 # ======================================================================
 if __name__ == "__main__":
@@ -3645,7 +3198,6 @@ if __name__ == "__main__":
     optimize = False
     data = {}
     control_panel()
-    asset_cap, asset_dominance, asset_rank = marketcap()
     dictionaries()
     initialize()
     test_initialize()
@@ -3675,13 +3227,13 @@ if __name__ == "__main__":
         live()
 
     if OPTIMIZE:
-        optimizer()
-        print ('https://www.youtube.com/watch?v=5ydqjqZ_3oc')
-        sys.exit()
+        import quantumSWARM
+        quantumSWARM.optimizer(storage, info, roi_currency, roi_assets)
+
 # ======================================================================
 ''' EXTINCTION EVENT '''
 # ======================================================================
 #
 # THE DESTROYER,
-# litepresence - 2018
+# litepresence - 2019
 #
