@@ -1,7 +1,9 @@
 
-' metaNODE = Bitshares_Trustless_Client()'
+#=======================================================================
+VERSION = 'Bitshares metaNODE 0.00000015 '
+#=======================================================================
 
-# multiprocess public api statistical curation utility
+# Trustless Public Node Statistical Curation Utility
 
 ' litepresence 2019 '
 
@@ -12,10 +14,13 @@ def WTFPL_v0_March_1765():
         except:
             return [tar, feathers]
 
+' ********** ALPHA RELEASE TO PUBLIC DOMAIN WITH NO WARRANTY ********* '
+
 # 99.99% uptime
 # no rogue data, no stale data
 # no hung processes, no runaway processes
 # maintains whitelist of validated tested nodes for buy/sell/cancel ops
+# no pybitshares dependencies
 
 ' metaNODE '
 
@@ -37,11 +42,18 @@ def WTFPL_v0_March_1765():
 # metaNODE and latencyTEST communicate via nodes.txt
 # a hardcoded list of nodes is also provided as backup
 
-# to access metaNODE data from any python scirpt just import via:
+# to access metaNODE data from any python scirpt:
 
 ''' metaNODE = Bitshares_Trustless_Client() '''
 
+DEV = False
+COLOR = True
+
+' STANDARD PYTHON MODULES '
+
 from random import random, shuffle, randint, choice
+from json import loads as json_loads
+from json import dumps as json_dumps
 from multiprocessing import Process
 from datetime import datetime
 from statistics import mode
@@ -49,40 +61,25 @@ import traceback
 import psutil
 import numpy
 import time
-import json
 import sys
 import os
 
-DEV = False
-COLOR = True
+' MODULES WHICH MAY REQUIRE INSTALLATION '
 
-'''
-# Development tool for namespace object size
-try:
-    from pympler import asizeof
+print('pip3 install websocket-client')
+import websocket
 
-    sizes = []
-    for name, obj in locals().items():
-        if name != 'asizeof':
-            sizes.append((name, (asizeof.asizeof(obj) / 1024)))
-    race_write(doc='sizes.txt', text=str(sizes))
-except:
-    pass
-'''
 
-try:
-    import websocket
-    if DEV:
-        websocket.enableTrace(True)
-except:
-    raise ValueError('pip3 install websocket-client')
+if DEV:
+    websocket.enableTrace(True)
+
+print("\033c") # clear screen
 
 def version():
 
-    global VERSION, version
+    global version
 
-    version = 'v0.00000014-DEL'
-    VERSION = 'metaNODE ' + version + ' - Bitshares Trustless Client'
+    version = "".join(i for i in VERSION if i in "0123456789.")
 
     sys.stdout.write(
         '\x1b]2;' +
@@ -100,7 +97,6 @@ def red(text):
 
 def purple(text):
     return ('\033[95m' + text + '\033[0m') if COLOR else text
-
 
 def banner():
     print("\033c")
@@ -186,60 +182,90 @@ def controls():
 def public_nodes():
 
     global nodes, node_count
-    nodes = [
-        'wss://api-ru.bts.blckchnd.com/wss',
-        'wss://api.bitshares.bhuz.info/wss',
+    nodes = []
+    # SEEN LIVE SINCE 181127
+    static_nodes = [
+        'wss://api.open-asset.tech',
+        'wss://dex.iobanker.com:9090',
+        'wss://japan.bitshares.apasia.tech',
+        'wss://bitshares.crypto.fans',
+        'wss://australia.bitshares.apasia.tech',
+        'wss://ws.winex.pro',
+        'wss://altcap.io',
+        'wss://api-ru.bts.blckchnd.com',
+        'wss://api.bitshares.bhuz.info',
         'wss://api.bitsharesdex.com',
-        'wss://api.bts.ai/wss',
-        'wss://api.bts.blckchnd.com/ws',
-        'wss://api.bts.mobi/ws',
-        'wss://api.bts.network/wss',
-        'wss://api.btsgo.net/wss',
-        'wss://api.dex.trading/ws',
+        'wss://api.bts.ai',
+        'wss://api.bts.blckchnd.com',
+        'wss://api.bts.mobi',
+        'wss://api.bts.network',
+        'wss://api.btsgo.net',
+        'wss://api.btsxchng.com',
+        'wss://api.dex.trading',
         'wss://api.fr.bitsharesdex.com',
-        'wss://atlanta.bitshares.apasia.tech/wss',
-        'wss://b.mrx.im/ws',
-        'wss://bit.btsabc.org/ws',
-        'wss://bitshares.cyberit.io/wss',
-        'wss://bitshares.openledger.info/ws',
-        'wss://blockzms.xyz/wss',
-        'wss://bts-api.lafona.net/ws',
-        'wss://bts-seoul.clockwork.gr/wss',
+        'wss://atlanta.bitshares.apasia.tech',
+        'wss://australia.bitshares.apasia.tech',
+        'wss://b.mrx.im',
+        'wss://bit.btsabc.org',
+        'wss://bitshares.cyberit.io',
+        'wss://bitshares.dacplay.org',
+        'wss://bitshares.dacplay.org:8089',
+        'wss://bitshares.openledger.info',
+        'wss://blockzms.xyz',
+        'wss://bts-api.lafona.net',
+        'wss://bts-seoul.clockwork.gr',
         'wss://bts.liuye.tech:4443',
-        'wss://bts.open.icowallet.net/wss',
-        'wss://bts.proxyhosts.info/wss',
-        'wss://btsfullnode.bangzi.info/wss',
-        'wss://btsws.roelandp.nl/wss',
-        'wss://chicago.bitshares.apasia.tech/wss',
-        'wss://crazybit.online/ws',
-        'wss://dexnode.net/wss',
-        'wss://england.bitshares.apasia.tech/ws',
-        'wss://eu.nodes.bitshares.ws/ws',
-        'wss://eu.openledger.info/wss',
-        'wss://kc-us-dex.xeldal.com/wss',
-        'wss://kimziv.com/ws',
-        'wss://la.dexnode.net/ws',
-        'wss://na.openledger.info/ws',
-        'wss://netherlands.bitshares.apasia.tech/ws',
-        'wss://new-york.bitshares.apasia.tech/wss',
-        'wss://node.bitshares.eu/wss',
-        'wss://node.market.rudex.org/wss',
-        'wss://openledger.hk/wss',
-        'wss://relinked.com/ws',
-        'wss://seattle.bitshares.apasia.tech/wss',
-        'wss://sg.nodes.bitshares.ws/ws',
-        'wss://us-la.bitshares.apasia.tech/ws',
-        'wss://us-ny.bitshares.apasia.tech/wss',
-        'wss://us.nodes.bitshares.ws/wss',
-        'wss://ws.gdex.io/wss',
-        'wss://ws.gdex.top/ws',
-        'wss://ws.hellobts.com/ws']
+        'wss://bts.open.icowallet.net',
+        'wss://bts.proxyhosts.info',
+        'wss://btsfullnode.bangzi.info',
+        'wss://btsws.roelandp.nl',
+        'wss://chicago.bitshares.apasia.tech',
+        'wss://citadel.li/node',
+        'wss://crazybit.online',
+        'wss://dallas.bitshares.apasia.tech',
+        'wss://dex.rnglab.org',
+        'wss://dexnode.net',
+        'wss://england.bitshares.apasia.tech',
+        'wss://eu-central-1.bts.crypto-bridge.org',
+        'wss://eu.nodes.bitshares.ws',
+        'wss://eu.openledger.info',
+        'wss://france.bitshares.apasia.tech',
+        'wss://frankfurt8.daostreet.com',
+        'wss://kc-us-dex.xeldal.com',
+        'wss://kimziv.com',
+        'wss://la.dexnode.net',
+        'wss://miami.bitshares.apasia.tech',
+        'wss://na.openledger.info',
+        'wss://ncali5.daostreet.com',
+        'wss://netherlands.bitshares.apasia.tech',
+        'wss://new-york.bitshares.apasia.tech',
+        'wss://node.bitshares.eu',
+        'wss://node.market.rudex.org',
+        'wss://nohistory.proxyhosts.info',
+        'wss://openledger.hk',
+        'wss://paris7.daostreet.com',
+        'wss://relinked.com',
+        'wss://scali10.daostreet.com',
+        'wss://seattle.bitshares.apasia.tech',
+        'wss://sg.nodes.bitshares.ws',
+        'wss://singapore.bitshares.apasia.tech',
+        'wss://status200.bitshares.apasia.tech',
+        'wss://us-east-1.bts.crypto-bridge.org',
+        'wss://us-la.bitshares.apasia.tech',
+        'wss://us-ny.bitshares.apasia.tech',
+        'wss://us.nodes.bitshares.ws',
+        'wss://valley.bitshares.apasia.tech',
+        'wss://ws.gdex.io',
+        'wss://ws.gdex.top',
+        'wss://ws.hellobts.com']
 
     try:
         nodes = race_read(doc='nodes.txt')
     except:
         print('nodes.txt not found using list stored in public_nodes()')
         pass
+    if len(nodes) < 20:
+        nodes = static_nodes
 
     node_count = len(nodes)
 
@@ -285,12 +311,12 @@ def sign_in():
 def initialize():
 
     now = int(time.time())
-    race_write(doc='blacklist.txt', text=json.dumps([]))
-    race_write(doc='whitelist.txt', text=json.dumps([]))
-    race_write(doc='metaNODElog.txt', text=json.dumps(''))
-    race_write(doc='metaNODE.txt', text=json.dumps({}))
-    race_write(doc='mavens.txt', text=json.dumps([]))
-    race_write(doc='watchdog.txt', text=json.dumps([now, now]))
+    race_write(doc='blacklist.txt', text=json_dumps([]))
+    race_write(doc='whitelist.txt', text=json_dumps([]))
+    race_write(doc='metaNODElog.txt', text=json_dumps(''))
+    race_write(doc='metaNODE.txt', text=json_dumps({}))
+    race_write(doc='mavens.txt', text=json_dumps([]))
+    race_write(doc='watchdog.txt', text=json_dumps([now, now]))
 
 # TEXT PIPE
 # ======================================================================
@@ -306,13 +332,21 @@ def Bitshares_Trustless_Client():  # Your access to the metaNODE
             with open('metaNODE.txt', 'r') as f:
                 ret = f.read()  # .replace("'",'"')
                 f.close()
-                metaNODE = json.loads(ret)
+                metaNODE = json_loads(ret)
                 break
         except Exception as e:
-            msg = str(type(e).__name__) + str(e.args)
-            if DEV:
-                msg += str(traceback.format_exc())
-            print(msg + 'metaNODE = Bitshares_Trustless_Client')
+            msg = str(
+                time.ctime(
+                ) + ' ' + type(
+                    e).__name__) + ' ' + str(
+                e.args)
+            race_condition = ['Unterminated', "Expecting"]
+            if any([x in str(e.args) for x in race_condition]):
+                print('metaNODE = Bitshares_Trustless_Client() RACE READ')
+            elif 'metaNODE is blank' in str(e.args):
+                continue
+            else:
+                print('metaNODE = Bitshares_Trustless_Client() ' + msg)
             try:
                 f.close()
             except:
@@ -322,6 +356,7 @@ def Bitshares_Trustless_Client():  # Your access to the metaNODE
                 f.close()
             except:
                 pass
+
     return metaNODE
 
 def race_read(doc=''):  # Concurrent Read from File Operation
@@ -335,18 +370,18 @@ def race_read(doc=''):  # Concurrent Read from File Operation
                 ret = f.read().replace("'", '"')
                 f.close()
                 try:
-                    # ret = json.loads(ret)
-                    ret = json.loads(ret)
+                    # ret = json_loads(ret)
+                    ret = json_loads(ret)
                 except:
                     try:
                         ret = ret.split(']')[0] + ']'
-                        # ret = json.loads(ret)
-                        ret = json.loads(ret)
+                        # ret = json_loads(ret)
+                        ret = json_loads(ret)
                     except:
                         try:
                             ret = ret.split('}')[0] + '}'
-                            # ret = ljson.loads(ret)
-                            ret = json.loads(ret)
+                            # ret = ljson_loads(ret)
+                            ret = json_loads(ret)
                         except:
                             print ('race_read() failed %s' % str(ret))
                             if '{' in ret:
@@ -444,7 +479,7 @@ def watchdog():
                     ret = f.read()
                     f.close()
 
-                ret = json.loads(ret)
+                ret = json_loads(ret)
                 response = int(ret[identity])
                 now = int(time.time())
                 latency = now - response
@@ -460,8 +495,6 @@ def watchdog():
 
                 msg = str(latency)
                 if latency > max_latency:
-                    bell()
-                    gmail()
                     msg += ' !!!!! WARNING: the other app is not responding !!!!!'
                 return msg
 
@@ -495,6 +528,7 @@ def watchdog():
 
 def history():
 
+    # logs snapshot of account balance to file periodically
     while True:
         metaNODE = Bitshares_Trustless_Client()
         try:
@@ -507,7 +541,7 @@ def history():
             snapshot = {k: metaNODE[k] for k in keys}
             snapshot['unix'] = int(time.time())
             race_append(doc='account_history.txt',
-                        text=json.dumps(snapshot))
+                        text=json_dumps(snapshot))
             time.sleep(3600)
         except Exception as e:
             msg = str(type(e).__name__) + str(e.args)
@@ -534,7 +568,7 @@ def inquire(call):  # single use public node database api call
             call = call.replace("'", '"')  # never use single quotes
             ws = websocket.create_connection(node, timeout=6)
             ws.send(call)
-            ret = json.loads(ws.recv())['result']
+            ret = json_loads(ws.recv())['result']
             ws.close()
             winnow('whitelist', node)
             return ret
@@ -650,6 +684,8 @@ def spawn():  # multiprocessing handler
 
 def thresh(process, epoch, pid):  # make calls, shake out errors
 
+    global bw_depth
+
     # DATABASE CALLS
 
     def dex_handshake(node):
@@ -664,11 +700,12 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
         get_chain_id = Z + '"get_chain_id",[]]}'
         start = time.time()
         ws.send(get_chain_id)
-        chain_id = json.loads(ws.recv())['result']
+        ret = ws.recv()
         ping_latency = time.time() - start
+        chain_id = json_loads(ret)['result']
         if chain_id != MAINNET:
             raise ValueError('chain_id != MAINNET')
-        if 0 > ping_latency > 1:
+        if 0 > ping_latency > 0.6:
             raise ValueError('ping_latency', ping_latency)
         return ping_latency
 
@@ -676,7 +713,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
         get_dynamic_global_properties = Z + \
             '"get_dynamic_global_properties",[]]}'
         ws.send(get_dynamic_global_properties)
-        dynamic_global_properties = json.loads(ws.recv())['result']
+        dynamic_global_properties = json_loads(ws.recv())['result']
         blocktime = from_iso_date(dynamic_global_properties['time'])
         block_latency = TZ + time.time() - blocktime
         if 0 > block_latency > 6:
@@ -688,7 +725,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
             '"get_ticker",["%s","%s","%s"]]}' % (
                 currency, asset, False)
         ws.send(get_ticker)
-        ticker = json.loads(ws.recv())['result']
+        ticker = json_loads(ws.recv())['result']
         last = precision(ticker['latest'], 16)
         if float(last) == 0:
             raise ValueError('zero price last')
@@ -699,7 +736,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
             '"get_trade_history",["%s","%s","%s","%s","%s"]]}' % (
                 currency, asset, now, then, depth)
         ws.send(get_trade_history)
-        trade_history = json.loads(ws.recv())['result']
+        trade_history = json_loads(ws.recv())['result']
         history = []
         for i in range(len(trade_history)):
             unix = int(from_iso_date(trade_history[i]['date']))
@@ -728,7 +765,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
             get_balances += ('"' + asset_ids[i] + '",')
         get_balances += ']]]}'
         ws.send(get_balances)
-        ret = json.loads(ws.recv())['result']
+        ret = json_loads(ws.recv())['result']
         balances = {}
         for j in range(len(asset_ids)):
             balances[asset_ids[j]] = 0
@@ -753,7 +790,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
         BitPAIR = asset + ":" + currency
         print (BitPAIR)
         try:
-            limit_orders = json.loads(ret)['result'][0][1]['limit_orders']
+            limit_orders = json_loads(ret)['result'][0][1]['limit_orders']
         except:
             limit_orders = []
         orders = []
@@ -795,7 +832,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 currency, asset, depth)
         time.sleep(BLIP)
         ws.send(get_order_book)
-        order_book = json.loads(ws.recv())['result']
+        order_book = json_loads(ws.recv())['result']
         askp = []
         bidp = []
         askv = []
@@ -847,12 +884,15 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
 
             # connect to websocket
             handshake_latency, ws = dex_handshake(node)
+            if handshake_latency > 3:
+                raise ValueError('slow handshake')            
             # use node a dozen times
             for i in range(12):
                 time.sleep(PAUSE)
-                # Database calls
+                # Database calls w/ data validations
                 ping_latency = dex_ping_latency(ws)
                 block_latency, blocktime = dex_block_latency(ws)
+                block_latency, ws = dex_handshake(node)
                 last = float(dex_last(ws, currency, asset))
                 now = to_iso_date(time.time())
                 then = to_iso_date(time.time() - 3 * 86400)
@@ -879,10 +919,10 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                     ram = '%.3f' % (100 * float(proc.memory_percent()))
                     io = list(proc.io_counters())[:2]
                 except Exception as e:
-                    msg = str(type(e).__name__) + str(e.args)
                     if DEV:
+                        msg = str(type(e).__name__) + str(e.args)
                         msg += str(traceback.format_exc())
-                    print(msg)
+                        print(msg)
 
                 watchdog_latency = watchdog()
                 metaNODE = Bitshares_Trustless_Client()
@@ -895,6 +935,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 asset_max = 0
                 invested = 0
                 divested = 0
+                ping = 0
                 keys = ['bifurcating the metaNODE....']
 
                 try:
@@ -907,12 +948,13 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                     invested = metaNODE['invested']
                     divested = metaNODE['divested']
                     keys = metaNODE['keys']
+                    ping = metaNODE['ping']
                 except:
                     pass
-
                 runtime = int(time.time()) - BEGIN
+                bw_depth = max(int(len(nodes) / 6), 1)
 
-                if (len(white) < WHITE) or (len(black) < BLACK):
+                if (len(white) < bw_depth) or (len(black) < bw_depth):
                     alert = ' * building lists *'
                 else:
                     alert = ''
@@ -949,6 +991,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 print('block latency    ', ('%.3f' % block_latency))
                 print('handshake        ', ('%.3f' % handshake_latency))
                 print('ping             ', ('%.3f' % ping_latency))
+                print('mean ping        ', ('%.3f' % ping))
 
                 print('                 ', [x.rjust(16, ' ')
                       for x in ['name', 'balance', 'orders', 'holding',
@@ -999,6 +1042,7 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 # Must be JSON type
                 # 'STRING', 'INT', 'FLOAT', '{DICT}', or '[LIST]'
                 maven = {}
+                maven['ping'] = ping_latency # FLOAT
                 maven['bidv'] = bidv  # LIST of precision() STRINGS
                 maven['askv'] = askv  # LIST of precision() STRINGS
                 maven['bidp'] = bidp  # LIST of precision() STRINGS
@@ -1012,6 +1056,8 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 maven['whitelist'] = white  # LIST
                 maven['blacklist'] = black  # LIST
                 maven['blocktime'] = blocktime  # INT
+
+
                 nascent_trend(maven)
 
                 # winnow this node to the whitelist
@@ -1055,8 +1101,8 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
                 time.sleep(BLIP)
                 ws.close()
             except Exception as e:
-                msg = str(type(e).__name__) + str(e.args)
                 if DEV:
+                    msg = str(type(e).__name__) + str(e.args)
                     msg += str(traceback.format_exc())
                 print(msg)
                 pass
@@ -1064,6 +1110,11 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
 
         except Exception as e:
             try:
+                if DEV:
+                    msg = str(type(e).__name__) + str(e.args)
+
+                    msg += str(traceback.format_exc())
+                    print(msg)
                 time.sleep(BLIP)
                 ws.close()
             except:
@@ -1092,13 +1143,16 @@ def thresh(process, epoch, pid):  # make calls, shake out errors
 
 def winnow(x, node):  # seperate good nodes from bad
 
+    global bw_depth
+    bw_depth = max(int(len(nodes) / 6), 1)
+
     if x == 'blacklist':
         black = race_read(doc='blacklist.txt')
         if isinstance(black, list):
             if node in black:
                 black.remove(node)
             black.append(node)
-            black = black[-BLACK:]
+            black = black[-bw_depth:]
             race_write(doc='blacklist.txt', text=black)
         else:
             race_write(doc='blacklist.txt', text=[node])
@@ -1109,7 +1163,7 @@ def winnow(x, node):  # seperate good nodes from bad
             if node in white:
                 white.remove(node)
             white.append(node)
-            white = white[-WHITE:]
+            white = white[-bw_depth:]
             race_write(doc='whitelist.txt', text=white)
         else:
             race_write(doc='whitelist.txt', text=[node])
@@ -1126,9 +1180,9 @@ def nascent_trend(maven):  # append latest data
     if isinstance(mavens, list):
         mavens.append(maven)
         mavens = mavens[-MAVENS:]
-        race_write(doc='mavens.txt', text=json.dumps(mavens))
+        race_write(doc='mavens.txt', text=json_dumps(mavens))
     else:
-        race_write(doc='mavens.txt', text=json.dumps([maven]))
+        race_write(doc='mavens.txt', text=json_dumps([maven]))
     del mavens
 
 def bifurcation():  # statistically curate data
@@ -1137,7 +1191,6 @@ def bifurcation():  # statistically curate data
         try:
 
             time.sleep(2)  # take a deep breath
-
             # initialize the metaNODE dictionary
             metaNODE = {}
             # initialize lists to sort data from each maven by key
@@ -1154,14 +1207,14 @@ def bifurcation():  # statistically curate data
             blacklist = []
             blocktime = []
             orders = []
+            pings = []
 
             # gather list of maven opinions from the nascent_trend()
             mavens = race_read(doc='mavens.txt')
 
-            # sort maven data for statistical analysis by key
+            # sort maven data for statistical mode analysis by key
             l = len(mavens)
             for i in range(l):
-
                 maven = mavens[i]
                 bts_balance.append(maven['bts_balance'])
                 currency_balance.append(maven['currency_balance'])
@@ -1170,20 +1223,23 @@ def bifurcation():  # statistically curate data
                 blocktime.append(maven['blocktime'])
                 whitelist.append(maven['whitelist'])
                 blacklist.append(maven['blacklist'])
-
-                # stringify lists for statistical mode
-                bidp.append(str(maven['bidp']))
-                askp.append(str(maven['askp']))
-                bidv.append(str(maven['bidv']))
-                askv.append(str(maven['askv']))
-                history.append(str(maven['market_history']))
-                orders.append(str(maven['orders']))
+                pings.append(maven['ping'])
+                # stringify lists for statistical mode of json text
+                bidp.append(json_dumps(maven['bidp']))
+                askp.append(json_dumps(maven['askp']))
+                bidv.append(json_dumps(maven['bidv']))
+                askv.append(json_dumps(maven['askv']))
+                history.append(json_dumps(maven['market_history']))
+                orders.append(json_dumps(maven['orders']))
+                
+            # the mean ping of the mavens is passed to the metaNODE
+            ping = int(1000*sum(pings)/(len(pings)+0.00000001))/1000.0
 
             # find the youngest bitshares blocktime in our dataset
             try:
                 blocktime = max(blocktime)
             except:
-                raise ValueError('validating the nascent trend...')
+                print('validating the nascent trend...')
                 continue
             # get the mode of the mavens for each metric
             # allow 1 or 2 less than total & most recent for mode
@@ -1262,34 +1318,29 @@ def bifurcation():  # statistically curate data
                 except:
                     orders = (mode(orders[-(l - 2):]))
 
-            from ast import literal_eval as literal
-
-            # race_append(doc='metaNODElog.txt', text=bidp)
-
-            bidp = json.loads(str(bidp).replace("'", '"'))
-            askp = json.loads(str(askp).replace("'", '"'))
-            bidv = json.loads(str(bidv).replace("'", '"'))
-            askv = json.loads(str(askv).replace("'", '"'))
-            history = json.loads(str(history).replace("'", '"'))
-            orders = json.loads(str(orders).replace("'", '"'))
+            # convert statistical mode string back to python object
+            history = json_loads(history)
+            orders = json_loads(orders)
+            bidp = json_loads(bidp)
+            askp = json_loads(askp)
+            bidv = json_loads(bidv)
+            askv = json_loads(askv)
 
             # attempt a full whitelist and blacklist
             wl = []
             for i in whitelist:
                 wl += i
-            whitelist = list(set(wl))[-WHITE:]
+            whitelist = list(set(wl))[-bw_depth:]
             bl = []
             for i in blacklist:
                 bl += i
-            blacklist = list(set(bl))[-BLACK:]
-
+            blacklist = list(set(bl))[-bw_depth:]
             # rebuild orderbook as 4 key dict with lists of floats
             bidp = [float(i) for i in bidp]
             bidv = [float(i) for i in bidv]
             askp = [float(i) for i in askp]
             askv = [float(i) for i in askv]
             book = {'bidp': bidp, 'bidv': bidv, 'askp': askp, 'askv': askv}
-
             # calculate total outstanding orders
             buy_orders = 0
             sell_orders = 0
@@ -1299,10 +1350,8 @@ def bifurcation():  # statistically curate data
                         order['amount']) * float(order['price'])
                 if order['orderType'] == 'sell':
                     sell_orders += float(order['amount'])
-
             buy_orders = float(precision(buy_orders, currency_precision))
             sell_orders = float(precision(sell_orders, asset_precision))
-
             # provide some metadata regarding account balances
             currency_holding = float(currency_balance) + float(buy_orders)
             asset_holding = float(asset_balance) + float(sell_orders)
@@ -1310,7 +1359,6 @@ def bifurcation():  # statistically curate data
             asset_max = currency_max / float(last)
             invested = 100 * asset_holding / asset_max
             divested = 100 - invested
-
             currency_holding = float(
                 precision(
                     currency_holding,
@@ -1320,11 +1368,11 @@ def bifurcation():  # statistically curate data
             asset_max = float(precision(asset_max, asset_precision))
             invested = float(precision(invested, 1))
             divested = float(precision(divested, 1))
-
             # if you made it this far without statistics error
             # truncate and rewrite the metaNODE with curated data
             # Must be JSON type
             # 'STRING', 'INT', 'FLOAT', '{DICT}', or '[LIST]'
+            metaNODE['ping'] = ping  # FLOAT about 0.500
             metaNODE['book'] = book  # DICTIONARY
             metaNODE['bts_balance'] = float(bts_balance)  # FLOAT
             metaNODE['currency_balance'] = float(currency_balance)  # FLOAT
@@ -1351,12 +1399,10 @@ def bifurcation():  # statistically curate data
             metaNODE['asset_max'] = asset_max  # FLOAT
             metaNODE['invested'] = invested  # FLOAT 0 to 1
             metaNODE['divested'] = divested  # FLOAT 0 to 1
-
             # add index to metaNODE
             metaNODE['keys'] = list(metaNODE.keys())
-
             # solitary process with write access to metaNODE.txt
-            metaNODE = json.dumps(metaNODE)
+            metaNODE = json_dumps(metaNODE)
             race_write(doc='metaNODE.txt', text=metaNODE)
             print ('metaNODE.txt updated')
 
@@ -1393,55 +1439,12 @@ def bifurcation():  # statistically curate data
 
         except Exception as e:  # wait a second and try again
             # common msg is "no mode statistics error"
-            msg = str(type(e).__name__) + str(e.args)
             if DEV:
+                msg = str(type(e).__name__) + str(e.args)
                 msg += str(traceback.format_exc())
-            print(msg)
-            race_append(doc='metaNODElog.txt', text=msg)
+                print(msg)
+                race_append(doc='metaNODElog.txt', text=msg)
             continue  # from top of while loop NOT pass through error
-
-# ALERT FUNCTIONS
-# =================== DEVELOPER SUGGESTIONS ============================
-
-def bell(duration=2, frequency=432):  # Activate linux audible bell
-
-    pass
-    '''
-    os.system('play --no-show-progress --null --channels 1 synth' +
-                  ' %s sine %f' % (duration*1000, frequency))
-    '''
-
-def email():  # Send Email to a Gmail Account
-
-    # sorry no subject lines with this API
-    pass
-    '''
-    send_to     = "THE EMAIL ADDRESS TO SEND TO"
-    send_from   = "YOUR EMAIL ADDRESS"
-    pass        = "YOUR PASSWORD"
-    msg         = "YOUR MESSAGE!"
-    import smtplib
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(send_from, pass)
-    server.sendmail(send_from, send_to, msg)
-    server.quit()
-    '''
-
-def image():  # Display Warning Image in new window
-    os.system("start " + "your_warning_image.png")
-    pass
-
-def sms():  # Send SMS Message via Twilio Account
-    # Download the twilio-python library from http://twilio.com/docs/libraries
-    from twilio.rest import Client
-    # Find these values at https://twilio.com/user/account
-    account_sid = "ACXXXXXXXXXXXXXXXXX"
-    auth_token = "YYYYYYYYYYYYYYYYYY"
-    client = Client(account_sid, auth_token)
-    message = client.api.account.messages.create(to="+12316851234",
-                                                 from_="+15555555555",
-                                                 body="Hello there!")
 
 # HELPER FUNCTIONS
 # ======================================================================
@@ -1500,6 +1503,7 @@ def logo():
     print(blue(w))
     print(blue(x))
     print(cyan(
+
 '''                             ____  _____   ___   ______   ________
 Bitshares Trustless Client  (_   \(_   _).'   `.(_   _ `.(_   __  \   
   __  __  ____  ____   __     |   \ | | /  .-.  \ | | `. \ | |_ \_|   
