@@ -1,23 +1,47 @@
 
-' manualSIGNING '
+#=======================================================================
+VERSION = 'Bitshares manualSIGNING 0.00000004'
+#=======================================================================
 
 # Authenticated BUY/SELL/CANCEL without Pybitshares(MIT) Architecture
 
 ' litepresence 2019 '
 
-' ***** WARN: THIS SCRIPT IS FEATURE COMPLETE ALPHA ***** '
+def WTFPL_v0_March_1765():
+    if any([stamps, licenses, taxation, regulation, fiat, etat]):
+        try:
+            print('no thank you')
+        except:
+            return [tar, feathers]
 
-# Joe CEX algo trader finds bitshares DEX and asks:
+' ********** ALPHA RELEASE TO PUBLIC DOMAIN WITH NO WARRANTY ********* '
+
+# Joe CEX algo trader finds Bitshares DEX and asks:
 
 # How do I get good public API data that never goes stale?
 ' metaNODE.py'
 # How do I authenticate?
-' manualSIGNING.py ' 
+' manualSIGNING.py '
 # What nodes to use?
 ' latencyTEST.py'
 
-# three 50KB scripts and DEX algo trading barriers to entry defeated:
-# buy/sell/cancel - six sigma connectivity - simple auth - cex like data   
+# three 50KB scripts and DEX algo trading barriers to entry defeated 
+# nothing else to learn to be connected and authenticated
+# buy/sell/cancel - six sigma connectivity - simple auth - cex like data
+
+# need more?
+
+# buy/sell/cancel + orderbooks UI
+' microDEX.py '
+# Algo Trading and Backtesting Engine
+' extinctionEVENT.py '
+# Historical Return on Investment
+' accountBALANCES.py '
+
+# whitepaper
+
+' metaNODEwhitepaper.md'
+' manualSIGNINGwhitepaper.md'
 
 ' ********************************************** '
 ' ****** API CHANGE IN VERSION 0.00000003 ****** '
@@ -29,11 +53,14 @@
 
 ' NEW FEATURES '
 
-# edicts can be any mixed list of buy/sell/cancel 
+# prototype_order() leverages metaNODE to build order header template
+# edicts can be any mixed list of buy/sell/cancel
 # autoscale buy/sell orders to account means if overbudget
 # autoscale buy/sell orders to retain last two bitshares for fees
 # multiprocessing ensures websockets and faulty orders timeout
 # control_panel() advanced user controls to alter execution behaviors
+# new edict {'op':login} matches wif to account name; returns True/False
+# no pybitshares dependencies
 
 ' HOW DO I USE THIS THING? '
 
@@ -41,36 +68,29 @@
 ' broker(order) '
 
 
-def WTFPL_v0_March_1765():
-    if any([stamps, licenses, taxation, regulation, fiat, etat]):
-        try:
-            print('no thank you')
-        except:
-            return [tar, feathers]
-
 ' OBJECTIVES '
 
-'import only standard python objects' # DONE
-'gather needed pybitshares objects: copy, paste, and cite' # DONE
-'strip pybitshares objects of unused methods' # DONE
-'restack classes and definitions chronologically' # DONE
-'allow orders to be placed in human terms' # DONE
-'build tx in graphene terms' # DONE
-'serialize tx' # DONE
-'validate serialization via get_transaction_hex_without_sig()' # DONE
-'sign tx with ECDSA' # DONE
-'validate signed tx' # DONE
-'broadcast tx to rpc node' # DONE
-'allow this script to be imported as module; broker(order)' # DONE
-'allow list of buy/sell/cancel edicts' # DONE
-'allow cancel-all' # DONE
-'heavy line-by-line commentary' # DONE
-'extinctionEVENT implementation' # DONE
+'import only standard python objects'  # DONE
+'gather needed pybitshares objects: copy, paste, and cite'  # DONE
+'strip pybitshares objects of unused methods'  # DONE
+'restack classes and definitions chronologically'  # DONE
+'allow orders to be placed in human terms'  # DONE
+'build tx in graphene terms'  # DONE
+'serialize tx'  # DONE
+'validate serialization via get_transaction_hex_without_sig()'  # DONE
+'sign tx with ECDSA'  # DONE
+'validate signed tx'  # DONE
+'broadcast tx to rpc node'  # DONE
+'allow this script to be imported as module; broker(order)'  # DONE
+'allow list of buy/sell/cancel edicts'  # DONE
+'allow cancel-all'  # DONE
+'heavy line-by-line commentary'  # DONE
+'extinctionEVENT implementation'  # DONE
 
-'simplify and condense pybitshares methods' # ONGOING
-'whitepaper readme.md' # 5200 word rough draft, editing ongoing
+'simplify and condense pybitshares methods'  # ONGOING
+'whitepaper readme.md'  # 5200 word rough draft, editing ongoing
 
-'microDEX implementation' # TODO
+'microDEX implementation'  # TODO
 
 ' DEPENDENCIES '
 
@@ -81,27 +101,26 @@ def WTFPL_v0_March_1765():
 
 # citations to pybitshares(MIT) & @xeroc where pertinent
 # h/t @vvk123 @sschiessl @harukaff_bot
-# remainder WTFPL 1765
+# remainder WTFPL March 1765
 
 DEV = False
 COLOR = True
-VERSION = 0.00000003
 
 ' STANDARD PYTHON MODULES '
 
-from time import time, ctime, mktime, strptime, sleep
-from multiprocessing import Process, Value # encapsulate processes
+from time import time, ctime, mktime, strptime
+from multiprocessing import Process, Value  # encapsulate processes
 from decimal import Decimal as decimal  # higher precision than float
 from json import dumps as json_dumps  # serialize object to string
 from json import loads as json_loads  # deserialize string to object
 from collections import OrderedDict
-from traceback import format_exc # stack trace in terminal
+from traceback import format_exc  # stack trace in terminal
 from datetime import datetime
 from calendar import timegm
 from getpass import getpass  # hidden input()
 from random import shuffle
 from pprint import pprint  # pretty printing
-
+import math
 import sys
 import os
 
@@ -133,7 +152,11 @@ from ecdsa import SigningKey as ecdsa_SigningKey  # class
 from ecdsa import SECP256k1 as ecdsa_SECP256k1  # curve
 from ecdsa import util as ecdsa_util  # module
 from ecdsa import der as ecdsa_der  # module
-print("\033c") # clear screen if they are all installed 
+print("\033c")  # clear screen if they are all installed
+
+' litepresence/extinction-event MODULES '
+
+from metaNODE import Bitshares_Trustless_Client
 
 ' LINUX AND PYTHON 3 REQUIRED '
 
@@ -144,7 +167,7 @@ if 'linux' not in platform:
 if version_info[0] < 3:
     raise Exception("% is DED, long live Python 3.4+" % version_info[0])
 
-' PRINT CONTROL ' 
+' PRINT CONTROL '
 
 def blockPrint():
     # temporarily disable printing
@@ -168,88 +191,75 @@ def sample_orders():
     global order1, order2, order3
 
     # cancel all and place two buy orders
-    order1 =  {
-              'edicts': [   {'op':'cancel',
-                            'ids': ['1.7.X']}, # cancel all
-                            {'op':'buy',
-                            'amount': 10.0,
-                            'price': 0.00000100,
-                            'expiration': 0},
-                            {'op':'buy',
-                            'amount': 30.0,
-                            'price': 0.00000150,
-                            'expiration': 0},
+    order1 = {
+        'edicts': [
+                        {'op': 'buy',
+                        'amount': 10.0,
+                        'price': 0.00000100,
+                        'expiration': 0},
+                        {'op': 'buy',
+                        'amount': 30.0,
+                        'price': 0.00000150,
+                        'expiration': 0},
 
-                        ],
-              'header': {   'asset_id': '1.3.0',
-                            'currency_id': '1.3.861',
-                            'asset_precision': 5,
-                            'currency_precision': 8,
-                            'account_id': '1.2.x',
-                            'account_name': '',
-                            'wif':'',
-                            },
-              'nodes': [
-                            'wss://chicago.bitshares.apasia.tech/wss',
-                            'wss://new-york.bitshares.apasia.tech/wss',
-                            'wss://seattle.bitshares.apasia.tech/wss',
-                            'wss://us-ny.bitshares.apasia.tech/wss',
-                            'wss://us-la.bitshares.apasia.tech/wss',
-                       ]}
-    # place one sell order
-    order2 =  {
-              'edicts': [   
-                            {'op':'sell',
-                            'amount': 10.0,
-                            'price': 0.00020000,
-                            'expiration': 0},
-                        ],
-              'header': {   'asset_id': '1.3.0',
-                            'currency_id': '1.3.861',
-                            'asset_precision': 5,
-                            'currency_precision': 8,
-                            'account_id': '1.2.x',
-                            'account_name': '',
-                            'wif':'',
-                            },
-              'nodes': [
-                            'wss://chicago.bitshares.apasia.tech/wss',
-                            'wss://new-york.bitshares.apasia.tech/wss',
-                            'wss://seattle.bitshares.apasia.tech/wss',
-                            'wss://us-ny.bitshares.apasia.tech/wss',
-                            'wss://us-la.bitshares.apasia.tech/wss',
-                       ]}
+        ],
+        'header': {'asset_id': '1.3.0',
+                   'currency_id': '1.3.861',
+                   'asset_precision': 5,
+                   'currency_precision': 8,
+                   'account_id': '1.2.x',
+                   'account_name': '',
+                   'wif': '',
+                   },
+        'nodes': [
+            'wss://chicago.bitshares.apasia.tech/ws',
+            'wss://new-york.bitshares.apasia.tech/ws',
+            'wss://seattle.bitshares.apasia.tech/ws',
+            'wss://us-ny.bitshares.apasia.tech/ws',
+            'wss://us-la.bitshares.apasia.tech/ws',
+        ]}
     # cancel all
-    order3 =  {
-              'edicts': [   {'op':'cancel',
-                            'ids': ['1.7.X']}, # cancel all
-                            # or cancel specific order numbers:
-                            #{'op':'cancel',
-                            #'ids':['1.7.101','1.7.102','1.7.103']},
-                            {'op':'buy',
-                            'amount': 10.0,
-                            'price': 0.00000100,
-                            'expiration': 0},
-                            {'op':'sell',
-                            'amount': 10.0,
-                            'price': 0.00020000,
-                            'expiration': 0},
-                        ],
-              'header': {   'asset_id': '1.3.0',
-                            'currency_id': '1.3.861',
-                            'asset_precision': 5,
-                            'currency_precision': 8,
-                            'account_id': '1.2.x',
-                            'account_name': '',
-                            'wif':'',
-                            },
-              'nodes': [
-                            'wss://chicago.bitshares.apasia.tech/wss',
-                            'wss://new-york.bitshares.apasia.tech/wss',
-                            'wss://seattle.bitshares.apasia.tech/wss',
-                            'wss://us-ny.bitshares.apasia.tech/wss',
-                            'wss://us-la.bitshares.apasia.tech/wss',
-                       ]}
+    order2 = {
+        'edicts': [{'op': 'cancel',
+                    'ids': ['1.7.X']},  # cancel all
+                   # or cancel specific order numbers:
+                   #{'op':'cancel',
+                   #'ids':['1.7.101','1.7.102','1.7.103']},
+        ],
+        'header': {'asset_id': '1.3.0',
+                   'currency_id': '1.3.861',
+                   'asset_precision': 5,
+                   'currency_precision': 8,
+                   'account_id': '1.2.x',
+                   'account_name': '',
+                   'wif': '',
+                   },
+        'nodes': [
+            'wss://chicago.bitshares.apasia.tech/ws',
+            'wss://new-york.bitshares.apasia.tech/ws',
+            'wss://seattle.bitshares.apasia.tech/ws',
+            'wss://us-ny.bitshares.apasia.tech/ws',
+            'wss://us-la.bitshares.apasia.tech/ws',
+        ]}
+
+    order3 = {
+        'edicts': [{'op': 'login'}
+                   ],
+        'header': {'asset_id': '1.3.0',
+                   'currency_id': '1.3.861',
+                   'asset_precision': 5,
+                   'currency_precision': 8,
+                   'account_id': '1.2.x',
+                   'account_name': '',
+                   'wif': '',
+                   },
+        'nodes': [
+            'wss://chicago.bitshares.apasia.tech/ws',
+            'wss://new-york.bitshares.apasia.tech/ws',
+            'wss://seattle.bitshares.apasia.tech/ws',
+            'wss://us-ny.bitshares.apasia.tech/ws',
+            'wss://us-la.bitshares.apasia.tech/ws',
+        ]}
 
 def global_variables():
 
@@ -260,7 +270,7 @@ def global_variables():
 
 def global_constants():
 
-    global OP_IDS, OP_NAMES, ID, TYPES
+    global OP_IDS, OP_NAMES, ID, TYPES, SATOSHI, SIXSIG
     global BASE58, HEXDIGITS, ISO8601, END_OF_TIME
     # bitsharesbase/operationids.py
     OP_IDS = {"Limit_order_create": 1,
@@ -270,9 +280,9 @@ def global_constants():
     # bitsharesbase/chains.py
     ID = "4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8"
     # bitsharesbase/objecttypes.py used by ObjectId() to confirm a.b.c
-    TYPES = {"account": 2, # 1.2.x
-             "asset": 3, # 1.3.x
-             "limit_order": 7} # 1.7.x
+    TYPES = {"account": 2,  # 1.2.x
+             "asset": 3,  # 1.3.x
+             "limit_order": 7}  # 1.7.x
     # base58 encoding and decoding; this is alphabet defined:
     BASE58 = b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
     # hex encoding and decoding
@@ -280,7 +290,11 @@ def global_constants():
     # ISO8601 timeformat; 'graphene time'
     ISO8601 = '%Y-%m-%dT%H:%M:%S%Z'
     # MAX is 4294967295; year 2106 due to 4 byte unsigned integer
-    END_OF_TIME = 4*10**9 # about 75 years in future
+    END_OF_TIME = 4 * 10 ** 9  # about 75 years in future
+    # very little
+    SATOSHI = decimal(0.00000001)
+    # almost 1
+    SIXSIG = decimal(0.999999)
 
 def control_panel():
 
@@ -341,7 +355,7 @@ def wss_handshake():
     while handshake > HANDSHAKE_TIMEOUT:
         try:
             try:
-                ws.close # attempt to close open stale connection
+                ws.close  # attempt to close open stale connection
                 print(purple('connection terminated'))
             except:
                 pass
@@ -359,10 +373,7 @@ def wss_handshake():
 def wss_query(params):
 
     # this definition will place all remote procedure calls (RPC)
-    i = 0 # this will keep track of iterations to increase sleep time
-    start = time() # this for elapsed time calculation at end 
-    while True:
-        i += 1
+    for i in range(10):
         try:
             # print(purple('RPC ' + params[0]), cyan(params[1]))
             # this is the 4 part format of EVERY rpc request
@@ -371,30 +382,28 @@ def wss_query(params):
                                 "params": params,
                                 "jsonrpc": "2.0",
                                 "id": 1})
-
             # print(query)
             # ws is the websocket connection created by wss_handshake()
             # we will use this connection to send query and receive json
             ws.send(query)
             ret = json_loads(ws.recv())
             try:
-                ret = ret['result'] # if there is result key take it
+                ret = ret['result']  # if there is result key take it
             except:
                 pass
             # print(ret)
             # print('elapsed %.3f sec' % (time() - start))
             return ret
-        except Exception as e: 
-            try: # attempt to terminate the connection
+        except Exception as e:
+            try:  # attempt to terminate the connection
                 ws.close()
             except:
                 pass
-            trace(e) # tell me what happened
-            # sleep for an ever increasing amount of time between loops
-            sleep(0.05 ** (1.0 / i))
+            trace(e)  # tell me what happened
             # switch nodes
             wss_handshake()
             continue
+    raise
 
 def rpc_block_number():
     # block number and block prefix
@@ -414,9 +423,9 @@ def rpc_account_id():
 def rpc_fees():
     # returns fee for limit order create and cancel without 10^precision
     query = ["database",
-             "get_required_fees",[[
-                ['1', {"from": str(account_id)}],
-                ['2', {"from": str(account_id)}]], "1.3.0"  ]]
+             "get_required_fees", [[
+                                   ['1', {"from": str(account_id)}],
+                                   ['2', {"from": str(account_id)}]], "1.3.0"]]
     ret = wss_query(query)
     create = ret[0]['amount']
     cancel = ret[1]['amount']
@@ -425,26 +434,26 @@ def rpc_fees():
 def rpc_balances():
 
     balances = wss_query(["database",
-                     "get_named_account_balances",
-                     [account_name, [currency_id, asset_id, '1.3.0']]])
+                          "get_named_account_balances",
+                          [account_name, [currency_id, asset_id, '1.3.0']]])
 
-    #print(balances)
+    # print(balances)
     for balance in balances:
         if balance['asset_id'] == currency_id:
-            currency = balance['amount'] / 10 ** currency_precision
+            currency = decimal(balance['amount']) / 10 ** currency_precision
         if balance['asset_id'] == asset_id:
-            assets = balance['amount'] / 10 ** asset_precision
+            assets = decimal(balance['amount']) / 10 ** asset_precision
         if balance['asset_id'] == '1.3.0':
-            bitshares = balance['amount'] / 10 ** 5
+            bitshares = decimal(balance['amount']) / 10 ** 5
 
-    #print(currency, assets, bitshares)
+    # print(currency, assets, bitshares)
     return currency, assets, bitshares
 
 def rpc_open_orders():
     # return a list of open orders, for one account, in one market
     ret = wss_query(["database",
                      "get_full_accounts",
-                    [[account_name],"false"]])
+                    [[account_name], "false"]])
     try:
         limit_orders = ret[0][1]['limit_orders']
     except:
@@ -458,6 +467,15 @@ def rpc_open_orders():
             orders.append(order['id'])
     return(orders)
 
+def rpc_key_reference(public_key):
+
+    # given public key return account id
+    ret = wss_query(["database",
+                     "get_key_references",
+                     [[public_key]]])
+
+    return ret
+
 def rpc_get_transaction_hex_without_sig(tx):
     # use this to verify the manually serialized tx buffer
     ret = wss_query(["database",
@@ -470,7 +488,7 @@ def rpc_broadcast_transaction(tx):
     ret = wss_query(["network_broadcast",
                      "broadcast_transaction",
                      [tx]])
-    if ret == None:
+    if ret is None:
         print(yellow('*************************************'))
         print('manualSIGNING' + red(' has placed your order'))
         print(yellow('*************************************'))
@@ -502,29 +520,32 @@ def types_README():
     # but only when bytes() is called on an object that has passed
     # through a class with a "magic" __bytes__ method
     # these methods are used to serialize OrderDicts of various elements
-
     # graphenebase  __str__() methods have been removed
     # as they are unused for limit order operations
-
     # Set() has been merged into Array()
     # Bool() has been merged into Uint8()
     # Varint32() has been merged into both Id() and Array()
-
     'consider the following "magic method" example'
     # this would have no effect on the way bytes() normally behaves
     class normal():
+
         def __init__(self, d):
             self.data = int(d)
+
         def __bytes__(self):
             return bytes(self.data)
     # this redifines bytes() in global to pack unsigned 8 bit integers
     # but only in the case of bytes(Uint8(x))
+
     class Uint8():
+
         def __init__(self, d):
             self.data = int(d)
+
         def __bytes__(self):
             return pack("<B", self.data)
     # this is a definition method to accomplish the same "magic"
+
     def bytes_Uint8(data):
         return pack("<B", int(data))
     # apply each of these methods to x=3 to show what happens
@@ -557,7 +578,7 @@ class ObjectId():
             self.instance = Id(self.c)
             self.abc = object_str
             # 1.2.x:account, 1.3.x:asset, or 1.7.x:limit
-            if type_verify:                
+            if type_verify:
                 assert (TYPES[type_verify] == int(b)), (
                     # except raise error showing mismatch
                     "Object id does not match object type! " +
@@ -568,11 +589,12 @@ class ObjectId():
 
     def __bytes__(self):
         # b'\x00\x00\x00' of serialized c element; the "instance"
-        return bytes(self.instance)  
+        return bytes(self.instance)
 
 class Id():
     # serializes the c element of "a.b.c" types
     # merged with Varint32()
+
     def __init__(self, d):
         self.data = int(d)
 
@@ -582,6 +604,7 @@ class Id():
 class Array():
     # serializes lists as byte strings
     # merged with Set() and Varint32()
+
     def __init__(self, d):
         self.data = d
         self.length = int(len(self.data))
@@ -592,6 +615,7 @@ class Array():
 class Uint8():
     # byte string of 8 bit unsigned integers
     # merged with Bool()
+
     def __init__(self, d):
         self.data = int(d)
 
@@ -600,6 +624,7 @@ class Uint8():
 
 class Uint16():
     # byte string of 16 bit unsigned integers
+
     def __init__(self, d):
         self.data = int(d)
 
@@ -608,6 +633,7 @@ class Uint16():
 
 class Uint32():
     # byte string of 32 bit unsigned integers
+
     def __init__(self, d):
         self.data = int(d)
 
@@ -616,6 +642,7 @@ class Uint32():
 
 class Int64():
     # byte string of 64 bit unsigned integers
+
     def __init__(self, d):
         self.data = int(d)
 
@@ -624,14 +651,16 @@ class Int64():
 
 class Signature():
     # used to disable bytes() method on Signatures in OrderedDicts
+
     def __init__(self, d):
         self.data = d
 
     def __bytes__(self):
-        return self.data # note does NOT return bytes(self.data)
+        return self.data  # note does NOT return bytes(self.data)
 
 class PointInTime():
     # used to pack ISO8601 time as 4 byte unix epoch integer as bytes
+
     def __init__(self, d):
         self.data = d
 
@@ -729,13 +758,15 @@ def base58encode(hexstring):
         res.insert(0, BASE58[n])
     ret = (BASE58[0:1] * leading_zeroes_count + res).decode('ascii')
 
-    print(purple('BTS' + str(ret)), "public key")
+    # public_key = 'BTS' + str(ret)
+    # print(purple(public_key), "public key")
+
     print('len(ret)', len(ret))
     return ret
 
 def ripemd160(s):
     # 160-bit cryptographic hash function
-    ripemd160 = hashlib_new('ripemd160') # import the library
+    ripemd160 = hashlib_new('ripemd160')  # import the library
     ripemd160.update(unhexlify(s))
     ret = ripemd160.digest()
     print('use hashlib to perform a ripemd160 message digest')
@@ -745,10 +776,10 @@ def ripemd160(s):
 def doublesha256(s):
     # double sha256 cryptographic hash function
     ret = sha256(sha256(unhexlify(s)).digest()).digest()
-    print('use hashlib to perform a doublesha26 message digest')
+    print('use hashlib to perform a double sha256 message digest')
     print(ret)
     return ret
-    
+
 def base58CheckEncode(version, payload):
 
     print(green('base58CheckEncode'))
@@ -784,7 +815,7 @@ def gphBase58CheckDecode(s):
     assert(s[-4:] == checksum)
     return dec
 
-' ADDRESS AND KEYS '
+' ADDRESS AND KEYS ' 
 
 class Address(object):  # cropped litepresence2019
 
@@ -809,11 +840,30 @@ class PublicKey(Address):  # graphenebase/account.py
     """
 
     def __init__(self, pk, prefix="BTS"):
+
+        global authenticated
+
         print(red('PublicKey'))
         self.prefix = prefix
         self._pk = Base58(pk, prefix=prefix)
         self.address = Address(pubkey=pk, prefix=prefix)
         self.pubkey = self._pk
+
+        public_key = prefix + str(self._pk)
+
+        if login and (len(public_key) == 53):
+            try:
+                public_key = prefix + str(self._pk)
+                print(public_key)
+                print(len(public_key))
+                account = rpc_key_reference(public_key)
+                print(str(account[0][0]))
+                print(str(account_id))
+                if str(account[0][0]) == str(account_id):
+                    authenticated = True
+                print ('authenticated:', authenticated)
+            except:
+                pass
 
     def _derive_y_from_x(self, x, is_even):
         print(purple('           y^2 = x^3 + ax + b          '))
@@ -1117,12 +1167,14 @@ class Signed_Transaction(GrapheneObject):  # merged litepresence2019
             print(green('************ pubkey ************'))
             print(blue('repr(pubkey)'))
             print(repr(pubkey))
+
             print(cyan('len(pubkey)'), len(str(pubkey)))
             print('')
             if not isinstance(pubkey, PublicKey):
                 raise Exception("Pubkeys must be array of 'PublicKey'")
 
             k = pubkey.unCompressed()[2:]
+
             print(green('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'))
             print(yellow('k'))
             print(k)
@@ -1233,11 +1285,11 @@ def verify_message(message, signature, hashfn=sha256):
 
     return phex
 
-def isArgsThisClass(self, args): # graphenebase/objects.py
+def isArgsThisClass(self, args):  # graphenebase/objects.py
     # if there is only one argument and its type name is
     # the same as the type name of self
     ret = (len(args) == 1 and
-            type(args[0]).__name__ == type(self).__name__)
+           type(args[0]).__name__ == type(self).__name__)
     return ret
 
 ' PRIMARY TRANSACTION BACKBONE '
@@ -1245,7 +1297,6 @@ def isArgsThisClass(self, args): # graphenebase/objects.py
 def build_transaction(order):
     # this performs incoming limit order api conversion
     # from human terms to graphene terms
-
     # humans speak:
     "account name, asset name, order number"
     "decimal amounts, rounded is just fine"
@@ -1267,10 +1318,12 @@ def build_transaction(order):
     "autoscale amounts if spending last bitshare"
     "bundled cancel/buy/sell transactions out; cancel first"
     "prevent inadvertent huge number of orders"
+    "do not place orders for dust amounts"
 
     global account_id, account_name, currency_id, asset_id
     global currency_precision, asset_precision
-    # first we will perform some checks on incoming data format
+
+    ' VALIDATE INCOMING DATA '
     if not isinstance(order['edicts'], list):
         raise ValueError('order parameter must be list: %s' % order['edicts'])
     if not isinstance(order['nodes'], list):
@@ -1281,18 +1334,20 @@ def build_transaction(order):
     currency_precision = int(order['header']['currency_precision'])
     asset_precision = int(order['header']['asset_precision'])
     # validate a.b.c identifiers of account id and asset ids
-    currency_id = str(order['header']['currency_id']) 
+    currency_id = str(order['header']['currency_id'])
     asset_id = str(order['header']['asset_id'])
     account_id = str(order['header']['account_id'])
     account_name = str(order['header']['account_name'])
     for i in [account_id, currency_id, asset_id]:
         try:
-            a,b,c = i.split('.')
+            a, b, c = i.split('.')
             int(a) == 1
-            int(b) in [2,3]
+            int(b) in [2, 3]
             int(c) == float(c)
         except:
             raise ValueError('invalid object id %s' % i)
+
+    ' GATHER TRANSACTION HEADER DATA '
     # fetch block data via websocket request
     block = rpc_block_number()
     ref_block_num = block["head_block_number"] & 0xFFFF
@@ -1300,40 +1355,49 @@ def build_transaction(order):
         "<I",
         unhexlify(block["head_block_id"]),
         4)[0]
-    #print('block number:', block['head_block_number'], ref_block_num)
-    #print('block id    :', block['head_block_id'], ref_block_prefix)
-    # fetch fee via websocket request
+    # fetch limit order create and cancel fee via websocket request
     fees = rpc_fees()
     # establish transaction expiration
     tx_expiration = to_iso_date(int(time() + 120))
     # initialize tx_operations list
     tx_operations = []
-    # sort incoming edicts by type:
+
+    ' SORT INCOMING EDICTS BY TYPE AND CONVERT TO DECIMAL '
     buy_edicts = []
     sell_edicts = []
     cancel_edicts = []
-    for edict in order['edicts']:
-        if edict['op'] == 'cancel':
-            print(yellow(str(edict)))
-            cancel_edicts.append(edict)
-        elif edict['op'] == 'buy':
-            print(yellow(str(edict)))
-            buy_edicts.append(edict)
-        elif edict['op'] == 'sell':
-            print(yellow(str(edict)))
-            sell_edicts.append(edict)
-    #print('early edicts')
-    #edicts = cancel_edicts + buy_edicts + sell_edicts
-    #pprint(edicts)
-    # append incoming cancel edicts to graphene type tx_operations
+    if not login:
+        for edict in order['edicts']:
+            if edict['op'] == 'cancel':
+                print(yellow(str({k:str(v) for k,v in edict.items()})))
+                cancel_edicts.append(edict)
+            elif edict['op'] == 'buy':
+                print(yellow(str({k:str(v) for k,v in edict.items()})))
+                buy_edicts.append(edict)
+            elif edict['op'] == 'sell':
+                print(yellow(str({k:str(v) for k,v in edict.items()})))
+                sell_edicts.append(edict)
+    for i in range(len(buy_edicts)):
+        buy_edicts[i]['amount'] = decimal(buy_edicts[i]['amount'])
+        buy_edicts[i]['price'] = decimal(buy_edicts[i]['price'])
+    for i in range(len(sell_edicts)):
+        sell_edicts[i]['amount'] = decimal(sell_edicts[i]['amount'])
+        sell_edicts[i]['price'] = decimal(sell_edicts[i]['price'])
+    if DEV:
+        print('early edicts')
+        edicts = cancel_edicts + buy_edicts + sell_edicts
+        pprint(edicts)
+
+    ' TRANSLATE CANCEL ORDERS TO GRAPHENE '
     for edict in cancel_edicts:
-        if '1.7.X' in edict['ids']: # the "cancel all" signal
+        if '1.7.X' in edict['ids']:  # the "cancel all" signal
             # for cancel all op, we collect all open orders in 1 market
             edict['ids'] = rpc_open_orders()
+            print(yellow(str(edict)))
         for order_id in edict['ids']:
             # confirm it is good 1.7.x format:
             order_id = str(order_id)
-            a,b,c = order_id.split('.', 2)
+            a, b, c = order_id.split('.', 2)
             assert (int(a) == 1)
             assert (int(b) == 7)
             assert (int(c) == float(c) > 0)
@@ -1343,102 +1407,127 @@ def build_transaction(order):
                               ('asset_id', '1.3.0')
                               ])
             # create ordered operation dicitonary for this edict
-            operation = [2, # two means "Limit_order_cancel"
-                OrderedDict([
-                    ('fee', fee),
-                    ('fee_paying_account', account_id),
-                    ('order', order_id),
-                    ('extensions', [])
-            ])]
-            # append the dict to the transaction operations list
+            operation = [2,  # two means "Limit_order_cancel"
+                         OrderedDict([
+                                    ('fee', fee),
+                                     ('fee_paying_account', account_id),
+                             ('order', order_id),
+                             ('extensions', [])
+                         ])]
+            # append the ordered dict to the tx operations list
             tx_operations.append(operation)
-    #print('after cancel edicts')
-    #edicts = cancel_edicts + buy_edicts + sell_edicts
-    #pprint(edicts)
-    if AUTOSCALE or BTS_FEES:
-        satoshi = 0.00000001
-        six_sig = 0.999999
+    if DEV:
+        print('after cancel edicts')
+        edicts = cancel_edicts + buy_edicts + sell_edicts
+        pprint(edicts)
+
+
+    ' SCALE ORDER SIZE TO FUNDS ON HAND '
+    if (AUTOSCALE or BTS_FEES) and not login:
         currency, assets, bitshares = rpc_balances()
-        # scale order size to funds on hand
-        if AUTOSCALE and len(buy_edicts+sell_edicts) :
+        if AUTOSCALE and len(buy_edicts + sell_edicts):
             # autoscale buy edicts
-            currency_value = 0
-            # calculate total value of each amount in the order
-            for i in range(len(buy_edicts)):
-                currency_value += (buy_edicts[i]['amount'] *
-                                    buy_edicts[i]['price'])
-            # scale the order amounts to means
-            scale = six_sig*currency/(currency_value+satoshi)
-            if scale < 1:
-                print(yellow('ALERT: scaling buy edicts to means: %.3f' % scale))
+            if len(buy_edicts):
+                currency_value = 0
+                # calculate total value of each amount in the order
                 for i in range(len(buy_edicts)):
-                    buy_edicts[i]['amount'] *= scale
+                    currency_value += (buy_edicts[i]['amount'] *
+                                      buy_edicts[i]['price'])
+                # scale the order amounts to means
+                scale = SIXSIG * currency / (currency_value + SATOSHI)
+                if scale < 1:
+                    print(
+                        yellow(
+                            'ALERT: scaling buy edicts to means: %.3f' %
+                            scale))
+                    for i in range(len(buy_edicts)):
+                        buy_edicts[i]['amount'] *= scale
             # autoscale sell edicts
-            asset_total = 0
-            # calculate total amount in the order
-            for i in range(len(sell_edicts)):
-                asset_total += sell_edicts[i]['amount']
-            scale = six_sig*assets/(asset_total+satoshi)
-            # scale the order amounts to means
-            if scale < 1:
-                print(yellow('ALERT: scaling sell edicts to means: %.3f' % scale))
+            if len(sell_edicts):
+                asset_total = 0
+                # calculate total amount in the order
                 for i in range(len(sell_edicts)):
-                    sell_edicts[i]['amount'] *= scale
-        #print('after autoscale edicts')
-        #edicts = cancel_edicts + buy_edicts + sell_edicts
-        #pprint(edicts)
-        # always save our last 2 Bitshares for fees !!!
-        if BTS_FEES and (len(buy_edicts+sell_edicts) 
+                    asset_total += (sell_edicts[i]['amount'])
+                scale = SIXSIG * assets / (asset_total + SATOSHI)
+                # scale the order amounts to means
+                if scale < 1:
+                    print(
+                        yellow(
+                            'ALERT: scaling sell edicts to means: %.3f' %
+                            scale))
+                    for i in range(len(sell_edicts)):
+                        sell_edicts[i]['amount'] *= scale
+        if DEV:
+            print('after autoscale edicts')
+            edicts = cancel_edicts + buy_edicts + sell_edicts
+            pprint(edicts)
+
+        ' ALWAYS SAVE LAST 2 BITSHARES FOR FEES '
+        if BTS_FEES and (len(buy_edicts + sell_edicts)
                 and ('1.3.0' in [asset_id, currency_id])):
-            #print(bitshares, 'BTS balance')
+            # print(bitshares, 'BTS balance')
             # when BTS is the currency don't spend the last 2
-            if currency_id == '1.3.0':
+            if currency_id == '1.3.0' and len(buy_edicts):
                 bts_value = 0
                 # calculate total bts value of each amount in the order
                 for i in range(len(buy_edicts)):
                     bts_value += (buy_edicts[i]['amount'] *
                                   buy_edicts[i]['price'])
                 # scale the order amounts to save last two bitshares
-                scale = six_sig*max(0,(bitshares-2.01))/(bts_value+satoshi)
+                scale = SIXSIG * \
+                    max(0, (bitshares - 2)) / (bts_value + SATOSHI)
                 if scale < 1:
-                    print(yellow('ALERT: scaling buy edicts for fees: %.4f' % scale))
+                    print(
+                        yellow(
+                            'ALERT: scaling buy edicts for fees: %.4f' %
+                            scale))
                     for i in range(len(buy_edicts)):
                         buy_edicts[i]['amount'] *= scale
             # when BTS is the asset don't sell the last 2
-            if asset_id == '1.3.0':
+            if asset_id == '1.3.0' and len(sell_edicts):
                 bts_total = 0
                 # calculate total of each bts amount in the order
                 for i in range(len(sell_edicts)):
                     bts_total += sell_edicts[i]['amount']
-                scale = six_sig*max(0,(bitshares-2.01))/(bts_total+satoshi)
+                scale = SIXSIG * \
+                    max(0, (bitshares - 2)) / (bts_total + SATOSHI)
                 # scale the order amounts to save last two bitshares
                 if scale < 1:
-                    print(yellow('ALERT: scaling sell edicts for fees: %.4f' % scale))
+                    print(
+                        yellow(
+                            'ALERT: scaling sell edicts for fees: %.4f' %
+                            scale))
                     for i in range(len(sell_edicts)):
                         sell_edicts[i]['amount'] *= scale
-    #print('after bts fee edicts')
-    #edicts = cancel_edicts + buy_edicts + sell_edicts
-    #pprint(edicts)
-    # after scaling recombine buy and sell 
-    create_edicts = buy_edicts+sell_edicts
-    # remove dust edicts
-    if DUST:
+    if DEV:
+        print('after bts fee edicts')
+        edicts = cancel_edicts + buy_edicts + sell_edicts
+        pprint(edicts)
+    # after scaling recombine buy and sell
+    create_edicts = buy_edicts + sell_edicts
+
+    ' REMOVE DUST EDICTS '
+    if DUST and len(create_edicts):
         ce = []
-        dust = DUST*100000/10**asset_precision
+        dust = DUST * 100000 / 10 ** asset_precision
         for i in range(len(create_edicts)):
             if create_edicts[i]['amount'] > dust:
                 ce.append(create_edicts[i])
             else:
-                print(red('WARN: removing dust threshold %s order from edicts' % dust), create_edicts[i])
-        create_edicts = ce[:] # copy as new list
+                print(
+                    red('WARN: removing dust threshold %s order' %
+     dust), create_edicts[i])
+        create_edicts = ce[:]  # copy as new list
         del ce
-    #print('after bts fee edicts')
-    #edicts = cancel_edicts + buy_edicts + sell_edicts
-    #pprint(edicts)
-    # port incoming create edicts to Limit_order_create objects
+    if DEV:
+        print('after dust edicts')
+        edicts = cancel_edicts + buy_edicts + sell_edicts
+        pprint(edicts)
+
+    ' TRANSLATE LIMIT ORDERS TO GRAPHENE '
     for i in range(len(create_edicts)):
-        price = decimal(create_edicts[i]['price'])
-        amount = decimal(create_edicts[i]['amount'])
+        price = create_edicts[i]['price']
+        amount = create_edicts[i]['amount']
         op_exp = int(create_edicts[i]['expiration'])
         # convert zero expiration flag to "really far in future"
         if op_exp == 0:
@@ -1481,14 +1570,28 @@ def build_transaction(order):
                 ('expiration', op_expiration),  # ISO8601
                 ('fill_or_kill', KILL_OR_FILL),  # bool
                 ('extensions', [])  # always empty list for our purpose
-        ])]
+            ])]
+        tx_operations.append(operation)
+
+    if login:
+        # create an dummy cancel operation to pass to signing process
+        fee = OrderedDict([
+                          ('amount', 0),
+                          ('asset_id', '1.3.0')
+                          ])
+        operation = [2,
+            OrderedDict([
+                ('fee', fee),
+                ('fee_paying_account', account_id),
+                ('order', '1.7.0'),
+                ('extensions', [])
+            ])]
         tx_operations.append(operation)
 
     # prevent inadvertent huge number of orders
     tx_operations = tx_operations[:LIMIT]
     # the tx is just a regular dictionary we will convert to json later
-    # the operations themselves are still an OrderedDict
-
+    # the operations themselves must still be an OrderedDict
     tx = {'ref_block_num': ref_block_num,
           'ref_block_prefix': ref_block_prefix,
           'expiration': tx_expiration,
@@ -1512,11 +1615,11 @@ def serialize_transaction(tx):
     print(yellow('get RPC tx hex...'))
     rpc_tx_hex = rpc_get_transaction_hex_without_sig(tx)
     print(yellow('build manual tx hex...'))
-    buf = b"" # create an empty byte string buffer
+    buf = b""  # create an empty byte string buffer
     # add block number, prefix, and tx expiration to the buffer
-    buf += pack("<H", tx["ref_block_num"]) # 2 byte int
-    buf += pack("<I", tx["ref_block_prefix"]) # 4 byte int
-    buf += pack("<I", from_iso_date(tx['expiration'])) # 4 byte int
+    buf += pack("<H", tx["ref_block_num"])  # 2 byte int
+    buf += pack("<I", tx["ref_block_prefix"])  # 4 byte int
+    buf += pack("<I", from_iso_date(tx['expiration']))  # 4 byte int
     # add length of operations list to buffer
     buf += bytes(varint(len(tx["operations"])))
     # add the operations list to the buffer in graphene type fashion
@@ -1529,7 +1632,7 @@ def serialize_transaction(tx):
         if op[0] == 2:
             buf += bytes(Limit_order_cancel(op[1]))
     # add legth of (empty) extensions list to buffer
-    buf += bytes(varint(len(tx["extensions"]))) # effectively varint(0)
+    buf += bytes(varint(len(tx["extensions"])))  # effectively varint(0)
     # this the final manual transaction hex, which should match rpc
     manual_tx_hex = hexlify(buf)
     print(red('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'))
@@ -1550,7 +1653,7 @@ def sign_transaction(tx, message):
     # @xeroc/steem-transaction-signing-in-a-nutshell
     # @dantheman/steem-and-bitshares-cryptographic-security-update
 
-    # deterministic signatures retain the cryptographic 
+    # deterministic signatures retain the cryptographic
     # security features associated with digital signatures
     # but can be more easily implemented
     # since they do not need high-quality randomness
@@ -1558,7 +1661,7 @@ def sign_transaction(tx, message):
     # 1 in 4 signatures are randomly canonical; "normal form"
     # using the other three causes vulnerability to maleability attacks
     # as a metaphor; "require reduced fractions in simplest terms"
-    def canonical(sig):  
+    def canonical(sig):
         sig = bytearray(sig)
         # 0x80 hex = 10000000 binary = 128 integer
         ret = (not (int(sig[0]) & 0x80) and
@@ -1567,7 +1670,7 @@ def sign_transaction(tx, message):
                not (sig[32] == 0 and not (int(sig[33]) & 0x80)))
         print(green('canonical'), cyan(str(ret)))
         print(sig)
-        return ret # true/false
+        return ret  # true/false
     # create fixed length representation of arbitrary length data
     # this will thoroughly obfuscate and compress the transaction
     # signing large data is computationally expensive and time consuming
@@ -1580,16 +1683,16 @@ def sign_transaction(tx, message):
     eliptical curve digital signature algorithm
     this is where the real hocus pocus lies
     all of the ordering, typing, serializing, and digesting
-    culminates with the message meeting the wif 
+    culminates with the message meeting the wif
     '''
     # 8 bit string representation of private key
     p = bytes(PrivateKey(wif))
     # create some arbitrary data used by the nonce generation
     ndata = secp256k1_ffi.new("const int *ndata")
-    ndata[0] = 0 # it adds "\0x00", then "\0x00\0x00", etc..
-    while 1: # repeat process until deterministic and cannonical  
-        ndata[0] += 1 # increment the arbitrary nonce
-        # obtain compiled/binary private key from the WIF
+    ndata[0] = 0  # it adds "\0x00", then "\0x00\0x00", etc..
+    while True:  # repeat process until deterministic and cannonical
+        ndata[0] += 1  # increment the arbitrary nonce
+        # obtain compiled/binary private key from the wif
         privkey = secp256k1_PrivateKey(p, raw=True)
         print(red(str(privkey)))
         print(privkey)
@@ -1600,16 +1703,16 @@ def sign_transaction(tx, message):
         # returns: 1 = deterministic; 0 = not deterministic
         deterministic = (
             secp256k1_lib.secp256k1_ecdsa_sign_recoverable(
-                privkey.ctx, # initialized context object
-                sig, # array where signature is held
-                digest, # 32-byte message hash being signed
-                privkey.private_key, # 32-byte secret key
-                secp256k1_ffi.NULL, # default nonce function
-                ndata # incrementing nonce data
-        ))
+                privkey.ctx,  # initialized context object
+                sig,  # array where signature is held
+                digest,  # 32-byte message hash being signed
+                privkey.private_key,  # 32-byte secret key
+                secp256k1_ffi.NULL,  # default nonce function
+                ndata  # incrementing nonce data
+            ))
         if not deterministic:
             print('not deterministic, try again...')
-            continue 
+            continue
         # we derive the recovery paramter
         # which simplifies the verification of the signature
         # it links the signature to a single unique public key
@@ -1637,12 +1740,12 @@ def sign_transaction(tx, message):
     print(signature)
     print('')
 
-    return tx 
+    return tx
 
 def verify_transaction(tx):
     # gist.github.com/xeroc/9bda11add796b603d83eb4b41d38532b
     # once you have derived your new tx including the signatures
-    # verify your transaction and it's signature 
+    # verify your transaction and it's signature
     print(blue('verify_transaction'))
     print(blue('tx2 = Signed_Transaction(**tx)'))
     tx2 = Signed_Transaction(**tx)
@@ -1663,7 +1766,6 @@ def verify_transaction(tx):
 ' THE BROKER METHOD'
 
 def broker(order):
-
     'broker(order) --> execute(signal, order)'
     # insistent timed multiprocess wrapper for authorized ops
     # covers all incoming buy/sell/cancel authenticated requests
@@ -1676,68 +1778,104 @@ def broker(order):
     global_variables()
     control_panel()
 
-    signal = Value('i', 1)
+    log_in = False
+    if order['edicts'][0]['op'] == 'login':
+        log_in = True
+
+    signal = Value('i', 0)
+    auth = Value('i', 0)
     i = 0
-    while signal.value and (i < ATTEMPTS):
+    while (i < ATTEMPTS) and not signal.value:
         i += 1
         print('')
         print('manualSIGNING authentication attempt:', i, ctime())
-        child = Process(target=execute, args=(signal, order))
+        child = Process(target=execute, args=(signal, log_in, auth, order))
         child.daemon = False
         child.start()
-        if JOIN: # means main script will not continue till child done
+        if JOIN:  # means main script will not continue till child done
             child.join(PROCESS_TIMEOUT)
-        print('')
+    if log_in:
+        if auth.value == 1:
+            return True
+        else:
+            return False
 
-def execute(signal, order):
-    global nodes, account_id, account_name, wif
+def execute(signal, log_in, auth, order):
 
+    global nodes, account_id, account_name, wif, login, authenticated
+
+    login = log_in
 
     start = time()
-    if not DEV: # disable printing with DEV=False
+    if not DEV:  # disable printing with DEV=False
         blockPrint()
     nodes = order['nodes']
     account_id = order['header']['account_id']
     account_name = order['header']['account_name']
     wif = order['header']['wif']
     wss_handshake()
+
     if not DEV:
         enablePrint()
     try:
         tx = build_transaction(order)
     except Exception as e:
         trace(e)
-    if len(tx['operations']): # if there are any orders
-        if not DEV: # disable printing with DEV=False
+    if len(tx['operations']):  # if there are any orders
+        if not DEV:  # disable printing with DEV=False
             blockPrint()
+        authenticated = False
         # perform ecdsa on serialized transaction
-        tx, message = serialize_transaction(tx)
-        signed_tx = sign_transaction(tx, message)
-        signed_tx = verify_transaction(signed_tx)
-        if not DEV:
-            enablePrint()
-        broadcasted_tx = rpc_broadcast_transaction(signed_tx)
+        try:
+            tx, message = serialize_transaction(tx)
+        except Exception as e:
+            trace(e)
+        try:
+            signed_tx = sign_transaction(tx, message)
+        except Exception as e:
+            trace(e)
+        if login:
+            # PublicKey.__init__ switches "authenticated"
+            if not DEV:
+                enablePrint()
+            print ('authenticated', authenticated)
+            if authenticated:
+                auth.value = 1
+        else:
+            signed_tx = verify_transaction(signed_tx)
+            if not DEV:
+                enablePrint()
+            broadcasted_tx = rpc_broadcast_transaction(signed_tx)
     else:
         print(red('manualSIGNING rejected your order'), order['edicts'])
     print('manualSIGNING process elapsed: %.3f sec' %
-            (time() - start))
+         (time() - start))
     print('')
-    signal.value = 0
+    signal.value = 1
+    return None
 
 def prototype_order():
 
-    '''
-    # included for example only!
-    # in production use this method with Bitshares_Trustless_Client()
     # creates an auto formatted empty prototype order in json format
-    # you will need to add your ['edicts'] key
+    # you will add your ['edicts'] and ['wif']
+    # metaNODE handles everything else
+
+    # usage
+    '''
+    from manualSIGNING import prototype_order
+
+    order = json_loads(prototype_order())
+    order['header']['wif'] = wif
+    order['edicts'] = edicts
+
+    broker(order)
+    '''
 
     proto = {}
     metaNODE = Bitshares_Trustless_Client()
     proto['op'] = ''
     proto['nodes'] = metaNODE['whitelist']
     proto['header'] = {}
-    proto['header']['wif'] = WIF # use python getpass() at login 
     proto['header']['asset_id'] = metaNODE['asset_id']
     proto['header']['currency_id'] = metaNODE['currency_id']
     proto['header']['asset_precision'] = metaNODE['asset_precision']
@@ -1746,7 +1884,6 @@ def prototype_order():
     proto['header']['account_name'] = metaNODE['account_name']
     del metaNODE
     return json_dumps(proto)
-    '''
 
 ' IN SCRIPT DEMONSTRATION '
 
@@ -1755,7 +1892,7 @@ def log_in():
     global wif, account_name, account_id
     global order, order1, order2, order3, nodes
 
-    print("\033c") # clear terminal
+    print("\033c")  # clear terminal
     # bitshares ascii logo encoded and compressed
     b = b'x\x9c\xad\xd4M\n\xc4 \x0c\x05\xe0}O1P\x12B\x10\xbc\x82\xf7?\xd5\xf8\xaf\x83F\xe3\xe0[t\xf9\xf5%\xda>\x9f\x1c\xf7\x7f\x9e\xb9\x01\x17\x0cc\xec\x05\xe3@Y\x18\xc6(\'Z\x1a\xca.\x1bC\xa5l\r\x85\xa20\xb6\x8a\xca\xd8,W0\xec\x05\xc3\xdf\xd4_\xe3\r\x11(q\x16\xec\x95l\x04\x06\x0f\x0c\xc3\xddD\x9dq\xd2#\xa4NT\x0c/\x10\xd1{b\xd4\x89\x92\x91\x84\x11\xd9\x9d-\x87.\xe4\x1cB\x15|\xe0\xc8\x88\x13\xa5\xbc\xd4\xa21\x8e"\x18\xdc\xd2\x0e\xd3\xb6\xa0\xc6h\xa3\xd4\xde\xd0\x19\x9a\x1e\xd8\xddr\x0e\xcf\xf8n\xe0Y\rq\x1fP:p\x92\xf2\xdbaB,v\xda\x84j\xc4.\x03\xb1>\x97\xee{\x99oSa\x00\x0f\xc6\x84\xd8\xdf\x0f\xb4e\xa7$\xfdE\xae\xde\xb1/\x1d\xfc\x96\x8a'
     print(cyan(decompress(b).decode()))
@@ -1816,9 +1953,9 @@ def log_in():
     order3['header']['wif'] = wif
     order3['header']['account_id'] = account_id
     order3['header']['account_name'] = account_name
-    print(' 1:buy, 2:sell, 3:cancel ')
+    print(' 1:buy, 2:cancel, 3:authenticate ')
     select = 0
-    while select not in [1,2,3]:
+    while select not in [1, 2, 3]:
         select = int(input('1, 2, or 3? '))
     if select == 1:
         order = order1
@@ -1828,7 +1965,6 @@ def log_in():
         order = order3
 
 def demo():
-
     # this is the backbone of events for the demo
     '''
     receive order
@@ -1910,7 +2046,7 @@ def demo():
 
 def main():
 
-    sample_orders() 
+    sample_orders()
     global_constants()
     global_variables()
     control_panel()
@@ -1920,4 +2056,3 @@ def main():
 if __name__ == "__main__":
 
     main()
-
