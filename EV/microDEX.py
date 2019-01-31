@@ -1,5 +1,7 @@
 
-' microDEX '
+#=======================================================================
+VERSION = 'Bitshares microDEX 0.00000022'
+#=======================================================================
 
 # Lightweight UI for Bitshares Decentralized Exchange
 
@@ -12,78 +14,53 @@ def WTFPL_v0_March_1765():
         except:
             return [tar, feathers]
 
+' ********** ALPHA RELEASE TO PUBLIC DOMAIN WITH NO WARRANTY ********* '
+
 # Standard Python Modules
 import os
 import sys
 import zlib
 import time
-import json
 import requests
 import traceback
 import numpy as np
 from tkinter import *
 from getpass import getpass
+from ast import literal_eval as literal # race read
+from random import random, shuffle, randint, choice
+from json import dumps as json_dumps
+from json import loads as json_loads
 from decimal import Decimal as decimal
-from ast import literal_eval as literal
-from random import random, shuffle, randint
 
-# Bitshares Modules
-try:
-    from bitshares import BitShares
-    from bitshares.market import Market
-    from bitshares.account import Account
-    from bitshares.blockchain import Blockchain
-except Exception as e:
-    print(str(e.args))
-    print('for installation please visit:')
-    print('https://github.com/litepresence/extinction-event/blob/master/README.md')
+# litepresence/extinction-event modules
+from manualSIGNING import broker, prototype_order
 
 DEV = False  # additional feedback
 COLOR = True  # black and white only in terminal
-SLOW_PING = 1.25  # switch nodes if laggy
-
-'''
-# Development tool for namespace object size
-try:
-    from pympler import asizeof
-
-    sizes = []
-    for name, obj in locals().items():
-        if name != 'asizeof':
-            sizes.append((name, (asizeof.asizeof(obj) / 1024)))
-    race_write(doc='sizes.txt', text=str(sizes))
-except:
-    pass
-'''
 
 # set default currency pair
 BitCURRENCY = 'OPEN.BTC'
 BitASSET = 'BTS'
 BitPAIR = BitASSET + ':' + BitCURRENCY
-PASS_PHRASE = ''
+wif = ''
 BEGIN = int(time.time())
-VERSION = 'v0.00000021-DEL'
-SATOSHI = 0.00000001
-ANTISAT = expiration = 1/SATOSHI
+SATOSHI = decimal(0.00000001)
+SIXSIG = decimal(0.999999)
+ANTISAT = 1 / SATOSHI
 
-# mainnet ID
+# bitshares mainnet chain ID
 ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 
 def red(text):
     return ('\033[91m' + text + '\033[0m') if COLOR else text
-
 def green(text):
     return ('\033[92m' + text + '\033[0m') if COLOR else text
-
 def yellow(text):
     return ('\033[93m' + text + '\033[0m') if COLOR else text
-
 def blue(text):
     return ('\033[94m' + text + '\033[0m') if COLOR else text
-
 def purple(text):
     return ('\033[95m' + text + '\033[0m') if COLOR else text
-
 def cyan(text):
     return ('\033[96m' + text + '\033[0m') if COLOR else text
 
@@ -104,6 +81,36 @@ def colors():
     gray2 = '#3f3f3f'
     gray3 = '#262626'
 
+def cancel_all():
+
+    global edicts
+    edicts = [{'op': 'cancel', 'ids': ['1.7.X']}]
+    order = json_loads(prototype_order())
+    order['header']['wif'] = wif
+    order['edicts'] = edicts
+    broker(order)
+    edicts = []
+
+def log_in():
+
+    global edicts
+    edicts = [{'op': 'login'}]
+    order = json_loads(prototype_order())
+    order['header']['wif'] = wif
+    order['edicts'] = edicts
+    authenticated = broker(order)
+    edicts = []
+    return authenticated
+
+def place_order():
+
+    global edicts
+    order = json_loads(prototype_order())
+    order['header']['wif'] = wif
+    order['edicts'] = edicts
+    broker(order)
+    edicts = []
+
 def elapsed(text=''):
     if DEV:
         global stopwatch
@@ -119,18 +126,13 @@ def msg_(e):  # traceback message
 def Bitshares_Trustless_Client():  # Your access to the metaNODE
     # Include this definition in your script to access metaNODE.txt
     # Deploy your bot script in the same folder as metaNODE.py
-    i = 0
-    while True:
-        time.sleep(0.05 * i ** 2)
-        i += 1
+    for i in range(10):
         try:
             with open('metaNODE.txt', 'r') as f:
                 ret = f.read()  # .replace("'",'"')
                 f.close()
-                metaNODE = json.loads(ret)
-                if metaNODE == {}:
-                    raise ValueError('metaNODE is blank')
-                break
+                metaNODE = json_loads(ret)
+                return metaNODE
         except Exception as e:
             msg = str(
                 time.ctime(
@@ -153,54 +155,45 @@ def Bitshares_Trustless_Client():  # Your access to the metaNODE
                 f.close()
             except:
                 pass
-    return metaNODE
+    raise
 
-def race_read(doc=''):  # Concurrent Read from File Operation
-
-    opened = 0
-    while not opened:
+def race_read(doc=''):
+    # Concurrent Read from File Operation
+    for i in range(10):
         try:
             with open(doc, 'r') as f:
-                # ret = json.loads(f.read())
+                # ret = json_loads(f.read())
                 ret = literal(f.read())
-                opened = 1
+                return ret
         except Exception as e:
             msg = (time.ctime() + str(type(e).__name__) + str(e.args))
             print('race_read ' + msg)
-            time.sleep(0.1)
             pass
-    return ret
-
-def race_append(doc='', text=''):  # Concurrent Append to File Operation
-
+    raise
+    
+def race_append(doc='', text=''):
+    # Concurrent Append to File Operation
     text = '\n' + str(time.ctime()) + ' ' + str(text) + '\n'
-    opened = 0
-    while not opened:
+    for i in range(10):
         try:
             with open(doc, 'a+') as f:
-
                 f.write(str(text))
-                opened = 1
+                return
         except Exception as e:
                 msg = (time.ctime() + str(type(e).__name__) + str(e.args))
                 print('race_append' + msg)
-                time.sleep(0.1)
                 pass
+    raise
 
-def race_write(doc='', text=''):  # Concurrent Write to File Operation
-
-    if not isinstance(text, str):
-        text = str(text)
-
-    i = 0
-    while True:
-        time.sleep(0.05 * i ** 2)
-        i += 1
+def race_write(doc='', text=''):
+    # Concurrent Write to File Operation
+    text = str(text)
+    for i in range(10):
         try:
             with open(doc, 'w+') as f:
                 f.write(text)
                 f.close()
-                break
+                return
         except Exception as e:
             msg = str(type(e).__name__) + str(e.args)
             if DEV:
@@ -215,99 +208,28 @@ def race_write(doc='', text=''):  # Concurrent Write to File Operation
                 f.close()
             except:
                 pass
-
-def reconnect():
-
-    global account, market, nodes, chain, pings
-    try:
-        history_text.delete("1.0", "end")
-        history_text.insert(END, '\n\n CONNECTING...')
-        master.update()
-    except:
-        pass
-    print(cyan(time.ctime() + ' CONNECTING...'))
-    start = time.time()
-
-    # create fresh websocket connection
-    connected = 0
-    while not connected:
-        # fetch fresh nodes list from subprocess and shuffle it
-        metaNODE = Bitshares_Trustless_Client()
-        nds = metaNODE['whitelist']
-        del metaNODE
-        if isinstance(nds, list):
-            nodes = nds
-        shuffle(nodes)
-        node = nodes[0]
-        print(green(node))
-        pings = [0]
-        try:
-            account = Account(USERNAME,
-                              bitshares_instance=BitShares(nodes,
-                                                           num_retries=2))
-            market = Market(BitPAIR,
-                            bitshares_instance=BitShares(nodes,
-                                                         num_retries=2),
-                            mode='head')
-            chain = Blockchain(
-                bitshares_instance=BitShares(nodes, num_retries=2), mode='head')
-            if chain.get_network()['chain_id'] != ID:
-                raise ValueError('Not Mainnet Chain')
-            connected = 1
-        except Exception as e:
-            try:
-                history_text.insert(END, '\n\n RECONNECTING...')
-                master.update()
-            except:
-                pass
-            msg = (time.ctime() + str(type(e).__name__) + str(e.args))
-            print('RECONNECTING ' + msg)
-            pass
-    try:
-        market.bitshares.wallet.unlock(PASS_PHRASE)
-    except:
-        # print('YOUR WALLET IS LOCKED')
-        pass
-    print('CONNECTION ELAPSED: ', ('%.1f' % (time.time() - start)))
+    raise
 
 def dex_buy():
 
     def buy(price, amount):
+        global edicts
         confirm.destroy()
-        print('CONFIRMED')
-        attempt = 1
-
-        while attempt:
-            try:
-                msg = market.buy(price, amount, expiration)
-
-                msg = (' BUY ' + str(amount) + ' of ' + str(BitPAIR) +
-                       ' @ ' + str(price) + '\n' + str(msg))
-                print (msg)
-                attempt = 0
-            except Exception as e:
-                msg = msg_(e)
-                race_append(doc='microDEX_log.txt', text=msg)
-                msg += (str(attempt) + ' ' + ' BUY FAILED, RECONNECTING '
-                        + str(nodes[0]) + ' ' + str(price) + ' ' + str(amount))
-                print(' BUY FAILED, RECONNECTING ', msg)
-                race_append(doc='microDEX_log.txt', text=msg)
-                reconnect()
-                attempt += 1
-                if attempt > 10:
-                    print('BUY ABORTED')
-                    return
-                pass
-        race_append(doc='microDEX_log.txt', text=msg)
+        account_state()
+        edicts = [{'op': 'buy',
+                   'price': price,
+                   'amount': amount,
+                   'expiration': 0}]
+        place_order()
 
     print(green('*** BUY ***'))
     metaNODE = Bitshares_Trustless_Client()
     currency = metaNODE['currency']
-    currency_balance = metaNODE['currency_balance']
+    currency_balance = decimal(metaNODE['currency_balance'])
     del metaNODE
     # interact with tkinter
     confirm = Tk()
-    if market.bitshares.wallet.unlocked():
+    if authenticated:
         #
         # gather the price and amount from tkinter gui
         price = buy_price.get()
@@ -319,13 +241,13 @@ def dex_buy():
                 raise ValueError('No Amount Specified')
             # convert pricing to ultra precision decimal
             price = decimal(price)
-            # convert amounts to float; should already be
-            amount = float(amount)
+            # convert amounts to decimal; should already be
+            amount = decimal(amount)
             # do not spend your last bitshare
             if currency == 'BTS':
-                currency_balance = currency_balance - 1
+                currency_balance -= 2
             # limit buy amount to means given currency in hand and price
-            means = 0.998 * currency_balance / float(price)
+            means = SIXSIG * currency_balance / decimal(price)
             if amount > means:
                 amount = means
             #
@@ -371,7 +293,7 @@ def dex_buy():
             if str(type(e).__name__) == 'NumRetriesReached()':
                 confirm.title('LOST CONNECTION, TRY AGAIN')
                 print(yellow('LOST CONNECTION, TRY AGAIN'))
-                reconnect()
+
             else:
                 confirm.title('INVALID BUY ORDER')
                 print(yellow('INVALID BUY ORDER'))
@@ -403,42 +325,26 @@ def dex_buy():
 def dex_sell():
 
     def sell(price, amount):
+        global edicts
         confirm.destroy()
-        print('CONFIRMED')
-        attempt = 1
-        while attempt:
-            try:
-                msg = market.sell(price, amount, expiration)
-                msg = (' SELL ' + str(amount) + ' of ' + str(BitPAIR) +
-                       ' @ ' + str(price) + '\n' + str(msg))
-                print (msg)
-                attempt = 0
-            except Exception as e:
-                msg = msg_(e)
-                race_append(doc='microDEX_log.txt', text=msg)
-                msg += (str(attempt) + ' ' + ' SELL FAILED, RECONNECTING '
-                        + str(nodes[0]) + ' ' + str(price) + ' ' + str(amount))
-                print(' SELL FAILED, RECONNECTING ', msg)
-                race_append(doc='microDEX_log.txt', text=msg)
-                reconnect()
-                attempt += 1
-                if attempt > 10:
-                    print('SELL ABORTED')
-                    return
-                pass
-        race_append(doc='microDEX_log.txt', text=msg)
+        account_state()
+        edicts = [{'op': 'sell',
+                   'price': price,
+                   'amount': amount,
+                   'expiration': 0}]
+        place_order()
 
     print(red('*** SELL ***'))
 
     metaNODE = Bitshares_Trustless_Client()
-    bts_balance = metaNODE['bts_balance']
-    asset_balance = metaNODE['asset_balance']
+    bts_balance = decimal(metaNODE['bts_balance'])
+    asset_balance = decimal(metaNODE['asset_balance'])
     asset = metaNODE['asset']
     del metaNODE
 
     # interact with tkinter confirm sell widget
     confirm = Tk()
-    if market.bitshares.wallet.unlocked():
+    if authenticated:  
         price = sell_price.get()
         amount = sell_amount.get()
         # retain the last bitshare
@@ -448,12 +354,11 @@ def dex_sell():
             if amount == '':
                 raise ValueError('No Amount Specified')
             if asset == 'BTS':
-                if float(amount) > (bts_balance - 1):
-                    amount = (bts_balance - 1)
+                asset_balance -= 2
             price = decimal(price)
-            amount = float(amount)
-            if amount > (0.998 * asset_balance):
-                amount = 0.998 * asset_balance
+            amount = decimal(amount)
+            if amount > (SIXSIG * asset_balance):
+                amount = SIXSIG * asset_balance
             sprice = str(price)[:16]
             samount = str(amount)[:16]
             sorder = str(
@@ -497,7 +402,7 @@ def dex_sell():
             if str(type(e).__name__) == 'NumRetriesReached()':
                 confirm.title('LOST CONNECTION, TRY AGAIN')
                 print(yellow('LOST CONNECTION, TRY AGAIN'))
-                reconnect()
+
             confirm.title('INVALID SELL ORDER')
             print(yellow('INVALID SELL ORDER'))
 
@@ -530,40 +435,15 @@ def dex_cancel():
     orders = metaNODE['orders']
     del metaNODE
 
-    def cancel(market):
+    def cancel():
         confirm.destroy()
-        print('CONFIRMED')
-        attempt = 1
-        metaNODE = Bitshares_Trustless_Client()
-        orders = metaNODE['orders']
-        del metaNODE
-
-        o = orders[:]
-        while len(o):
-            order_list = []
-            for order in orders:
-                order_list.append(order['orderNumber'])
-            try:
-                msg = market.cancel(order_list)
-                msg = (' CANCEL ' + str(order_list) + ' of ' +
-                       str(BitPAIR) + '\n' + str(msg))
-                print (msg)
-
-            except Exception as e:
-                msg = msg_(e)
-                race_append(doc='microDEX_log.txt', text=msg)
-                msg += (' CANCEL FAILED, RECONNECTING ' + str(nodes[0]))
-                print(' CANCEL FAILED, RECONNECTING ')
-                race_append(doc='microDEX_log.txt', text=msg)
-                reconnect()
-                pass
-            o = market.accountopenorders()
-        race_append(doc='microDEX_log.txt', text=msg)
+        account_state()
+        cancel_all()
 
     # interact with tkinter
     confirm = Tk()
     if len(orders):
-        if market.bitshares.wallet.unlocked():
+        if authenticated:
             if len(orders) > 1:
                 title = str(len(orders)) + ' ORDERS TO CANCEL'
             else:
@@ -573,7 +453,7 @@ def dex_cancel():
             Button(
                 confirm,
                 text='CONFIRM CANCEL ALL',
-                command=lambda: cancel(market)).grid(
+                command=cancel).grid( #lambda: cancel(market)).grid(
                 row=1,
                 column=0,
                 pady=8)
@@ -614,56 +494,65 @@ def dex_cancel():
 def dex_auth_gui():
 
     # unlock wallet from gui
-    global lock, PASS_PHRASE
-    PASS_PHRASE = str(login.get())
+    global lock, wif, authenticated
+    wif = str(login.get())
     login.delete(0, END)
     print(blue('LOCK/UNLOCK WALLET'))
-    try:
-        market.bitshares.wallet.unlock(PASS_PHRASE)
-        lock.set('AUTHENTICATED')
+    authenticated = False
+    if wif:
+        try:
+            authenticated = log_in()
+        except:
+            pass
+    if authenticated:
         print(red('*****************'))
         print(red('**AUTHENTICATED**'))
         print(red('*****************'))
-    except Exception as e:
-        print(type(e).__name__)
-        market.bitshares.wallet.lock()
-        lock.set('WALLET IS UNLOCKED')
-        print(yellow('WALLET LOCKED'))
-        pass
+    else:
+        wif = ''
+        print(yellow('WALLET IS LOCKED'))
+
+def account_state():
+
+    print( ' ASSETS: ' + (ap % asset_balance).rjust(12, ' ') +
+        '         CURRENCY: ' + (cp % currency_balance).rjust(12, ' ') +
+        '                BITSHARES: ' + ('%.2f' % bts_balance))
+
+    print( ' ORDERS: ' +
+        (ap % sell_orders).rjust(12, ' ') +
+        '                   ' +
+        (cp % buy_orders).rjust(12, ' '))
+
+    print( '  TOTAL: ' +
+        (ap % asset_total).rjust(12, ' ') +
+        ' ' + (str(invested) + ' %').ljust(7, ' ') +
+        '           ' +
+        (cp % currency_total).rjust(12, ' ') +
+        ' ' + str(divested).ljust(4, ' '))
+
+    print( '    MAX: ' +
+        (ap % asset_value).rjust(12, ' ') + ' ' +
+        asset.ljust(10, ' ') +
+        '        ' +
+        (cp % currency_value).rjust(12, ' ') + ' ' +
+        currency.ljust(10, ' '))
 
 def update():
 
-    global ping, update_id, pings
+    global ping, update_id, pings, asset, currency
+    global asset_total, currency_total, asset_value, currency_value
+    global buy_orders, sell_orders, ap, cp, invested, divested
+    global asset_balance, currency_balance, bts_balance
+
     elapsed('begin')
     complete = 0
-    if update_id % 8 == 0:
+    if update_id % 4 == 0:
         while not complete:
             try:
-                trade_node = nodes[0].replace(
-                    'wss://',
-                    '').replace('/wss',
-                                '').replace('/ws',
-                                            '')
-                if update_id % 80 == 0:
-                    start = time.time()
-                    chain.get_network()['chain_id']
-                    chain_id = chain.get_network()['chain_id']
-                    if chain_id != ID:
-                        raise ValueError('INVALID CHAIN: ' + chain_id)
-                    ping = time.time() - start
-                pings.append(ping)
-                depth = 6
-                pings = pings[-depth:]
-                ping = sum(pings) / len(pings)
-                if ping > SLOW_PING:
-                    raise ValueError('SLOW PING: %.3f' % ping)
-                if len(pings) == (depth - 1):
-                    print('PING: %.3f' % (ping * depth / (depth - 1)))
-                elapsed('ping')
                 metaNODE = Bitshares_Trustless_Client()
                 elapsed('metaNODE')
                 # localize metaNODE data
-                data_node = metaNODE['whitelist'][0].replace(
+                data_node = choice(metaNODE['whitelist']).replace(
                     'wss://',
                     '').replace('/wss',
                                 '').replace('/ws',
@@ -684,6 +573,7 @@ def update():
                 sell_orders = metaNODE['sell_orders']
                 invested = metaNODE['invested']
                 divested = metaNODE['divested']
+                ping = metaNODE['ping']
                 # metaNODE dict is large, best to delete object when done
                 del metaNODE
 
@@ -723,7 +613,6 @@ def update():
                 elapsed('format data')
             except Exception as e:
                 print(e)
-                reconnect()
                 elapsed('reconnect')
                 continue
 
@@ -732,11 +621,9 @@ def update():
             END,
             ('     ' + time.ctime() + '    microDEX - Bishares Minimalist UI\n\n'))
         header_text.insert(
-            END, ('               MEAN PING ' + ('%.3f' %
-                                                 ping) + '  ' + trade_node + '\n'))
+            END, ('                    PING %.3f %s \n'% (ping, data_node)))
         header_text.insert(
-            END,
-            ('            DATA LATENCY ' + latency + '  ' + data_node + '\n'))
+            END, ('\n'))
         header_text.insert(
             END,
             ('                    LAST ' + slast + '     ' +
@@ -809,13 +696,15 @@ def update():
                             currency.ljust(10, ' '))
         master.update()
         elapsed('account')
-
         lock = StringVar()
-        lock.set('AUTHENTICATED')
-        lock_color = red1
-        if market.bitshares.wallet.locked():
+
+        if authenticated:
+            lock.set('AUTHENTICATED')
+            lock_color = red1
+        else:
             lock.set('WALLET LOCKED')
             lock_color = blue1
+
         Label(
             master,
             textvariable=lock,
@@ -828,28 +717,22 @@ def update():
         elapsed('locked')
     update_id += 1
 
-    master.after(100, update)
+    master.after(200, update)
 
 def invalidate(confirm):
     confirm.destroy()
     print(blue('MANUALLY INVALIDATED'))
 
-def switch():
-
-    print(blue('MANUALLY SWITCHING NODES...'))
-    reconnect()
-
 def main():
 
-    global stopwatch, USERNAME, BitPAIR, PASS_PHRASE
+    global stopwatch, USERNAME, BitPAIR, wif
     global master, lock
     global header_text, bid_text, ask_text, history_text, orders_text
     global update_id, ping, pings, account_text
-    global account, market, nodes, chain
+    global nodes, authenticated
     global buy_price, buy_amount, sell_price, sell_amount, login
 
     colors()
-
     race_write(doc='microDEX_log.txt', text=time.ctime())
     stopwatch = time.time()
 
@@ -870,7 +753,7 @@ def main():
       (_/\/\_)(____)\___)(_)\_) \___/ (______.'(________|(____)(____)
     ===================================================================
           '''))
-    print(cyan('           Bitshares Minimalist UI ' + VERSION))
+    print(cyan('                                   ' + VERSION))
     print(blue('''
     ===================================================================
           '''))
@@ -880,9 +763,10 @@ def main():
     try:
         metaNODE = Bitshares_Trustless_Client()
         nodes = metaNODE['whitelist']
-        account_name = metaNODE['account_name']
+        USERNAME = metaNODE['account_name']
         asset = metaNODE['asset']
         currency = metaNODE['currency']
+        account_id = metaNODE['account_id']
         del metaNODE
         print('')
         print('      metaNODE = Bitshares_Trustless_Client()')
@@ -897,85 +781,55 @@ def main():
     print('')
     print(cyan('CONNECTING to DEX account...'))
     print('')
-
-    valid = 0
-    while not valid:
-        try:
-            USERNAME = account_name
-            account = Account(
-                USERNAME,
-                bitshares_instance=BitShares(
-                    nodes,
-                    num_retries=5))
-            valid = 1
-        except Exception as e:
-            print (type(e).__name__, 'try again...')
-            pass
-    print('      Welcome Back: ', green(USERNAME), blue(str(account)))
+    print('      Welcome Back: ', green(USERNAME), blue(str(account_id)))
     print('')
     print(cyan('CONNECTING to DEX market...'))
-    valid = 0
-    while not valid:
-        try:
-            BitPAIR = asset + ':' + currency
-            BitASSET = BitPAIR.split(':')[0]
-            BitCURRENCY = BitPAIR.split(':')[1]
-            market = Market(
-                BitPAIR,
-                bitshares_instance=BitShares(
-                    nodes,
-                    num_retries=5),
-                mode='head')
-            valid = 1
-        except Exception as e:
-            print (type(e).__name__, 'try again...')
-            pass
+    BitPAIR = asset + ':' + currency
+    BitASSET = BitPAIR.split(':')[0]
+    BitCURRENCY = BitPAIR.split(':')[1]
     print('')
     print('   You are Trading: ', green(BitPAIR))
     print('')
     print(yellow(
         'Enter PASS PHRASE below to AUTHENTICATE or press ENTER to skip'))
     print(red(' YOU SHOULD UNDERSTAND THE SCRIPT BEFORE ENTERING PASS PHRASE'))
-
     print('')
     valid = 0
     default = ''
+    authenticated = False
     while not valid:
         try:
-            PASS_PHRASE = getpass(prompt='       PASS PHRASE: ') or default
+            wif = getpass(prompt='               wif: ') or default
             print(
-                "\033[F       PASS PHRASE: " + green(
+                "\033[F              wif: " + green(
                     '********************************'))
-            if PASS_PHRASE != '':
+            if wif:
                 print('')
                 print(cyan('AUTHENTICATING to DEX wallet...'))
-                market.bitshares.wallet.unlock(PASS_PHRASE)
-                print('')
-                print(red('*****************'))
-                print(red('**AUTHENTICATED**') +
-                      yellow(' YOUR WALLET IS UNLOCKED'))
-                print(red('*****************'))
-                valid = 1
+                try:
+                    authenticated = log_in()
+                except Exception as e:
+                    trace(e)
+                    pass
+                if authenticated:
+                    print('')
+                    print(red('*****************'))
+                    print(red('**AUTHENTICATED**') +
+                          yellow(' YOUR WALLET IS UNLOCKED'))
+                    print(red('*****************'))
+                    valid = 1
+                else:
+                    wif = ''
+                    print(yellow('wif DOES NOT MATCH USERNAME'))
+                    valid = 0
             else:
                 print('')
                 print(yellow('SKIP AUTHENTICATION - YOUR WALLET IS LOCKED'))
                 valid = 1
         except Exception as e:
-            print (type(e).__name__, 'try again...')
+            print(msg_(e))
             pass
-    time.sleep(0.3)
-    print('')
-    print(
-        cyan('VALIDATING mainnet DEX chain...'))
-    print('')
-    chain = Blockchain(
-        bitshares_instance=BitShares(nodes, num_retries=5), mode='head')
-    chain_id = chain.get_network()['chain_id']
-    if chain_id != ID:
-        print(cyan('INVALID CHAIN reconnecting...'))
-        reconnect()
-    print(' BITSHARES MAINNET: ', blue(chain_id))
-    print('')
+
     time.sleep(0.3)
     print(cyan('LAUNCHING microDEX user interface...'))
 
@@ -986,26 +840,26 @@ def main():
 
     elapsed('master')
     lock = StringVar()
-    lock.set('AUTHENTICATED')
-    if market.bitshares.wallet.locked():
-        lock.set('WALLET LOCKED')
+    lock.set('WALLET LOCKED')
+    if authenticated:
+        lock.set('AUTHENTICATED')
     elapsed('lock')
 
-    header_text = Text(master, height=5, width=90, fg=blue2, bg=gray3)
+    header_text = Text(master, height=5, width=90, fg=blue2, bg=gray3, wrap=NONE)
     header_text.insert(END, '')
     header_text.grid(row=0, column=0, columnspan=4)
 
-    bid_text = Text(master, height=30, width=45, fg=green1, bg=gray3)
+    bid_text = Text(master, height=30, width=45, fg=green1, bg=gray3, wrap=NONE)
     bid_text.insert(END, '')
     bid_text.grid(row=1, column=0, columnspan=2)
     bid_text.tag_configure("right", justify="right")
     bid_text.tag_configure("left", justify="left")
 
-    ask_text = Text(master, height=30, width=45, fg=red1, bg=gray3)
+    ask_text = Text(master, height=30, width=45, fg=red1, bg=gray3, wrap=NONE)
     ask_text.insert(END, '')
     ask_text.grid(row=1, column=2, columnspan=2)
 
-    orders_text = Text(master, height=11, width=45, fg=yellow1, bg=gray3)
+    orders_text = Text(master, height=11, width=45, fg=yellow1, bg=gray3, wrap=NONE)
     orders_text.insert(END, '')
     orders_text.grid(row=2, column=0, columnspan=2)
 
@@ -1014,11 +868,11 @@ def main():
         height=11,
         width=45,
         fg=gray1,
-        bg=gray3)
+        bg=gray3, wrap=NONE)
     history_text.insert(END, '')
     history_text.grid(row=2, column=2, columnspan=2)
 
-    account_text = Text(master, height=4, width=90, fg=blue1, bg=gray3)
+    account_text = Text(master, height=4, width=90, fg=blue1, bg=gray3, wrap=NONE)
     account_text.insert(END, '')
     account_text.grid(row=3, columnspan=4)
 
@@ -1070,7 +924,7 @@ def main():
 
     try:
         # add bitshares logo to gui via imgur
-        def downloadImage(imageUrl, localFileName):
+        def download_img(imageUrl, localFileName):
             response = requests.get(imageUrl)
             with open(localFileName, 'wb') as fo:
                 for chunk in response.iter_content(4096):
@@ -1078,14 +932,13 @@ def main():
         try:
             photo = PhotoImage(file="bitshares_logo.gif")
         except:
-            downloadImage(
+            download_img(
                 'https://i.imgur.com/fvCE86Z.gif',
                 'bitshares_logo.gif')
             photo = PhotoImage(file="bitshares_logo.gif")
         label = Label(image=photo)
         label.image = photo
         label.grid(row=0, column=3, sticky=E)
-
     except:
         pass
 
@@ -1105,7 +958,11 @@ def main():
     Button(
         master,
         text='BUY',
-        command=dex_buy, fg=gray1, bg=gray3, activebackground=green2, highlightbackground=green1).grid(
+        command=dex_buy,
+        fg=gray1,
+        bg=gray3,
+        activebackground=green2,
+        highlightbackground=green1).grid(
         row=7,
         column=1,
         # sticky=E,
@@ -1113,7 +970,11 @@ def main():
     Button(
         master,
         text='SELL',
-        command=dex_sell, fg=gray1, bg=gray3, activebackground=red2, highlightbackground=red1).grid(
+        command=dex_sell,
+        fg=gray1,
+        bg=gray3,
+        activebackground=red2,
+        highlightbackground=red1).grid(
         row=7,
         column=3,
         # sticky=E,
@@ -1135,15 +996,7 @@ def main():
         sticky=E,
         pady=4)
     elapsed('button')
-    Button(
-        master,
-        text='SWITCH NODE',
-        command=switch, fg=gray1, bg=gray3, activebackground=blue2, highlightbackground=blue1).grid(
-        row=8,
-        column=3,
-        sticky=E,
-        pady=4)
-    elapsed('button')
+
 
     update_id = 0
     ping = 0
@@ -1158,7 +1011,7 @@ def main():
     print('')
 
     master.geometry('+9999+9999')
-    master.after(1, update)
+    master.after(0, update)
     master.mainloop()
 
 if __name__ == "__main__":
