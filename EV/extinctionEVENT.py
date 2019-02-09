@@ -1,6 +1,6 @@
 
 #=======================================================================
-VERSION = 'Bitshares extinctionEVENT v0.00000008'
+VERSION = 'Bitshares extinctionEVENT v0.00000009'
 #=======================================================================
 
 # Algorithmic Trading and Backtesting Platform
@@ -151,7 +151,6 @@ def tune_install():  # Basic User Controls
     BULL_STOP = 1
     BEAR_STOP = 1
 
-
 def control_panel():  # Advanced User Controls
 
     global LIVE, CURRENCY, ASSET, MA1, MA2, MA3, MA4, SCALP_PIECES
@@ -193,15 +192,14 @@ def control_panel():  # Advanced User Controls
     MIN_AMOUNT = 10
 
     # scalp thresholds
-    # ENTER OWN RISK &&&&
-    SCALP = True         # maintain market maker iceberg margins
-    SCALP_PIECES = 2     # number of pieces to break up scalp orders
-    SCALP_FUND = 0.1     # 0.10 = 10% of holdings reserved for scalping
-    SCALP_FUND_QTY = 0.1 # 0.10 = 10% of scalp fund on books per tick
-    SCALP_SPREAD = 0.1   # 0.10 = disable scalping outer 10% of market
-    MIN_MARGIN = 0.005   # about 0.005
-    MA3 = 0.300          # about 0.300
-    MA4 = 0.166          # about 0.166
+    SCALP = True          # maintain iceberg margins
+    SCALP_PIECES = 2      # number of pieces to break up scalp orders
+    SCALP_FUND = 0.1      # 0.10 = 10% of holdings reserved for scalping
+    SCALP_FUND_QTY = 0.3  # 0.10 = 10% of scalp fund on books per tick
+    SCALP_SPREAD = 0.1    # 0.10 = disable scalping outer 10% of market
+    MIN_MARGIN = 0.005    # about 0.005
+    MA3 = 0.300           # about 0.300
+    MA4 = 0.166           # about 0.166
 
     # force buy/sell thresholds manually
     MANUAL_OVERRIDE = False
@@ -209,7 +207,7 @@ def control_panel():  # Advanced User Controls
     MANUAL_SELL = ANTISAT
 
     # override tune_install() thresholds conservatively by 0.01 = 1%
-    GRAVITAS = 0.04
+    GRAVITAS = 0.01
 
     # Manual Override Alpha State when live
     FORCE_ALPHA = False  # Options: ( False, 'BULL', 'BEAR' )
@@ -790,7 +788,10 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
                 # print (params)
                 # print (headers)
 
-                ret = requests.get(uri, params=params, headers=headers).json()
+                ret = requests.get( uri,
+                                    params=params,
+                                    headers=headers,
+                                    timeout=(6,30)).json()
                 d = ret['Data']
                 # print(params)
                 # print(ret)
@@ -805,7 +806,8 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
                     ret = requests.get(
                         uri,
                         params=params,
-                        headers=headers).json(
+                        headers=headers,
+                        timeout=(6,30)).json(
                     )
                     d = ret['Data']
                     clean_d2 = [i for i in d if i['close'] > 0]
@@ -822,7 +824,7 @@ def chartdata2(pair, start, stop, period):  # Public API cryptocompare
                 print('invalid period')
                 return None
         except Exception as e:
-            msg = msg_(e)
+            msg = trace(e)
             race_append(doc='EV_log.txt', text=msg)
             print (msg, 'chartdata() failed; try again...')
             plt.pause(1)
@@ -839,7 +841,10 @@ def cryptocompare_last():  # CEX last price
             uri = 'https://min-api.cryptocompare.com/data/pricemultifull'
             params = {'fsyms': ASSET, 'tsyms': CURRENCY}
             headers = {'Apikey': CC_API_KEY}
-            ret = requests.get(uri, params=params, headers=headers).json()
+            ret = requests.get( uri,
+                                params=params,
+                                headers=headers,
+                                timeout=(6,30)).json()
             raw = ret['RAW'][ASSET][CURRENCY]
             del ret
             price = float(raw['PRICE'])
@@ -850,7 +855,7 @@ def cryptocompare_last():  # CEX last price
             print(('cex_rate latency    :', ('%.2f' % latency)))
             return price, volume, latency
         except Exception as e:
-            msg = msg_(e)
+            msg = trace(e)
             race_append(doc='EV_log.txt', text=msg)
             print ('cryptocompare_last() failed; try again...')
             plt.pause(1)
@@ -954,187 +959,192 @@ def live():  # Primary live event loop
             info['tick'] += 1
 
         else:
-            plt.pause(0.05)
-            print('')
-            print('RUNTIME: %s' % (info['current_time'] - info['begin']))
-            print('')
-            print('WATCHDOG LATENCY:', watchdog())
-            print('')
-            # RAISE ALARM
-            if attempt > 2:
-                time_msg = datetime.fromtimestamp(
-                    now).strftime('%H:%M')
-                print(
-                    ('%s FAIL @@@@@@@ ATTEMPT: %s %s' %
-                     (msg, attempt, time_msg)))
-            # GATHER AND POST PROCESS DATA
-            start = time.time()
             try:
                 plt.pause(0.05)
-                price, volume, latency = cryptocompare_last()
-                storage['cc_last'] = {
-                    'price': price, 'volume': volume, 'latency': latency}
-            except Exception as e:
-                msg += msg_(e) + 'cryptocompare_last() '
-                attempt += 1
-                continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            try:
-                plt.pause(0.05)
-                live_data()
-            except Exception as e:
-                msg += msg_(e) + 'live_data() '
-                attempt += 1
-                continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            try:
-                plt.pause(0.05)
-                indicators()
-            except Exception as e:
-                msg += msg_(e) + 'indicators() '
-                attempt += 1
-                continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            try:
-                plt.pause(0.05)
-                polynomial_regression()
-            except Exception as e:
-                msg += msg_(e) + 'polynomial_regression() '
-                attempt += 1
-                continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            try:
-                plt.pause(0.05)
-                state_machine()
-            except Exception as e:
-                msg += msg_(e) + 'state_machine() '
-                attempt += 1
-                continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            # LOWER FREQENCY EVENTS
-            plt.pause(0.05)
-            check_hour = (info['current_time'] - info['begin']) / 3600.0
-            if check_hour > info['hour']:
-
+                print('')
+                print('RUNTIME: %s' % (info['current_time'] - info['begin']))
+                print('')
+                print('WATCHDOG LATENCY:', watchdog())
+                print('')
+                # RAISE ALARM
+                if attempt > 2:
+                    time_msg = datetime.fromtimestamp(
+                        now).strftime('%H:%M')
+                    print(
+                        ('%s FAIL @@@@@@@ ATTEMPT: %s %s' %
+                         (msg, attempt, time_msg)))
+                # GATHER AND POST PROCESS DATA
+                start = time.time()
                 try:
-                    hourly()
-                    info['hour'] += 1
+                    plt.pause(0.05)
+                    price, volume, latency = cryptocompare_last()
+                    storage['cc_last'] = {
+                        'price': price, 'volume': volume, 'latency': latency}
                 except Exception as e:
-                    msg += msg_(e) + 'hourly() '
-                    attempt += 1
-                    continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            check_day = (info['current_time'] - info['begin']) / 86400.0
-            if check_day > info['day']:
-                try:
-                    daily()
-                    info['day'] += 1
-                except Exception as e:
-                    msg += msg_(e) + 'daily() '
-                    attempt += 1
-                    continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            # CANCEL ALL OUTSTANDING ORDERS IN THIS MARKET
-            # resets global edicts list with cancel all
-            cancel_all()
-            plt.pause(3) # allow acct balance to update on dex
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            # MAINTAIN 1 BITSHARE FOR FEES
-            plt.pause(0.05)
-            try:
-                fee_maintainer()
-            except Exception as e:
-                msg += msg_(e) + 'fee_maintainer() '
-                attempt += 1
-                continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            if 1.02 * storage['buying'] < price < 0.98 * storage['selling']:
-                # SCALP OPS
-                plt.pause(0.01)
-                try:
-                    scalp()
-                except Exception as e:
-                    msg += msg_(e) + 'scalp() '
-                    attempt += 1
-                    continue
-                # TRADE OPS
-                plt.pause(0.01)
-                try:
-                    trade()
-                except Exception as e:
-                    msg += msg_(e) + 'trade() '
+                    msg += trace(e) + 'cryptocompare_last() '
                     attempt += 1
                     continue
                 print('elapsed: %.3f' % (time.time()-start))
                 start = time.time()
-            else:
-                # TRADE OPS
-                plt.pause(0.01)
                 try:
-                    trade()
+                    plt.pause(0.05)
+                    live_data()
                 except Exception as e:
-                    msg += msg_(e) + 'trade() '
+                    msg += trace(e) + 'live_data() '
                     attempt += 1
                     continue
-                # SCALP OPS
-                plt.pause(0.01)
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
                 try:
-                    scalp()
+                    plt.pause(0.05)
+                    indicators()
                 except Exception as e:
-                    msg += msg_(e) + 'scalp() '
+                    msg += trace(e) + 'indicators() '
+                    attempt += 1
+                    continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+                try:
+                    plt.pause(0.05)
+                    polynomial_regression()
+                except Exception as e:
+                    msg += trace(e) + 'polynomial_regression() '
+                    attempt += 1
+                    continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+                try:
+                    plt.pause(0.05)
+                    state_machine()
+                except Exception as e:
+                    msg += trace(e) + 'state_machine() '
+                    attempt += 1
+                    continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+                # LOWER FREQENCY EVENTS
+                plt.pause(0.05)
+                check_hour = (info['current_time'] - info['begin']) / 3600.0
+                if check_hour > info['hour']:
+
+                    try:
+                        hourly()
+                        info['hour'] += 1
+                    except Exception as e:
+                        msg += trace(e) + 'hourly() '
+                        attempt += 1
+                        continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+                check_day = (info['current_time'] - info['begin']) / 86400.0
+                if check_day > info['day']:
+                    try:
+                        daily()
+                        info['day'] += 1
+                    except Exception as e:
+                        msg += trace(e) + 'daily() '
+                        attempt += 1
+                        continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+                # CANCEL ALL OUTSTANDING ORDERS IN THIS MARKET
+                # resets global edicts list with cancel all
+                cancel_all()
+                plt.pause(3) # allow acct balance to update on dex
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+                # MAINTAIN 1 BITSHARE FOR FEES
+                plt.pause(0.05)
+                try:
+                    fee_maintainer()
+                except Exception as e:
+                    msg += trace(e) + 'fee_maintainer() '
+                    attempt += 1
+                    continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+                if 1.02 * storage['buying'] < price < 0.98 * storage['selling']:
+                    # SCALP OPS
+                    plt.pause(0.01)
+                    try:
+                        scalp()
+                    except Exception as e:
+                        msg += trace(e) + 'scalp() '
+                        attempt += 1
+                        continue
+                    # TRADE OPS
+                    plt.pause(0.01)
+                    try:
+                        trade()
+                    except Exception as e:
+                        msg += trace(e) + 'trade() '
+                        attempt += 1
+                        continue
+                    print('elapsed: %.3f' % (time.time()-start))
+                    start = time.time()
+                else:
+                    # TRADE OPS
+                    plt.pause(0.01)
+                    try:
+                        trade()
+                    except Exception as e:
+                        msg += trace(e) + 'trade() '
+                        attempt += 1
+                        continue
+                    # SCALP OPS
+                    plt.pause(0.01)
+                    try:
+                        scalp()
+                    except Exception as e:
+                        msg += trace(e) + 'scalp() '
+                        attempt += 1
+                        continue
+                    print('elapsed: %.3f' % (time.time()-start))
+                    start = time.time()
+
+                order = json_loads(prototype_order())
+                order['header']['wif'] = wif
+                order['edicts'] = edicts
+                broker(order)
+
+                # PLOT
+                plt.pause(0.05)
+                try:
+                    live_chart()
+                except Exception as e:
+                    msg += trace(e) + 'live_chart() '
+                    attempt += 1
+                    continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+                try:
+                    plot_format()
+                except Exception as e:
+                    msg += trace(e) + 'plot_format() '
+                    attempt += 1
+                    continue
+                print('elapsed: %.3f' % (time.time()-start))
+                start = time.time()
+                try:
+                    live_plot()
+                except Exception as e:
+                    msg += trace(e) + 'live_plot() '
                     attempt += 1
                     continue
                 print('elapsed: %.3f' % (time.time()-start))
                 start = time.time()
 
-            order = json_loads(prototype_order())
-            order['header']['wif'] = wif
-            order['edicts'] = edicts
-            broker(order)
+                # END PRIMARY TICK
+                plt.pause(0.05)
+                msg = ''
+                print('tick', info['tick'])
+                info['tick'] += 1
+                info['completion_time'] = int(time.time())
+                attempt = 0
+            except Exception as e:
+                trace(e)
+                continue
 
-            # PLOT
-            plt.pause(0.05)
-            try:
-                live_chart()
-            except Exception as e:
-                msg += msg_(e) + 'live_chart() '
-                attempt += 1
-                continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            try:
-                plot_format()
-            except Exception as e:
-                msg += msg_(e) + 'plot_format() '
-                attempt += 1
-                continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-            try:
-                live_plot()
-            except Exception as e:
-                msg += msg_(e) + 'live_plot() '
-                attempt += 1
-                continue
-            print('elapsed: %.3f' % (time.time()-start))
-            start = time.time()
-
-            # END PRIMARY TICK
-            plt.pause(0.05)
-            msg = ''
-            print('tick', info['tick'])
-            info['tick'] += 1
-            info['completion_time'] = int(time.time())
-            attempt = 0
 
 def set_timing(tick_size):  # Limits live tick interval (seconds)
 
@@ -1261,8 +1271,8 @@ def scalp():  # Initiate secondary order placement
     scalp_resistance = offset * max(high, ma3, ma4)
     scalp_support = offset * min(low, ma3, ma4)
     # expand scalp ops to dex just inside market bid/ask
-    scalp_resistance = max(scalp_resistance, 0.99999 * ask_p)
-    scalp_support = min(scalp_support, 1.000001 * bid_p)
+    scalp_resistance = max(scalp_resistance, 0.999999999 * ask_p)
+    scalp_support = min(scalp_support, 1.000000001 * bid_p)
 
     # adjust scalp margins if too thin
     scalp_margin = (scalp_resistance - scalp_support) / scalp_support
@@ -1275,14 +1285,18 @@ def scalp():  # Initiate secondary order placement
     scalp_spread = market_spread * SCALP_SPREAD
     max_scalp_buy = selling - scalp_spread
     min_scalp_sell = buying + scalp_spread
+    # go all in / all out if outside alpha market channel
     if scalp_support < buying:
         scalp_support = buying
+    if scalp_resistance > selling:
+        scalp_resistance = selling
+    # rattle the volatility on top and bottom of the alpha channel
     if scalp_support > max_scalp_buy:
         scalp_support = max_scalp_buy
-    if scalp_resistance > selling:
         scalp_resistance = selling
     if scalp_resistance < min_scalp_sell:
         scalp_resistance = min_scalp_sell
+        scalp_support = buying
     # assure support under resistance
     if scalp_support > scalp_resistance:
         print('skip scalp, calculation error')
@@ -2686,7 +2700,7 @@ def print_tune():  # Display input thresholds
 # DIAGNOSTICS
 # ======================================================================
 
-def msg_(e):  # traceback message
+def trace(e):  # traceback message
     print(
         '                                                                 !@#$%^&*(){}[]{}()*&^%$#@!')
     print('send questions, comments, and pastebin of pertinent logs')
