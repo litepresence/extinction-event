@@ -1,6 +1,6 @@
 
 #=======================================================================
-VERSION = 'Bitshares manualSIGNING 0.00000004'
+VERSION = 'Bitshares manualSIGNING 0.00000005'
 #=======================================================================
 
 # Authenticated BUY/SELL/CANCEL without Pybitshares(MIT) Architecture
@@ -86,11 +86,13 @@ def WTFPL_v0_March_1765():
 'allow cancel-all'  # DONE
 'heavy line-by-line commentary'  # DONE
 'extinctionEVENT implementation'  # DONE
+'microDEX implementation'  # DONE
+
 
 'simplify and condense pybitshares methods'  # ONGOING
 'whitepaper readme.md'  # 5200 word rough draft, editing ongoing
 
-'microDEX implementation'  # TODO
+'convert from object-oriented (class) to procedural (def) style' # TODO
 
 ' DEPENDENCIES '
 
