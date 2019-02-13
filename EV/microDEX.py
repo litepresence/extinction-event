@@ -150,17 +150,24 @@ def colors():
     gray3 = '#262626'
 
 
-def ascii_logo(design):
+def download_text(key):
 
     # ascii artwork stored in pastebins
     urls = {'bitshares': 'https://pastebin.com/raw/xDJkyBrS',
             'microdex': 'https://pastebin.com/raw/3DYAUqQR',
-            'extinction-event': 'https://pastebin.com/raw/5YuEHcC4',
-            'metanode': 'https://pastebin.com/raw/VALMtPjL',
             'version': 'https://raw.githubusercontent.com/litepresence' +
                         '/extinction-event/master/EV/microDEX.py'}
+    # my ISP is currently blocking github
+    uri = 'https://www.textise.net/showText.aspx?strURL=https%253A//'
+    url = uri + ('raw.githubusercontent.com/litepresence' +
+                 '/extinction-event/master/EV/microDEX.py'')
+    urls['version'] = url
+    # so I hack quick proxy hole in their bullshit...
+    # yes your sketchy meter should pause here. no its not sketchy.
+    # do read re-read the code after an update
+
     try:
-        return (requests.get(urls[design], timeout=(6, 30))).text
+        return (requests.get(urls[key], timeout=(6, 30))).text
     except:
         return ''
 
@@ -318,11 +325,11 @@ def initialize():
     clear_terminal()
     print('')
     print('   initializing microDEX...')
-    bitshares_logo = it('cyan', ascii_logo('bitshares'))
+    bitshares_logo = it('cyan', download_text('bitshares'))
     clear_terminal()
     print(bitshares_logo)
     print('')
-    print(it('blue', ascii_logo('microdex')))
+    print(it('blue', download_text('microdex')))
     print(it('blue', '''
     ===================================================================
           '''))
@@ -374,7 +381,7 @@ def initialize():
 
 def check_version():
     # check github for latest microDEX version
-    latest_version = ascii_logo('version')
+    latest_version = download_text('version')
     latest = latest_version.split(maxsplit=21)[:20]
     for j in latest:
         try:
