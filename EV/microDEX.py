@@ -398,7 +398,7 @@ def check_version():
     else:
         print('      This is the latest microDEX version.')
     print('')
-    print(it('cyan', 'AFFIRMING system for compatibility...'))
+    print(it('cyan', 'AFFIRMING system compatibility...'))
     # confirm python 3 and linux OS
     if 'linux' not in platform:
         raise Exception('not a linux box, format drive and try again...')
