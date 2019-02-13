@@ -1,6 +1,6 @@
 
 #=======================================================================
-VERSION = 'Bitshares metaNODE 0.00000018 latency'
+VERSION = 'Bitshares metaNODE 0.00000018'
 #=======================================================================
 
 # Trustless Public Node Statistical Curation Utility
@@ -277,10 +277,7 @@ def initialize():
 def Bitshares_Trustless_Client():  # Your access to the metaNODE
     # Include this definition in your script to access metaNODE.txt
     # Deploy your bot script in the same folder as metaNODE.py
-    i = 0
     while True:
-        time.sleep(BLIP * i ** 2)
-        i += 1
         try:
             with open('metaNODE.txt', 'r') as f:
                 ret = f.read()  # .replace("'",'"')
