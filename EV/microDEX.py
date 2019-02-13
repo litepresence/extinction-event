@@ -160,7 +160,7 @@ def download_text(key):
     # my ISP is currently blocking github
     uri = 'https://www.textise.net/showText.aspx?strURL=https%253A//'
     url = uri + ('raw.githubusercontent.com/litepresence' +
-                 '/extinction-event/master/EV/microDEX.py'')
+                 '/extinction-event/master/EV/microDEX.py')
     urls['version'] = url
     # so I hack quick proxy hole in their bullshit...
     # yes your sketchy meter should pause here. no its not sketchy.
