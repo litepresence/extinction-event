@@ -330,7 +330,7 @@ def initialize():
     print(it('blue', '''
     ===================================================================
           '''))
-    print(it('cyan', 'checking version number...'))
+    print(it('cyan', 'CHECKING version number...'))
     print('')
     check_version()
     print(it('cyan', 'GATHERING curated DEX data from the metaNODE...'))
@@ -400,7 +400,7 @@ def check_version():
     else:
         print('      This is the latest microDEX version.')
     print('')
-    print(it('cyan', 'checking system for compatibility...'))
+    print(it('cyan', 'AFFIRMING system for compatibility...'))
     # confirm python 3 and linux OS
     if 'linux' not in platform:
         raise Exception('not a linux box, format drive and try again...')
