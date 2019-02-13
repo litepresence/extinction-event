@@ -113,7 +113,7 @@ def controls():
     MAVENS = 7  # 7
     TIMEOUT = 100  # 100
     PROCESSES = 20  # 20
-    BOOK_DEPTH = 10  # 10
+    BOOK_DEPTH = 30  # 30
     THRESH_PAUSE = 4  # 4
     UTILIZATIONS = 30  # 30
     HISTORY_DEPTH = 30  # 30
