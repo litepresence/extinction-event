@@ -1,6 +1,6 @@
 
 # ======================================================================
-VERSION = 'microDEX - Bitshares Minimalist UI 0.00000025'
+VERSION = 'microDEX - Bitshares Minimalist UI 0.00000026'
 # ======================================================================
 # Lightweight BUY/SELL/CANCEL UI for Bitshares Decentralized Exchange
 
@@ -156,7 +156,9 @@ def ascii_logo(design):
     urls = {'bitshares': 'https://pastebin.com/raw/xDJkyBrS',
             'microdex': 'https://pastebin.com/raw/3DYAUqQR',
             'extinction-event': 'https://pastebin.com/raw/5YuEHcC4',
-            'metanode': 'https://pastebin.com/raw/VALMtPjL'}
+            'metanode': 'https://pastebin.com/raw/VALMtPjL',
+            'version': 'https://raw.githubusercontent.com/litepresence' +
+                        '/extinction-event/master/EV/microDEX.py'}
     try:
         return (requests.get(urls[design], timeout=(6, 30))).text
     except:
@@ -200,8 +202,8 @@ def account_state():
           ' ' + (str(invested) + ' %').ljust(7, ' ') +
           '           ' +
          (cp % currency_total).rjust(12, ' ') +
-          ' ' + str(divested).ljust(4, ' ') +
-          '                TIME: %s' % time.ctime())
+          ' ' + str(divested).ljust(5, ' ') +
+          '               TIME: %s' % time.ctime())
     print('    MAX: ' +
          (ap % asset_value).rjust(12, ' ') + ' ' +
           asset.ljust(10, ' ') +
@@ -290,35 +292,27 @@ def race_write(doc='', text=''):
             except:
                 pass
 
+def race_read(doc=''):  # Concurrent Read from File Operation
+
+    for i in range(3) :
+        try:
+            with open(doc, 'r') as f:
+                return f.read()
+        except Exception as e:
+            msg = (time.ctime() + str(type(e).__name__) + str(e.args))
+            print('race_read ' + msg)
+    raise
+
 # WELCOME
 # ======================================================================
 
 
-def cache():
-
-    global asset, currency, asset_precision, currency_precision
-    global pair, ap, cp, account_name, account_id, nodes
-    metaNODE = Bitshares_Trustless_Client()
-    currency_precision = metaNODE['currency_precision']
-    asset_precision = metaNODE['asset_precision']
-    account_name = metaNODE['account_name']
-    account_id = metaNODE['account_id']
-    currency = metaNODE['currency']
-    nodes = metaNODE['whitelist']
-    asset = metaNODE['asset']
-    del metaNODE
-    # create dynamic format styles: "%.4f" etc. based on "precision"
-    ap = '%.' + str(int(asset_precision / 2.0)) + 'f'
-    cp = '%.' + str(int(currency_precision / 2.0)) + 'f'
-    pair = asset + ':' + currency
-
-
 def initialize():
 
-    global stopwatch, account_name, pair, wif
-    global update_id, authenticated
+    global update_id
+
+    update_id = 0
     race_write(doc='microDEX_log.txt', text=time.ctime())
-    stopwatch = time.time()
     colors()
     terminal_title()
     clear_terminal()
@@ -336,16 +330,9 @@ def initialize():
     print(it('blue', '''
     ===================================================================
           '''))
-    print(it('cyan', 'checking system for compatibility...'))
-
-    if 'linux' not in platform:
-        raise Exception('not a linux box, format drive and try again...')
-    if version_info[0] < 3:
-        raise Exception("% is DED, long live Python 3.4+" % version_info[0])
+    print(it('cyan', 'checking version number...'))
     print('')
-    print('      found python', version_info[0], 'running on', platform)
-    print('')
-    time.sleep(0.2)
+    check_version()
     print(it('cyan', 'GATHERING curated DEX data from the metaNODE...'))
     time.sleep(0.2)
     try:
@@ -372,6 +359,80 @@ def initialize():
     print('')
     print('   You are Trading: ', it('green', pair))
     print('')
+    sign_in()
+    time.sleep(0.3)
+    print(it('cyan', 'LAUNCHING microDEX user interface...'))
+    print(it('blue', '''
+    ===================================================================
+          '''))
+    print(it('cyan', '           ' + time.ctime()))
+    print(it('blue', '''
+    ===================================================================
+          '''))
+    print('')
+
+
+def check_version():
+    # check github for latest microDEX version
+    latest_version = ascii_logo('version')
+    latest = latest_version.split(maxsplit=21)[:20]
+    for j in latest:
+        try:
+            latest = float("".join(i for i in j if i in "0123456789."))
+            break
+        except:
+            pass
+    current = float("".join(i for i in VERSION if i in "0123456789."))
+    if latest > current:
+        print(it('red', '      WARN: NEW VERSION AVAILABLE!'))
+        print(it('yellow',
+                 '      github/litepresence/extinction-event/EV'))
+        choice = ''
+        while choice.lower() not in ['y', 'n']:
+            choice = input('      Y/N UPGRADE?  ')
+        if choice == 'y':
+            # backup and overwrite microDEX.py
+            current_version = race_read('metaNODE.py')
+            backup = 'microDEX' + ('%.8f' % current) + '.py'
+            race_write(backup, current_version)
+            race_write('microDEX.py', latest_version)
+            sys.exit('microDEX version updated please RESTART')
+    else:
+        print('      This is the latest microDEX version.')
+    print('')
+    print(it('cyan', 'checking system for compatibility...'))
+    # confirm python 3 and linux OS
+    if 'linux' not in platform:
+        raise Exception('not a linux box, format drive and try again...')
+    if version_info[0] < 3:
+        raise Exception("% is DED, long live Python 3.4+" % version_info[0])
+    print('')
+    print('      found python', version_info[0], 'running on', platform)
+    print('')
+    time.sleep(0.2)
+
+
+def cache():
+
+    global asset, currency, asset_precision, currency_precision
+    global pair, ap, cp, account_name, account_id, nodes
+    metaNODE = Bitshares_Trustless_Client()
+    currency_precision = metaNODE['currency_precision']
+    asset_precision = metaNODE['asset_precision']
+    account_name = metaNODE['account_name']
+    account_id = metaNODE['account_id']
+    currency = metaNODE['currency']
+    nodes = metaNODE['whitelist']
+    asset = metaNODE['asset']
+    del metaNODE
+    # create dynamic format styles: "%.4f" etc. based on "precision"
+    ap = '%.' + str(int(asset_precision / 2.0)) + 'f'
+    cp = '%.' + str(int(currency_precision / 2.0)) + 'f'
+    pair = asset + ':' + currency
+
+
+def sign_in():
+    global authenticated, wif
     print(it('yellow',
              ' Enter WIF below to AUTHENTICATE or press ENTER to skip'))
     print(it('red',
@@ -407,17 +468,6 @@ def initialize():
         except Exception as e:
             print(trace(e))
             pass
-    time.sleep(0.3)
-    print(it('cyan', 'LAUNCHING microDEX user interface...'))
-    update_id = 0
-    print(it('blue', '''
-    ===================================================================
-          '''))
-    print(it('cyan', '           ' + time.ctime()))
-    print(it('blue', '''
-    ===================================================================
-          '''))
-    print('')
 
 # TKINTER GUI
 # ======================================================================
@@ -786,7 +836,7 @@ def tk_animate():
                         ' ' + (str(invested) + ' %').ljust(7, ' ') +
                         '           ' +
                        (cp % currency_total).rjust(12, ' ') +
-                        ' ' + str(divested).ljust(4, ' ') + ' %\n')
+                        ' ' + str(divested).ljust(5, ' ') + ' %\n')
     account_text.insert(tk.END, '    MAX: ' +
                        (ap % asset_value).rjust(12, ' ') + ' ' +
                         asset.ljust(10, ' ') +
@@ -836,6 +886,7 @@ def tk_authenticate():
     else:
         wif = ''
         print(it('yellow', 'WALLET IS LOCKED'))
+
 
 def tk_buy():
 
