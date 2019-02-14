@@ -1,6 +1,6 @@
 
 # ======================================================================
-VERSION = 'microDEX - Bitshares Minimalist UI 0.00000026'
+VERSION = 'microDEX - Bitshares Minimalist UI 0.00000027'
 # ======================================================================
 # Lightweight BUY/SELL/CANCEL UI for Bitshares Decentralized Exchange
 
@@ -40,6 +40,7 @@ from manualSIGNING import broker, prototype_order
 DEV = True  # additional feedback in terminal log
 COLOR = True  # black and white only in terminal
 UI_REFRESH = 0.100  # seconds between ui button animation
+DATA_MODULUS = 5 # number of ui refreshes per metaNODE refesh
 # CONSTANTS
 # ======================================================================
 BEGIN = int(time.time())
@@ -290,6 +291,7 @@ def race_write(doc='', text=''):
             except:
                 pass
 
+
 def race_read(doc=''):  # Concurrent Read from File Operation
 
     for i in range(3) :
@@ -372,31 +374,35 @@ def initialize():
 
 def check_version():
     # check github for latest microDEX version
-    latest_version = download_text('version')
-    latest = latest_version.split(maxsplit=21)[:20]
-    for j in latest:
-        try:
-            latest = float("".join(i for i in j if i in "0123456789."))
-            break
-        except:
-            pass
-    current = float("".join(i for i in VERSION if i in "0123456789."))
-    if latest > current:
-        print(it('red', '      WARN: NEW VERSION AVAILABLE!'))
-        print(it('yellow',
-                 '      github/litepresence/extinction-event/EV'))
-        choice = ''
-        while choice.lower() not in ['y', 'n']:
-            choice = input('      Y/N UPGRADE?  ')
-        if choice == 'y':
-            # backup and overwrite microDEX.py
-            current_version = race_read('metaNODE.py')
-            backup = 'microDEX' + ('%.8f' % current) + '.py'
-            race_write(backup, current_version)
-            race_write('microDEX.py', latest_version)
-            sys.exit('microDEX version updated please RESTART')
-    else:
-        print('      This is the latest microDEX version.')
+    try:
+        latest_version = download_text('version')
+        latest = latest_version.split(maxsplit=21)[:20]
+        for j in latest:
+            try:
+                latest = float("".join(i for i in j if i in "0123456789."))
+                break
+            except:
+                pass
+        current = float("".join(i for i in VERSION if i in "0123456789."))
+        if latest > current:
+            print(it('red', '      WARN: NEW VERSION AVAILABLE!'))
+            print(it('yellow',
+                     '      github/litepresence/extinction-event/EV'))
+            choice = ''
+            while choice.lower() not in ['y', 'n']:
+                choice = input('      Y/N UPGRADE?  ')
+            if choice == 'y':
+                # backup and overwrite microDEX.py
+                current_version = race_read('metaNODE.py')
+                backup = 'microDEX' + ('%.8f' % current) + '.py'
+                race_write(backup, current_version)
+                race_write('microDEX.py', latest_version)
+                sys.exit('microDEX version updated please RESTART')
+        else:
+            print('      This is the latest microDEX version.')
+    except:
+            print(it('yellow', '      WARN: Skipping version test...'))
+    
     print('')
     print(it('cyan', 'AFFIRMING system compatibility...'))
     # confirm python 3 and linux OS
@@ -678,16 +684,17 @@ def tk_animate():
     global sbidp, saskp, sbidv, saskv
     global cbidp, caskp, cbidv, caskv
     global last_refresh, ui_refreshes, pings, latencies, ui_delta
-    global lock_label
+    global lock_label, runtime, read_time, pause
 
     if update_id == 0:
-        node_scroll = ''
+        node_scroll = '          '
         last_refresh = time.time()
         ui_refreshes = []
         pings = []
         latencies = []
         read_times = []
         ui_delta = 0
+        pause = 0
 
     # keep moving average of UI_REFRESH timing
     now = time.time()
@@ -697,82 +704,89 @@ def tk_animate():
     last_refresh = now
 
     while True:
-        try:
-            # open metaNODE and note how long it took
-            start = time.time()
-            metaNODE = Bitshares_Trustless_Client()
-            read_times.append(time.time() - start)
-            read_times = read_times[-40:]
-            read_time = sum(read_times) / len(read_times)
-            # localize metaNODE data
-            whitelist = metaNODE['whitelist']
-            blocktime = metaNODE['blocktime']
-            last = metaNODE['last']
-            orders = metaNODE['orders']
-            currency_balance = metaNODE['currency_balance']
-            asset_balance = metaNODE['asset_balance']
-            bts_balance = metaNODE['bts_balance']
-            history = metaNODE['history']
-            book = metaNODE['book']
-            buy_orders = metaNODE['buy_orders']
-            sell_orders = metaNODE['sell_orders']
-            invested = metaNODE['invested']
-            divested = metaNODE['divested']
-            ping = metaNODE['ping']
-            pings.append(ping)
-            pings = pings[-20:]
-            ping = sum(pings) / len(pings)
-            # metaNODE dict is large, best to delete object when done
-            del metaNODE
-            # build scrolling whitelisted websocket display
-            while len(node_scroll) < 100:
-                node_scroll += ('   ' + choice(
-                    whitelist).replace(
-                    'wss://',
-                    '').replace('/wss',
-                                '').replace('/ws',
-                                            '').split('/')[0].split(':')[0])
-                words = node_scroll.split()
-                node_scroll = (
-                    "   ".join(sorted(set(words), key=words.index)))
-            node_scroll = node_scroll[1:]
-            # limit size of orders object to keys needed
-            for i in range(len(orders)):
-                orders[i] = {k: v for k, v in orders[
-                    i].items() if k in ['price', 'orderType', 'amount']}
-            asset_total = (asset_balance + sell_orders)
-            currency_total = (currency_balance + buy_orders)
-            asset_value = asset_total + currency_total / last
-            currency_value = asset_value * last
-            # limit history depth
-            history = history[:10]
-            slast = '%.16f' % last
-            latency = time.time() - blocktime + time.timezone
-            latencies.append(latency)
-            latencies = latencies[-20:]
-            latency = sum(latencies) / len(latencies)
-            # stringified volume
-            sbidp = [(' %.16f ' % i).rjust(20, ' ') for i in book['bidp']]
-            saskp = [(' %.16f ' % i).ljust(20, ' ') for i in book['askp']]
-            sbidv = [(' %.2f ' % i).rjust(12, ' ') for i in book['bidv']]
-            saskv = [(' %.2f ' % i).rjust(12, ' ') for i in book['askv']]
-            # stringified cumulative volume
-            cbidv = list(np.cumsum(book['bidv']))
-            caskv = list(np.cumsum(book['askv']))
-            cbidv = [(' %.2f ' % i).rjust(12, ' ') for i in cbidv]
-            caskv = [(' %.2f ' % i).rjust(12, ' ') for i in caskv]
-            depth = 30
-            sbidp = sbidp[:depth]
-            saskp = saskp[:depth]
-            sbidv = sbidv[:depth]
-            saskv = saskv[:depth]
-            cbidv = cbidv[:depth]
-            caskv = caskv[:depth]
-            del book  # eliminate book after data extraction
-            runtime = str(int(time.time()) - BEGIN)
+        node_scroll = node_scroll[1:]
+        if update_id % DATA_MODULUS == 0:
+            try:
+                # open metaNODE and note how long it took
+                start = time.time()
+                metaNODE = Bitshares_Trustless_Client()
+                read_times.append(time.time() - start)
+                read_times = read_times[-40:]
+                read_time = sum(read_times) / len(read_times)
+                # localize metaNODE data
+                whitelist = metaNODE['whitelist']
+                blocktime = metaNODE['blocktime']
+                last = metaNODE['last']
+                orders = metaNODE['orders']
+                currency_balance = metaNODE['currency_balance']
+                asset_balance = metaNODE['asset_balance']
+                bts_balance = metaNODE['bts_balance']
+                history = metaNODE['history']
+                book = metaNODE['book']
+                buy_orders = metaNODE['buy_orders']
+                sell_orders = metaNODE['sell_orders']
+                invested = metaNODE['invested']
+                divested = metaNODE['divested']
+                ping = metaNODE['ping']
+                pings.append(ping)
+                pings = pings[-20:]
+                ping = sum(pings) / len(pings)
+                # metaNODE dict is large, best to delete object when done
+                del metaNODE
+                # build scrolling whitelisted websocket display
+                while len(node_scroll) < 100:
+                    node_scroll += ('   ' + choice(
+                        whitelist).replace(
+                        'wss://',
+                        '').replace('/wss',
+                                    '').replace('/ws',
+                                                '').split('/')[0].split(':')[0])
+                    words = node_scroll.split()
+                    node_scroll = (
+                        "   ".join(sorted(set(words), key=words.index)))
+
+                # limit size of orders object to keys needed
+                for i in range(len(orders)):
+                    orders[i] = {k: v for k, v in orders[
+                        i].items() if k in ['price', 'orderType', 'amount']}
+                asset_total = (asset_balance + sell_orders)
+                currency_total = (currency_balance + buy_orders)
+                asset_value = asset_total + currency_total / last
+                currency_value = asset_value * last
+                # limit history depth
+                history = history[:10]
+                slast = '%.16f' % last
+                latency = time.time() - blocktime + time.timezone
+                latencies.append(latency)
+                latencies = latencies[-20:]
+                latency = sum(latencies) / len(latencies)
+                # stringified volume
+                sbidp = [(' %.16f ' % i).rjust(20, ' ') for i in book['bidp']]
+                saskp = [(' %.16f ' % i).ljust(20, ' ') for i in book['askp']]
+                sbidv = [(' %.2f ' % i).rjust(12, ' ') for i in book['bidv']]
+                saskv = [(' %.2f ' % i).rjust(12, ' ') for i in book['askv']]
+                # stringified cumulative volume
+                cbidv = list(np.cumsum(book['bidv']))
+                caskv = list(np.cumsum(book['askv']))
+                cbidv = [(' %.2f ' % i).rjust(12, ' ') for i in cbidv]
+                caskv = [(' %.2f ' % i).rjust(12, ' ') for i in caskv]
+                depth = 30
+                sbidp = sbidp[:depth]
+                saskp = saskp[:depth]
+                sbidv = sbidv[:depth]
+                saskv = saskv[:depth]
+                cbidv = cbidv[:depth]
+                caskv = caskv[:depth]
+                del book  # eliminate book after data extraction
+                runtime = str(int(time.time()) - BEGIN)
+                break
+            except Exception as e:
+                print(trace(e))
+                continue
+        else:
             break
-        except Exception as e:
-            continue
+
+            
     # rebuild tkinter text fields with updated data
     header_text.delete("1.0", "end")
     header_text.insert(tk.END, (
@@ -782,70 +796,73 @@ def tk_animate():
     ))
     header_text.insert(tk.END, (node_scroll[:90] + '\n\n'))
     header_text.insert(tk.END, (
-        ('       UI %.4f' % ui_refresh) +
-        ('    PING %.3f' % ping) +
-        ('    READ %.5f' % read_time) +
-        ('    DATA %s' % ('%.1f' % latency).ljust(4)) +
-        ('   RUN %s' % runtime)
+        ('     UI %.4f' % ui_refresh) +
+        ('   PAUSE %s' %  str(pause).ljust(3)) +
+        ('  PING %.3f' % ping) +
+        ('   READ %.5f' % read_time) +
+        ('   DATA %s' % ('%.1f' % latency).ljust(4)) +
+        ('  RUN %s' % runtime) 
+
     ))
-    bid_text.delete("1.0", "end")
-    ask_text.delete("1.0", "end")
-    for i in range(len(saskp)):
-        ask_text.insert(tk.END, (saskp[i] + saskv[i] + caskv[i] + '\n'))
-        bid_text.insert(
-            tk.END,
-            (cbidv[i] + sbidv[i] + sbidp[i] + '\n'),
-            'right')
-    history_text.delete("1.0", "end")
-    history_text.insert(
-        tk.END,
-        (' ' + str(int(time.time())) + ' LAST TRADE ' +
-         str(int(time.time() - history[0][0] + time.timezone)) + '\n'))
-    for i in range(len(history)):
+    if update_id % DATA_MODULUS == 0:
+        bid_text.delete("1.0", "end")
+        ask_text.delete("1.0", "end")
+        for i in range(len(saskp)):
+            ask_text.insert(tk.END, (saskp[i] + saskv[i] + caskv[i] + '\n'))
+            bid_text.insert(
+                tk.END,
+                (cbidv[i] + sbidv[i] + sbidp[i] + '\n'),
+                'right')
+        history_text.delete("1.0", "end")
         history_text.insert(
             tk.END,
-            (' ' + str(history[i][0]) + ' ' +
-             str(history[i][1]) + ' ' +
-             str(history[i][2]) + ' ' + '\n'))
-    orders_text.delete("1.0", "end")
-    if len(orders):
-        orders_text.insert(tk.END, ' OPEN ORDERS IN ' + pair + '\n')
-        for i in range(len(orders)):
-            orders_text.insert(
+            (' ' + str(int(time.time())) + ' LAST TRADE ' +
+             str(int(time.time() - history[0][0] + time.timezone)) + '\n'))
+        for i in range(len(history)):
+            history_text.insert(
                 tk.END,
-                (' ' + str(orders[i]['price']) + ' ' +
-                 str(orders[i]['orderType']).ljust(4, ' ') + ' ' +
-                 str(orders[i]['amount']) + '\n'))
-    else:
-        orders_text.insert(tk.END, ('\n NO OPEN ORDERS IN ' + pair))
-    account_text.delete("1.0", "end")
-    account_text.insert(tk.END, ' ASSETS: ' +
-                        (ap % asset_balance).rjust(12, ' ') +
-                        '         CURRENCY: ' +
-                        (cp % currency_balance).rjust(12, ' ') +
-                        '                BITSHARES: ' +
-                        ('%.2f' % bts_balance) + '\n')
-    account_text.insert(tk.END, ' ORDERS: ' +
-                       (ap % sell_orders).rjust(12, ' ') +
-                        '                   ' +
-                       (cp % buy_orders).rjust(12, ' ') + '\n')
-    account_text.insert(tk.END, '  TOTAL: ' +
-                       (ap % asset_total).rjust(12, ' ') +
-                        ' ' + (str(invested) + ' %').ljust(7, ' ') +
-                        '           ' +
-                       (cp % currency_total).rjust(12, ' ') +
-                        ' ' + str(divested).ljust(5, ' ') + ' %\n')
-    account_text.insert(tk.END, '    MAX: ' +
-                       (ap % asset_value).rjust(12, ' ') + ' ' +
-                        asset.ljust(10, ' ') +
-                        '        ' +
-                       (cp % currency_value).rjust(12, ' ') + ' ' +
-                        currency.ljust(10, ' '))
-    # destroy and recreate lock label
+                (' ' + str(history[i][0]) + ' ' +
+                 str(history[i][1]) + ' ' +
+                 str(history[i][2]) + ' ' + '\n'))
+        orders_text.delete("1.0", "end")
+        if len(orders):
+            orders_text.insert(tk.END, ' OPEN ORDERS IN ' + pair + '\n')
+            for i in range(len(orders)):
+                orders_text.insert(
+                    tk.END,
+                    (' ' + str(orders[i]['price']) + ' ' +
+                     str(orders[i]['orderType']).ljust(4, ' ') + ' ' +
+                     str(orders[i]['amount']) + '\n'))
+        else:
+            orders_text.insert(tk.END, ('\n NO OPEN ORDERS IN ' + pair))
+        account_text.delete("1.0", "end")
+        account_text.insert(tk.END, ' ASSETS: ' +
+                            (ap % asset_balance).rjust(12, ' ') +
+                            '         CURRENCY: ' +
+                            (cp % currency_balance).rjust(12, ' ') +
+                            '                BITSHARES: ' +
+                            ('%.2f' % bts_balance) + '\n')
+        account_text.insert(tk.END, ' ORDERS: ' +
+                           (ap % sell_orders).rjust(12, ' ') +
+                            '                   ' +
+                           (cp % buy_orders).rjust(12, ' ') + '\n')
+        account_text.insert(tk.END, '  TOTAL: ' +
+                           (ap % asset_total).rjust(12, ' ') +
+                            ' ' + (str(invested) + ' %').ljust(7, ' ') +
+                            '           ' +
+                           (cp % currency_total).rjust(12, ' ') +
+                            ' ' + str(divested).ljust(5, ' ') + ' %\n')
+        account_text.insert(tk.END, '    MAX: ' +
+                           (ap % asset_value).rjust(12, ' ') + ' ' +
+                            asset.ljust(10, ' ') +
+                            '        ' +
+                           (cp % currency_value).rjust(12, ' ') + ' ' +
+                            currency.ljust(10, ' '))
+        # destroy and recreate lock label
 
-    lock_label.set('WALLET LOCKED')
-    if authenticated:
-        lock_label.set('AUTHENTICATED')
+        lock_label.set('WALLET LOCKED')
+        if authenticated:
+            lock_label.set('AUTHENTICATED')
 
     # update id increment
     if update_id == 0:
