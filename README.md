@@ -1,4 +1,5 @@
-# Installation
+Installation
+================
 
 
 NOTE: this toolset is currently in alpha state of development; more new toys coming soon!
@@ -16,9 +17,13 @@ def WTFPL_v0_March_1765():
             return [tar, feathers]
 ```
 
-Cryptocurrency algo trading tools
+CEX MUST DIE
+=============
 
 The repo name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algo trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algo trading services.
+
+Cryptocurrency algo trading tools
+===============================
 
 latencyTEST.py
 ------------
@@ -32,7 +37,12 @@ extinctionEVENT.py
 microDEX.py 
 ------------
 	lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
-
+proxyDEX.py
+-----------
+        create true HLOCV candles from bishares public API market_history buckets
+manualSIGNING.py
+-------------
+        pybitshares fork, purpose built for efficiently signing limit orders
 
 
 Create an account on Bishares Reference UI
