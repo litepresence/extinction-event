@@ -20,22 +20,20 @@ Cryptocurrency algo trading tools
 
 The repo name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algo trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algo trading services.
 
-
-EV.py 
+latencyTEST.py
+------------
+	scans all known nodes in the Bitshares public network for lowest latency
+metaNODE.py
+------------
+	statistical curation of market data from multiple public DEX nodes into a streaming text file
+extinctionEVENT.py 
 ------------
 	algo trading bot framework for trading on the Bitshares DEX with external CEX data; requires metaNODE
 microDEX.py 
 ------------
 	lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
-metaNODE.py
-------------
-	statistical curation of market data from multiple public DEX nodes into a streaming text file
-bitshares-latency.py
-------------
-	scans all known nodes in the Bitshares public network for lowest latency
-bitshares-database-reference.py
-------------
-	make api requests to Bitshares database without pybitshares
+
+
 
 Create an account on Bishares Reference UI
 -----------------------------------------------
