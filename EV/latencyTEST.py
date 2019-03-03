@@ -58,10 +58,10 @@ print("\033c")  # clear screen if they are all installed
 # bitshares main net id
 ID = '4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8'
 BLIP = 0.05  # pause between race read conditions
-JSONBIN = True  # set to true to share your latency test
+JSONBIN = False  # set to true to share your latency test
 IPAPI = True  # set to true to add geolocation data
 PLOT = True  # set to true to plot
-UPLOAD = True  # set true to upload final image to hosting service
+UPLOAD = False  # set true to upload final image to hosting service
 SEEDS = False  # test seed nodes?
 TIMEOUT = 3  # Websocket Timeout
 PINGS = 9999  # Crop validated list prior to use
