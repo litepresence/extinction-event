@@ -37,10 +37,24 @@ bitshares-database-reference.py
 ------------
 	make api requests to Bitshares database without pybitshares
 
+Create an account on Bishares Reference UI
+-----------------------------------------------
 
+	To create an account:
+	
+    https://bitshares.org/download/
+    install bitshares by double clicking on *.deb file
 
+    create a new account on the bitshares exchange
+    sign into bitshares graphical interface
+    settings >>> accounts >>> show keys
+    click on KEY ICON
+    click SHOW private key in WIF FORMAT
 
-
+    You will need this WIF key when authenticating with microDEX and extinctionEVENT
+    
+    DO NOT SHARE THIS KEY WITH ANYONE
+    DO NOT AUTHENTICATE WITHOUT READING AND UNDERSTANDING MY SCRIPTS
 
 
 Make sure you are on an updated linux machine
@@ -54,11 +68,11 @@ Make sure you are on an updated linux machine
 Clone repository
 -----------------------------------------------
 
-    In terminal change directory to location you would like to install my repository, then:
+In terminal change directory to location you would like to install my repository, then:
 
 	$ git clone https://github.com/litepresence/extinction-event.git
 	
-	Thanks to: @sschiessl for setup.py & Makefile
+Thanks to: @sschiessl for setup.py & Makefile
 
 Change directory to:
 -----------------------------------------------
@@ -66,88 +80,93 @@ Change directory to:
 	$ cd extinction-event
 	$ dir
 
-	You should see two folders EV and microDEX which contain EV.py and microDEX.py respectively; 
-	along with some other dex tools under development.
+You should see a folder `EV` along with some other dex tools under development.
 
 Install environment
 -----------------------------------------------
 	
 	$ sudo apt-get install -y python3 python3-pip
 	
-	*NOTE this requirement may already be satisified on your system, do it anyway to check
+*NOTE this requirement may already be satisified on your system, do it anyway to check
 
 Install virtual environment and requirements
 -----------------------------------------------
+
+while in the extinction-event folder:
 
 	$ sudo pip3 install virtualenv
 	$ virtualenv -p python3 env 
 	$ source env/bin/activate
 	$ pip install -r requirements.txt
 	
+switch to EV folder
+-----------------------------------------------
+
+	$ cd EV	
+	$ dir
+	
+you should see:
+
+	latencyTEST.py
+	metaNODE.py
+	manualSIGNING.py
+	extinctionEVENT.py
+	microDEX.py
+	
+along with some other tools under developement
+	
+Test latencyTEST in virtual environment
+-----------------------------------------------
+
+you must do this prior to running any of my other apps
+
+	$ python3 latencyTEST.py	
+	
+this will create your initial nodes.txt which will be used by metaNODE.py 
+	
+Test metaNODE in virtual environment
+-----------------------------------------------
+
+when latencyTEST is done, do Ctrl+Shft+\ to kill the process, then:
+
+	$ python3 metaNODE.py	
+	
+this will begin writing metaNODE.txt which is streaming orderbook data
+	
 Test microDEX in virtual environment
 -----------------------------------------------
 
-	$ python3 microDEX/microDEX.py
+in a new terminal tab, with metaNODE still running in first tab: 
+navigate to extinction-event, 
+activate your virtual environment 
+then navigate to EV folder
+	
+	$ cd extinction-event
+	$ source env/bin/activate
+	$ cd EV
+	
+you will need to perform the 3 step "activate virtual environment" routine above every time you begin a new instance of my scripts in a new terminal
+
+now you may begin your first microDEX.py instance
+
+	$ python3 microDEX.py
 	
 Test Extinction Event in virtual environment
 -----------------------------------------------
 
 
-	$ python3 EV/EV.py
+in a new terminal tab, with metaNODE still running in first tab: 
+navigate to extinction-event 
+activate your virtual environment 
+then navigate to EV folder
 	
-EV and microDEX are a bot framework and exchange interface respectively.
-You cannot use these to create accounts or withdraw funds.
+	$ cd extinction-event
+	$ source env/bin/activate
+	$ cd EV
 
-
-Create an account on Bishares Reference UI
------------------------------------------------
-
-
-	To create an account:
+	$ python3 extinctionEVENT.py
 	
-    https://bitshares.org/download/
-    install bitshares by double clicking on *.deb file
-
-    create a new account on the bitshares exchange
-    sign into bitshares graphical interface
-    settings >>> accounts >>> show keys
-    click on KEY ICON
-    click SHOW private key in WIF FORMAT
-
-    You will need this WIF key in step 12
-
-    You should come away from step 11 with
-
-        account name
-        Reference UI account password
-        WIF KEY
-
-    
-Create a local wallet with uptick
------------------------------------------------
-
-    go to: https://media.readthedocs.org/pdf/uptick/latest/uptick.pdf
-    perform steps:
-        4.2.1
-        4.2.2
-        4.2.3
-
-    Create a new account on uptick using your Bitshares Reference UI name:
-
-	    uptick newaccount [account name from step 11]	
-
-    ** Then create a password and enter new account's password twice
-    ** This is your local wallet password WRITE IT DOWN
-    ** You will need this to log into Extinction Event or microDEX
-
-        uptick set default_account  [account name from step 11]	
-
-    Add a private key to the wallet:
-
-	    uptick addkey 
-
-        will ask you for password from local wallet step 12
-        will then ask you for WIF KEY from step 11
+you can now run your first backtest on the extinctionEVENT platform   
 
 
 Obtain latest scripts
@@ -159,7 +178,7 @@ Obtain latest scripts
     https://github.com/litepresence/extinction-event/blob/master/EV/EV.py
 
     In Github press raw button and then do select all and copy.  
-    Paste it in a text editor and save as microDEX.py and EV.py respectively.
+    Paste it in a text editor and save as microDEX.py and extinctionEVENT.py respectively.
     Save it into a folder you want to use for trading.  
     You will be changing into that directory to run the script.
 
@@ -174,46 +193,23 @@ Obtain latest scripts
     Read scripts before you put passwords in; take personal responsibility!
     If you don't and I am scammer I take your funds quick and easy.  
 
-    Extinction Event and microDEX are BLEEDING EDGE TECHNOLOGY in active DEVELOPMENT. 
+    extinctionEVENT and microDEX are BLEEDING EDGE TECHNOLOGY in active DEVELOPMENT. 
     These are alpha release to public domain without warranty.  
     YOU SHOULD EXPECT UPDATES AND BUG FIXES in the near future.
 
     READ THE CODE - Check litepresence github regularly for latest version.
 
-
-Run microDEX
------------------------------------------------
-
-        source env/bin/activate
-	
-    from the extinction-event folder will turn on your virtual environment
-
-    in terminal navigate to the virtual environment folder containing microDEX.py
-
-    commands: 'dir', 'cd ..', 'cd folder/folder' are helpful
+    find me:
     
-        python3 microDEX.py
-
-    enter account name from step 11
-    enter market in format as shown
-    enter local wallet password from step 12 
-    (you can skip this and demo without password)
-
-Run Extinction Event
------------------------------------------------
-
-    in terminal navigate to the virtual environment folder containing EV.py
-
-        python3 EV.py
-
-    you will be presented with options of MODE 0 through 5, select one and ENTER
-
-    in def install_tune() you can optimize your algorithm
-
-	ctrl + shift + \
-
-	will exit to terminal from either script ending all processes
-
+	    telegram @litepresence  <<< most responsive
+	    email finitestate@tutamail.com
+	    twitter @oraclepresence
+	    ronpaulforums.com @presence
+	    bitsharestalk @litepresence
+	    (BTS) litepresence1
+	    litepresence.com
+    
+    NOTE: "litepresence" at bitcointalk is a hacked account I no longer control
 
 Visit litepresence.com for machine optimized algorithms
 ========================================================
