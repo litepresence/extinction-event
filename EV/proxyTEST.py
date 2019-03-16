@@ -1,5 +1,5 @@
 # ======================================================================
-VERSION = "proxyTEST v0.00000001"
+VERSION = "proxyTEST v0.00000002"
 # ======================================================================
 
 # Plots Data Retrieved by proxyCEX, proxyDEX, proxyMIX, and proxyALPHA
