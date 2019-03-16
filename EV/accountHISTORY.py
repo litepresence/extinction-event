@@ -1,4 +1,6 @@
-" accountHISTORY "
+# ======================================================================
+VERSION = "Bitshares accountHISTORY 0.00000002"
+# ======================================================================
 
 # Bitshares Historical Account Balance Visualization Tool
 
