@@ -3,7 +3,7 @@ manualSIGNING.py - Bitshares Limit Order Transaction Signing
 
 litepresence2019
 
-I'm about to break down some crypto hocus pocus to you, focus!
+I'm about to break down some crypto hocus pocus, so focus!
 
 :D 
 
