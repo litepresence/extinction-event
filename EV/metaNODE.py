@@ -1,5 +1,5 @@
 # =======================================================================
-VERSION = "Bitshares metaNODE 0.00000018"
+VERSION = "Bitshares metaNODE 0.00000019"
 # =======================================================================
 
 # Trustless Public Node Statistical Curation Utility
