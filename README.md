@@ -214,13 +214,3 @@ Run Extinction Event
 
 	will exit to terminal from either script ending all processes
 
-
-Visit litepresence.com for machine optimized algorithms
-========================================================
-
-	using elitist bred quantum particle swarms I run hundreds of thousands of backtests to optimize algorithms
-	you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
-
-	litepresence.com
-	
-
