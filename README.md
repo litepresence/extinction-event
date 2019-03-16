@@ -21,50 +21,6 @@ BitShares DEX Algo Trading Tools
 The repo name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algo trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algo trading services.
 
 
-extinctionEVENT.py 
-------------
-    moving average crossover algo trading bot framework for trading on the Bitshares DEX
-microDEX.py 
-------------
-    lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
-metaNODE.py
-------------
-    statistical curation of market data from multiple public DEX nodes into a streaming text file
-latencyTEST.py
-------------
-    search for low latency Bitshares nodes in your region
-proxyDEX.py
-------------
-    correctly interpolated HLOCV Bitshares DEX candles for backtesting and live session
-proxyCEX.py
-------------
-    HLOCV altcoin:altcoin daily candles for backtesting from cryptocompare.com
-proxyMIX.py
-------------
-    HLOCV crypto exchange specific daily candles for backtesting from nomics.com
-proxyALPHA.py
-------------
-    HLOCV stocks, forex, and crypto:forex daily candles for backtesting from alphavantage.com
-apiKEYS.py
-------------
-    dictionary to store your cryptocompare, alphavantage, and nomics api keys
-proxyTEST.py
-------------
-    utility to gather and plot data from proxyDEX, CEX, MIX, and ALPHA
-accountHISTORY.py
-------------
-    metaNODE.py takes a balances snapshot hourly whenever it is running, use accountHISTORY to visualize
-Visit litepresence.com for machine optimized algorithms
-========================================================
-
-	using elitist bred quantum particle swarms I run hundreds of thousands of backtests to optimize algorithms
-	you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
-
-	litepresence.com
-	
-
-
-
 **GATHER HARDWARE**
 
 This stack is heavy on read/write, ram, and cpu. 
@@ -233,3 +189,46 @@ You will be presented with some options:
 Whenever your metaNODE is running your account history is being logged to file.  accountHISTORY.py can read this file and plot your changes in account balances over time. 
 
 
+**BRIEF DESCRIPTION OF TOOLS**
+
+
+extinctionEVENT.py 
+------------
+    moving average crossover algo trading bot framework for trading on the Bitshares DEX
+microDEX.py 
+------------
+    lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
+metaNODE.py
+------------
+    statistical curation of market data from multiple public DEX nodes into a streaming text file
+latencyTEST.py
+------------
+    search for low latency Bitshares nodes in your region
+proxyDEX.py
+------------
+    correctly interpolated HLOCV Bitshares DEX candles for backtesting and live session
+proxyCEX.py
+------------
+    HLOCV altcoin:altcoin daily candles for backtesting from cryptocompare.com
+proxyMIX.py
+------------
+    HLOCV crypto exchange specific daily candles for backtesting from nomics.com
+proxyALPHA.py
+------------
+    HLOCV stocks, forex, and crypto:forex daily candles for backtesting from alphavantage.com
+apiKEYS.py
+------------
+    dictionary to store your cryptocompare, alphavantage, and nomics api keys
+proxyTEST.py
+------------
+    utility to gather and plot data from proxyDEX, CEX, MIX, and ALPHA
+accountHISTORY.py
+------------
+    metaNODE.py takes a balances snapshot hourly whenever it is running, use accountHISTORY to visualize
+Visit litepresence.com for machine optimized algorithms
+========================================================
+
+	using elitist bred quantum particle swarms I run hundreds of thousands of backtests to optimize algorithms
+	you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
+
+	litepresence.com
