@@ -1,5 +1,5 @@
 # =======================================================================
-VERSION = "Bitshares manualSIGNING 0.00000004"
+VERSION = "Bitshares manualSIGNING 0.00000005"
 # =======================================================================
 
 # Authenticated BUY/SELL/CANCEL without Pybitshares(MIT) Architecture
