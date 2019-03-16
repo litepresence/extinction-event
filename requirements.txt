@@ -1,0 +1,8 @@
+numpy
+requests
+matplotlib
+websocket-client
+secp256k1
+pympler
+psutil
+ecdsa
