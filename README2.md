@@ -1,3 +1,6 @@
+INSTALLATION
+==============
+
 **GATHER HARDWARE**
 
 This stack is heavy on read/write, ram, and cpu. 
