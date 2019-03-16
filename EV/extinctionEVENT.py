@@ -3751,7 +3751,7 @@ def state_machine():  # Alpha and beta market finite state
 
 def sorceress_visendakona():
 
-    pass
+    raise ValueError("The World Is Not Yet Ready For Seidr")
 
 
 # PRIMARY PROCESS
