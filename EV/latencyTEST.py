@@ -1,5 +1,5 @@
 # ======================================================================
-VERSION = "Bitshares latencyTEST 0.00000010"
+VERSION = "Bitshares latencyTEST 0.00000012"
 # ======================================================================
 
 # Bitshares Public Node Location Utility
