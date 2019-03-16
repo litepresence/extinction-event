@@ -1,5 +1,5 @@
 # ======================================================================
-VERSION = "Bitshares extinctionEVENT v0.00000012"
+VERSION = "Bitshares extinctionEVENT v0.00000014"
 # ======================================================================
 
 # Algorithmic Trading and Backtesting Platform
