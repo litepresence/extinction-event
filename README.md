@@ -111,11 +111,11 @@ Next you will begin your first metaNODE session.  New terminal tab, cd navigate 
     $ python3 metaNODE.py
 	
 Enter your account name and dex market of choice, you can press enter to skip and a default account and market will be chosen:
-
+```
 account: abc123
 currency: open.btc
-ssest: bts
-
+assest: bts
+```
 Capitalization does not matter for the asset and currency.  metaNODE CANNOT access your funds.
 
 **MICRODEX**
