@@ -1,5 +1,5 @@
 # ======================================================================
-VERSION = "microDEX - Bitshares Minimalist UI 0.00000027"
+VERSION = "microDEX - Bitshares Minimalist UI 0.00000028"
 # ======================================================================
 # Lightweight BUY/SELL/CANCEL UI for Bitshares Decentralized Exchange
 
