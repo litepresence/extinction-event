@@ -44,14 +44,14 @@ Getting candle data is notoriously difficult to do from the DEX. This utility cr
 proxyCEX.py - proxyMIX.py - proxyALPHA.py
 ----------------------------
 
-These tools gather daily candle data from cryptocompare.com; nomics.com; and alphavantage.com. This gives you every conceivable combination of altcoin:altcoin, bitcoin:altcoin, forex:altcoin, exchange specific crypto markets, us stock markets, and forex:forex. All data is in the same format as proxyDEX and like proxyDEX external requests are multiprocess wrapped.  This data is then available within extinctionEVENT for backtesting.   The goal being to refine trading strategies for new dex pairs that mimic long established financial markets through backtesting on external to dex historical data. 
+These tools gather daily candle data from cryptocompare.com; nomics.com; and alphavantage.com. This gives you every conceivable combination of altcoin:altcoin, bitcoin:altcoin, forex:altcoin, exchange specific crypto markets, us stock markets, and forex:forex. All data is in the same format as proxyDEX and like proxyDEX external requests are multiprocess wrapped.  This data is then available within extinctionEVENT for backtesting.   The goal is to refine trading strategies for new dex pairs that mimic long established financial markets through backtesting on CEX historical data. 
 
 proxyTEST.py
 ----------------------------
 
-This tool allows you to visualize datasets from all available sources without backtesting. It also plots moving averages to demonstrate data structure, normalization, and interpolation.  Likewise this could be used as a plotting tool along side microDEX.  Given the nomalized data and plotting framwork, a developer can quickly plot any financial technical indication (SAR, RSI, EMA, etc.) to numpy array provided; in the same way I have applied the simple moving average defnition.  
+This tool allows you to visualize datasets from all available sources without backtesting. It also plots moving averages to demonstrate data structure, normalization, and interpolation.  Likewise this could be used as a plotting tool along side microDEX.  Given the nomalized data and plotting framwork, a developer can quickly plot any financial technical indication (SAR, RSI, EMA, etc.), to the numpy array provided, in the same way I have applied the simple moving average definition.  
 
 accountBALANCES.py
 ----------------------------
 
-Every hour your metaNODE will take a snapshot of your account balances for the market it is tending. accountBALANCES will then retrieve that data and plot for you ROI in `asset terms`, `currency terms`, and `sqrt(assetROI*currencyROI)` terms.
+Every hour your metaNODE will take a snapshot of your account balances for the market it is tending. accountBALANCES will then retrieve that data and plot ROI for you in `asset terms`, `currency terms`, and `sqrt(assetROI*currencyROI)` terms.
