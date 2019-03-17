@@ -24,7 +24,7 @@ manualSIGNING is a fork of pybitshares.  It is purpose built for efficient limit
 extinctionEVENT.py
 ----------------------------
 
-extinctionEVENT (EV) is a simple moving average trading tool which splits the market into Bull/Bear state and then trades on different thresholds depending on state. Is capable of producing live moving averages from 5m scale to daily candle scale; all at 5m resolution. EV also includes a backtesting engine for optimizing your algorithm. extinctionEVENT.py gets DEX data from metaNODE.txt. The utility also imports centralized exchange data from cryptocompare.com nomics.com and alphavantage.com for backtesting.
+extinctionEVENT (EV) is a simple moving average trading tool which splits the market into Bull/Bear state and then trades on different thresholds depending on state. Is capable of producing live moving averages from 5m scale to daily candle scale; all at 5m resolution. EV also includes a backtesting engine for optimizing your algorithm. extinctionEVENT gets DEX data from metaNODE and proxyDEX. The backtest utility also imports centralized exchange data from cryptocompare.com nomics.com and alphavantage.com for backtesting using proxyCEX, proxyMIX, and proxyALPHA respectively.
 
 microDEX.py
 ----------------------------
