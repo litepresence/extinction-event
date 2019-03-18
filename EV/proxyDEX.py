@@ -52,8 +52,8 @@ import numpy as np
 import traceback
 import time
 
-ATTEMPTS = 3
-TIMEOUT = 240
+ATTEMPTS = 30
+TIMEOUT = 480
 
 # to learn more about available data visit these links
 dex_asset_list = "http://cryptofresh.com/assets"
