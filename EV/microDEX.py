@@ -782,7 +782,7 @@ def tk_animate():
                 # limit history depth
                 history = history[:10]
                 slast = "%.16f" % last
-                latency = time.time() - blocktime + time.timezone
+                latency = time.time() - blocktime
                 latencies.append(latency)
                 latencies = latencies[-20:]
                 latency = sum(latencies) / len(latencies)
@@ -863,7 +863,7 @@ def tk_animate():
                 " "
                 + str(int(time.time()))
                 + " LAST TRADE "
-                + str(int(time.time() - history[0][0] + time.timezone))
+                + str(int(time.time() - history[0][0]))
                 + "\n"
             ),
         )
