@@ -2565,7 +2565,7 @@ def plot_text():  # Display market condition on plot
         text = "TEST ORDERS"
     if MODE in [2, 3, 6]:
         if not info["live"]:
-            text = "INITIALING"
+            text = "INITIALIZING"
 
     storage["text"].append(
         plt.text(
