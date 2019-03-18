@@ -1048,8 +1048,8 @@ def live_data():  # Gather live data from metaNODE and proxyDEX
     sasks = [("%.8f" % i) for i in book["askp"][:3]]
     # populate 4h and 5m candles to size needed for moving averages
     # MA1, MA2, MA3, MA4 are daily moving average periods
-    depth_4h = int(max(MA1, MA2) * 1.05 * 6)  # 6*4h = 24 hours
-    depth_5m = int(max(MA3, MA4) * 1.05 * 288)  # 288*5m = 24 hours
+    depth_4h = 10 + (int(max(MA1, MA2))+1) * 6 # 6*4h = 24 hours
+    depth_5m = 2 + (int(max(MA3, MA4))+1) * 288 # 288*5m = 24 hours
     data["14400"] = live_candles(candle=14400, depth=depth_4h)
     data["300"] = live_candles(candle=300, depth=depth_5m)
     # print top of book
