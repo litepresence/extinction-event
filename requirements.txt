@@ -1,7 +1,8 @@
-scrypt
-wheel
-matplotlib
 numpy
 requests
-bitshares>=0.1.12
-uptick
+matplotlib
+websocket-client
+secp256k1
+pympler
+psutil
+ecdsa
