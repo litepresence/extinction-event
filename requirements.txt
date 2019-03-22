@@ -6,3 +6,4 @@ secp256k1
 pympler
 psutil
 ecdsa
+wsaccel
