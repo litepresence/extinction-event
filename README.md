@@ -51,7 +51,7 @@ I used this writeup:
 
     https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/
 
-**SUDO APT INSTALL PIP3, GIT, TK, DEV, SECP256K1 **
+**SUDO APT INSTALL PIP3, GIT, TK, DEV, SECP256K1**
 
     $ sudo apt-get install -y python3-pip
     $ sudo apt-get install python3-tk
