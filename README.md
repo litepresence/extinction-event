@@ -24,29 +24,30 @@ The repo name "Extinction Event" was born of the notion that DEX tech combined w
 
 **GATHER HARDWARE**
 
-This stack is heavy on read/write, ram, and cpu. 
-You could print every matrix it handles if you wish to understand why.
+This stack is heavy on ssd read/write, needs 4 gig ram, and cpu speed = backtest speed; recommendations:
 
 - SSD SOLID STATE DRIVE of any size; 120GB drives are $20; plenty good.
 - *DO NOT* install exinction-event on a spinning platter HDD
-- 4 GB RAM for full stack, 8 recommended
-- CPU speed amounts to backtest speed, I run AMD 7950
+- 4 GB RAM for full stack, 8 preferred
+- moderate to high end desktop CPU, I run AMD 7950
 - Gold/Platinum power as this is your 24/7 crypto-on-the-line botscript machine
 - I run FM2+ milspec/ultra durable boards from ASUS or GIGABYTE
 
 **INSTALL LINUX OS**
 
-Any debian or ubuntu should do.  The stack is NOT Mac or Windows compliant. 
-
+Any debian/ubuntu should do.  
+The stack is NOT Mac or Windows compliant. 
 I am running Cinnamon Mint 19.04, learn more:
 
     https://linuxmint.com/
+
+extinction-event should be compliant with other linux distros, installation may vary. 
 
 **UPDATE APT-GET**
 
     $ sudo apt-get update
 
-**INSTALL PYTHON 3.7+**
+**INSTALL PYTHON 3.6+**
 
 I used this writeup:
 
@@ -77,13 +78,17 @@ Enter the extinction-event folder:
 
 **ENTER VIRTUAL ENVIRONMENT**
 
-*NOTE* you will need to activate from extinction-event folder every time you start a new terminal tab when running my python scripts
+
 
     $ source env/bin/activate
 
 **INSTALL REQUIREMENTS**
 
     $ pip install -r requirements.txt
+    
+*NOTE* The virtual environment and setup.py are in `extinction-event`
+*NOTE* The scripts are all in `extinction-event/EV`
+*NOTE* you will need to activate your virtual environment from extinction-event folder EVERY TIME you start a new terminal tab when running these scripts.
 
 **LATENCY TEST**
 
@@ -122,9 +127,11 @@ This will ensure you have all dependencies to sign transactions installed.  In a
     $ cd EV
     $ python3 microDEX.py
 
-You will be presented with the OPTION to enter your WIF.   Alternatively you can press ENTER to skip.  You do not need to give your WIF at this time to ensure complete setup.
+You will be presented with the OPTION to enter your WIF.   Alternatively you can press ENTER to skip.  You do not need to give your WIF at this time to ensure complete setup.  
 
-*NOTE* You SHOULD familiarize yourself and friends with the source code before entering your WIF.  Your WIF is what signs transactions of any type.  DO NOT authenitcate unless you understand and fully trust the scripts I have given to you.
+*microDEX HAS FULL ACCESS TO YOUR FUNDS IF YOU GIVE YOUR WIF*
+
+You SHOULD familiarize yourself and friends with the source code before entering your WIF.  Your WIF is what signs transactions of any type.  DO NOT authenitcate unless you understand and fully trust the scripts I have given to you.
 
 The best way to get your WIF is by opening the reference Bitshares UI:
 
@@ -148,12 +155,13 @@ Go get api keys from:
 
 open apiKEYS.py and install your keys where they go in the dictionary, save file and close
 
-use DOUBLE QUOTES and COMMA after each entry except the last; no comma
-DO NOT include any commments or other text in this document
+*NOTE* This py file must be in json format!
+- use DOUBLE QUOTES and COMMA after each entry except the last; no comma
+- DO NOT include any commments or other text in this document
 
-These keys are public api keys and CANNOT effect your funds if they are stolen, however they do limit your daily api calls to prevent ddos.  See each website for details.
+These keys are public api keys and CANNOT effect your funds if they are stolen, however they do limit your daily api calls to prevent ddos.  They need to be kept private; but not funds-on-line critical secret like your WIF.  See each website for details.
 
-If you skip this step, you will only be able to backtest with `CANDLE_SOURCE = 'DEX'` in `tune_install()`
+If you skip this step, you will only be able to backtest with `CANDLE_SOURCE = 'DEX'` in `tune_install()` as BitShares public RPC nodes do not require API keys. 
 
 **PROXYTEST**
 
