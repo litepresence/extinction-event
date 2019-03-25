@@ -58,6 +58,7 @@ I used this writeup:
     $ sudo apt-get install python3-dev
     $ sudo apt-get install libsecp256k1-dev    
     $ sudo apt-get install git
+    $ sudo pip3 install virtualenv
 
 **GIT CLONE EXTINCTION-EVENT REPO**
 
@@ -66,12 +67,11 @@ Navigate to the folder you want to run your bots from:
     $ cd <folder name>
     $ git clone https://github.com/litepresence/extinction-event.git
 
-**INSTALL VIRTUAL ENVIRONMENT**
+**CREATE A VIRTUAL ENVIRONMENT**
 
-Enter the extinction-event folder
+Enter the extinction-event folder:
 
-    $ cd extinction-event
-    $ sudo pip3 install virtualenv
+    $ .../extinction-event
     $ virtualenv -p python3 env 
 
 **ENTER VIRTUAL ENVIRONMENT**
