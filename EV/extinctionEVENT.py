@@ -738,8 +738,7 @@ def live_initialize():  # Begin live session
 
 def live():  # Primary live event loop
 
-    global storage
-    global info
+    global storage, info, edicts
 
     live_initialize()
 
@@ -912,6 +911,8 @@ def live():  # Primary live event loop
                     print("elapsed: %.3f" % (time.time() - start))
                     start = time.time()
 
+                edicts = [] #reset edicts dictionary globally
+                    
                 # SCALP OPS
                 plt.pause(0.01)
                 try:
