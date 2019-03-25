@@ -51,13 +51,13 @@ I used this writeup:
 
     https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/
 
-**INSTALL PIP 3**
+**SUDO APT INSTALL PIP3, GIT, TK, DEV, SECP256K1 **
 
     $ sudo apt-get install -y python3-pip
-
-**INSTALL GIT**
-
-    $ sudo apt install git
+    $ sudo apt-get install python3-tk
+    $ sudo apt-get install python3-dev
+    $ sudo apt-get install libsecp256k1-dev    
+    $ sudo apt-get install git
 
 **GIT CLONE EXTINCTION-EVENT REPO**
 
@@ -79,12 +79,6 @@ Enter the extinction-event folder
 *NOTE* you will need to activate from extinction-event folder every time you start a new terminal tab when running my python scripts
 
     $ source env/bin/activate
-
-**APT-GET INSTALL REQUIREMENTS**
-
-    $ sudo apt-get install python3-tk
-    $ sudo apt-get install python3-dev
-    $ sudo apt-get install libsecp256k1-dev
 
 **INSTALL REQUIREMENTS**
 
