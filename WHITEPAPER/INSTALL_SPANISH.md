@@ -4,12 +4,9 @@ INSTALACIÓN
 
 NOTA: este conjunto de herramientas se encuentra actualmente en estado alfa, aún en desarrollo; ¡pronto habrá más juguetes nuevos!
 
-(BTS) litepresence1
-----------------------
+**(BTS) litepresence1**
 
-
-Herramientas de trading BitShares DEX
---------------------------------
+**Herramientas de trading BitShares DEX**
 
 La traducciónd del nombre significa "Evento de Extinción Masiva" y  nació de la idea de que combinación de la tecnología DEX con la disposición del usuario común de tecnología de trading controlada por inteligencia artificial, supondrá un evento de nivel de extinción masiva tanto para las mercados centralizados (CEX) basados en la web como para los servicios de trading algorítmicos de "cuota mensual".
 
@@ -175,84 +172,86 @@ En una nueva terminal, con metaNODE todavía ejecutándose en la primera termina
 
 Se te ofrecerán algunas opciones:
 
-**BACKTEST** permite probar y ajustar estrategias usando la definición `tune_install()` dentro de extictionEVENT.py
-**PAPER** permite ejecutar una sesión en tiempo real sin darle al bot sus claves, no se realizarán operaciones reales.
-**LIVE** es el comercio en vivo con fondos según su configuración de `control_panel()` y `tune_install()`.
-**SALES** permite vender ajuestes de estrategias de extinctionEVENT, publicando imágenes de los puntos operados, pero sin mostrar tus umbrales para la media móvil.
-**ORDER_TEST** sesión de operaciones en vivo con dinero real.  Sin embargo, coloca las ordenes lejos de los márgenes,  para probar sólo la autenticación.
-**OPTIMIZER** ajuste automático para los parametros del backtest. Actualmente NO es  código abierto; de hecho estoy considerando un trabajador para esto y algo más.
+**BACKTEST** 
 
+permite probar y ajustar estrategias usando la definición `tune_install()` dentro de extictionEVENT.py
+
+**PAPER** 
+
+permite ejecutar una sesión en tiempo real sin darle al bot sus claves, no se realizarán operaciones reales.
+
+**LIVE** 
+
+es el comercio en vivo con fondos según su configuración de `control_panel()` y `tune_install()`.
+
+**SALES** 
+
+permite vender ajuestes de estrategias de extinctionEVENT, publicando imágenes de los puntos operados, pero sin mostrar tus umbrales para la media móvil.
+
+**ORDER_TEST** 
+
+sesión de operaciones en vivo con dinero real.  Sin embargo, coloca las ordenes lejos de los márgenes,  para probar sólo la autenticación.
+
+**OPTIMIZER** 
+
+ajuste automático para los parametros del backtest. Actualmente NO es  código abierto; de hecho estoy considerando un trabajador para esto y algo más.
 
 **HISTORIAL DE LA CUENTA**
 
 Cada vez que tu metaNODO se está ejecutando, el historial de tu cuenta se registra en un archivo. accountHISTORY.py puede leer este archivo y graficar la evolución de los saldos de la cuenta. 
 
-
 **BREVE DESCRIPCIÓN DE LAS HERRAMIENTAS**
 
-
-extinciónEVENT.py 
-------------
+**extinciónEVENT.py**
 
 Framework para el bot de trading algoritmico basado en el cruce de medias para operar en el DEX de Bitshares.  Permite realizar tanto backtest como trading real.
 
-microDEX.py 
-------------
+**microDEX.py**
 
 Interfaz de usuario ligera para realizar operaciones manuales de compra/venta/cancelación en el DEX de Bitshares
 
-metaNODE.py
-------------
+**metaNODE.py**
 
 Conservación estadística de datos de mercado de múltiples nodos DEX públicos en un archivo de texto en streaming
 
-latencyTEST.py
-------------
+**latencyTEST.py**
 
 Busca nodos Bitshares de baja latencia en tu zona
 
-proxyDEX.py
-------------
+**proxyDEX.py**
 
 Velas en formato HLOCV del DEX de Bitshares, correctamente interpoladas para backtest y trading real
 
-proxyCEX.py
-------------
+**proxyCEX.py**
 
 Velas diarias altcoin de cryptocompare.com en formato HLOCV para backtest
 
-proxyMIX.py
-------------
+**proxyMIX.py**
 
 Velas diarias de crypto exchanges de nomics.com en formato HLOCV para backtest
 
-proxyALPHA.py
-------------
+**proxyALPHA.py**
 
 Velas diarias de acciones, forex y crypto:forex de alphavantage.com en formato HLOCV para backtest
 
-apiKEYS.py
-------------
+**apiKEYS.py**
 
 Diccionario para almacenar sus claves API de cryptocompare, alphavantage y nomics
 
-proxyTEST.py
-------------
+**proxyTEST.py**
 
 Utilidad para recopilar y graficar datos de proxyDEX.py, proxyCEX.py, proxyMIX.py y proxyALPHA.py
 
-accountHISTORY.py
------------------
+**accountHISTORY.py**
 
 metaNODE.py registra los balances cada hora mientras se está ejecutando, utiliza accountHISTORY para visualizarlas.
 
-Visite litepresence.com para obtener algoritmos optimizados para máquinas
-========================================================
+**Visite litepresence.com para obtener algoritmos optimizados para máquinas**
 
 Ejecuto cientos de miles de pruebas usando enjambres de partículas cuánticas cultivadas elitistamente,  para optimizar los algoritmos.
 Tu mismo puedes optimizar los algoritmos por ensayo y error, pero ¿por qué no dejar que mi IA se encargue de ello?
 
-litepresence.com
+**litepresence.com**
 
 
 *Traducción versión 0.1,  por Paduel.*
