@@ -195,37 +195,59 @@ Whenever your metaNODE is running your account history is being logged to file. 
 
 extinctionEVENT.py 
 ------------
+
 moving average crossover algo trading bot framework for trading on the Bitshares DEX
+
 microDEX.py 
 ------------
+
 lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
+
 metaNODE.py
 ------------
+
 statistical curation of market data from multiple public DEX nodes into a streaming text file
+
 latencyTEST.py
 ------------
+
 search for low latency Bitshares nodes in your region
+
 proxyDEX.py
 ------------
+
 correctly interpolated HLOCV Bitshares DEX candles for backtesting and live session
+
 proxyCEX.py
 ------------
+
 HLOCV altcoin:altcoin daily candles for backtesting from cryptocompare.com
+
 proxyMIX.py
 ------------
+
 HLOCV crypto exchange specific daily candles for backtesting from nomics.com
+
 proxyALPHA.py
 ------------
+
 HLOCV stocks, forex, and crypto:forex daily candles for backtesting from alphavantage.com
+
 apiKEYS.py
 ------------
+
 dictionary to store your cryptocompare, alphavantage, and nomics api keys
+
 proxyTEST.py
 ------------
+
 utility to gather and plot data from proxyDEX, CEX, MIX, and ALPHA
+
 accountHISTORY.py
 ------------
+
 metaNODE.py takes a balances snapshot hourly whenever it is running, use accountHISTORY to visualize
+
 Visit litepresence.com for machine optimized algorithms
 ========================================================
 
