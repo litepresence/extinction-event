@@ -7,7 +7,7 @@ NOTE: this tool set is currently in alpha state of development; more new toys co
 
 **(BTS) litpresence1**
 
-	see WHITEPAPER folder for foreign language installation
+	see WHITEPAPER folder for spanish, chinese, and russian language installation
 	ver carpeta de papel blanco para instalación en español
 	看中文安装的白皮书文件夹
 	см. белую папку для русской
