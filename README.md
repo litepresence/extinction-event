@@ -7,6 +7,11 @@ NOTE: this tool set is currently in alpha state of development; more new toys co
 
 **(BTS) litpresence1**
 
+	see whitepaper folder for foreign language installation
+	ver carpeta de papel blanco para instalación en español
+	看中文安装的白皮书文件夹
+	см. белую папку для русской
+
 ```
 def WTFPL_v0_March_1765():
     if any([stamps, licenses, taxation, regulation, fiat, etat]):
