@@ -1,11 +1,11 @@
 INSTALLATION
 =======================
+
 **EXTINCTION EVENT - CEX MUST DIE**
 
-NOTE: this toolset is currently in alpha state of development; more new toys coming soon!
+NOTE: this tool set is currently in alpha state of development; more new toys coming soon!
 
-(BTS) litpresence1 
-----------------------
+**(BTS) litpresence1**
 
 ```
 def WTFPL_v0_March_1765():
@@ -16,21 +16,19 @@ def WTFPL_v0_March_1765():
             return [tar, feathers]
 ```
 
-BitShares DEX Algo Trading Tools
---------------------------------
+**BitShares DEX Algo Trading Tools**
 
-The repo name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algo trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algo trading services.
-
+The repository name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algorithmic trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algorithmic trading services.
 
 **GATHER HARDWARE**
 
-This stack is heavy on ssd read/write, needs 4 gig ram, and cpu speed = backtest speed; recommendations:
+This stack is heavy on solid state drive read/write, needs 4 gig ram, and central processing unit speed = back testing speed; recommendations:
 
-- SSD SOLID STATE DRIVE of any size; 120GB drives are $20; plenty good.
+- Solid State Drive SOLID STATE DRIVE of any size; 120 Gigabyte drives are $20; plenty good.
 - *DO NOT* install exinction-event on a spinning platter HDD
 - 4 GB RAM for full stack, 8 preferred
 - moderate to high end desktop CPU, I run AMD 7950
-- Gold/Platinum power as this is your 24/7 crypto-on-the-line botscript machine
+- Gold/Platinum power as this is your 24/7   bot  script machine
 - I run FM2+ milspec/ultra durable boards from ASUS or GIGABYTE
 
 **INSTALL LINUX OS**
@@ -41,7 +39,7 @@ I am running Cinnamon Mint 19.04, learn more:
 
     https://linuxmint.com/
 
-extinction-event should be compliant with other linux distros, installation may vary. 
+extinction-event should be compliant with other linux distrobutions, installation may vary. 
 
 **UPDATE APT-GET**
 
@@ -49,7 +47,7 @@ extinction-event should be compliant with other linux distros, installation may 
 
 **INSTALL PYTHON 3.6+**
 
-I used this writeup:
+I used this instructions:
 
     https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/
 
@@ -62,7 +60,7 @@ I used this writeup:
     $ sudo apt-get install git
     $ sudo pip3 install virtualenv
 
-**GIT CLONE EXTINCTION-EVENT REPO**
+**GIT CLONE EXTINCTION-EVENT REPOSITORY**
 
 Navigate to the folder you want to run your bots from:
 
@@ -77,6 +75,7 @@ Enter the extinction-event folder:
     $ virtualenv -p python3 env 
 
 **ENTER VIRTUAL ENVIRONMENT**
+
 
     $ source env/bin/activate
 
@@ -97,9 +96,9 @@ Open a new terminal tab. Run a latency test, it will take a few minutes.  This w
     $ cd EV
     $ python3 latencyTEST.py
 
-When you get more serious about running botscript full time you can change `USER CONTROLS` within latencyTEST.py for recurring loop, custom whitelists, or to scan github for newly posted nodes. You can even plot the node locations and upload your results to the web.  After latency test has written node.txt, open node.txt in a text editor to confirm you have a list of latency sorted nodes for your region.
+When you get more serious about running bot script full time you can change `USER CONTROLS` within latencyTEST.py for recurring loop, custom white lists, or to scan github for newly posted nodes. You can even plot the node locations and upload your results to the web.  After latency test has written node.txt, open node.txt in a text editor to confirm you have a list of latency sorted nodes for your region.
 
-**METANODE**
+**META NODE**
 
 Next you will begin your first metaNODE session.  New terminal tab, cd navigate to:
 
@@ -108,15 +107,15 @@ Next you will begin your first metaNODE session.  New terminal tab, cd navigate 
     $ cd EV
     $ python3 metaNODE.py
 	
-Enter your account name and dex market of choice, you can press enter to skip and a default account and market will be chosen:
+Enter your account name and market of choice.  You can press enter to skip and a default account and market will be chosen:
 ```
 account: abc123
 currency: open.btc
-assest: bts
+assets: bts
 ```
 Capitalization does not matter for the asset and currency.  metaNODE CANNOT access your funds.
 
-**MICRODEX**
+**MICRO DEX**
 
 This will ensure you have all dependencies to sign transactions installed.  In a new terminal tab, with metaNODE still running in first tab, navigate to:
 
@@ -129,41 +128,43 @@ You will be presented with the OPTION to enter your WIF.   Alternatively you can
 
 *microDEX HAS FULL ACCESS TO YOUR FUNDS IF YOU GIVE YOUR WIF*
 
-You SHOULD familiarize yourself and friends with the source code before entering your WIF.  Your WIF is what signs transactions of any type.  DO NOT authenitcate unless you understand and fully trust the scripts I have given to you.
+You SHOULD familiarize yourself and friends with the source code before entering your WIF.  Your WIF is what signs transactions of any type.  DO NOT authenticate unless you understand and fully trust the scripts I have given to you.
 
-The best way to get your WIF is by opening the reference Bitshares UI:
+The best way to get your WIF is by opening the reference Bitshares User Interface:
 
 settings >> accounts >> show keys
 click on "KEY" icon
 click "show private key in WIF format"
 
-to obtain a copy of the reference UI, visit:
+to obtain a copy of the reference User Interface, visit:
 
 http://bitshares.org/download/
 
-**APIKEYS**
+**Application Programming Interface Keys**
 
-The latest version of the backtest engine allows you to backtest against bitshares dex data as well as several outside sources.  Each of these sources was chosen because of the vast data available and ease of obtaining FREE api keys. 
+The latest version of the back testing engine allows you to back testing against bitshares decentralized exchange data as well as several outside sources.  Each of these sources was chosen because of the vast data available and ease of obtaining FREE application programming interface keys. 
 
-Go get api keys from: 
+Go get API keys from: 
 
-    www.cryptocompare.com
-    www.alphavantage.com
-    www.nomics.com
+www.cryptocompare.com
+
+www.alphavantage.com
+
+www.nomics.com
 
 open apiKEYS.py and install your keys where they go in the dictionary, save file and close
 
-*NOTE* This py file must be in json format!
+*NOTE* This py file must be in JSON format!
 - use DOUBLE QUOTES and COMMA after each entry except the last; no comma
-- DO NOT include any commments or other text in this document
+- DO NOT include any comments or other text in this document
 
-These keys are public api keys and CANNOT effect your funds if they are stolen, however they do limit your daily api calls to prevent ddos.  They need to be kept private; but not funds-on-line critical secret like your WIF.  See each website for details.
+These keys are public application programming interface keys and CANNOT effect your funds if they are stolen, however they do limit your daily application programming interface calls to prevent distributed denial of service attack.  They need to be kept private; but not funds-on-line critical secret like your WIF.  See each website for details.
 
-If you skip this step, you will only be able to backtest with `CANDLE_SOURCE = 'DEX'` in `tune_install()` as BitShares public RPC nodes do not require API keys. 
+If you skip this step, you will only be able to back testing with `CANDLE_SOURCE = 'DEX'` in `tune_install()` as BitShares public remote procedure call nodes do not require API keys. 
 
-**PROXYTEST**
+**PROXY TEST**
 
-proxyTEST.py will ensure that you have installed your backtest api keys correctly.
+proxyTEST.py will ensure that you have installed your back testing application programming interface keys correctly.
 
 open proxyTEST and there is user input `API` near the top of the script.  Run a test on `API` numbers 1 through 6. 
 
@@ -178,80 +179,83 @@ In a new terminal tab, with metaNODE still running in first tab, navigate to:
 
 You will be presented with some options:
 
-**BACKTEST** allows you to backtest and tune strategies using the `tune_install()` definition within extictionEVENT.py
-**PAPER** allows you to run a live session without giving the bot your keys, no live trades will be made
-**LIVE** is live trading with funds per your `control_panel()` and `tune_install()` settings
-**SALES** allows you to sell extinctionEVENT strategy tunes by posting images of trade points without showing your moving average thresholds
-**ORDER_TEST** is a live trading session WITH FUNDS but places orders far from the margins to test authentication
-**OPTIMIZE** autotunes backtests, this is NOT currently open source; I'm currently considering a worker for this and more.
+**BACKTEST** 
+
+allows you to back testing and tune strategies using the `tune_install()` definition within extictionEVENT.py
+
+**PAPER**
+
+allows you to run a live session without giving the bot your keys, no live trades will be made
+
+**LIVE** 
+
+is live trading with funds per your `control_panel()` and `tune_install()` settings
+
+**SALES**
+
+allows you to sell extinctionEVENT strategy tunes by posting images of trade points without showing your moving average thresholds
+
+**ORDER_TEST** 
+
+is a live trading session WITH FUNDS but places orders far from the margins to test authentication
+
+**OPTIMIZE**
+
+auto tunes back tests, this is NOT currently open source; I'm currently considering a worker for this and more.
 
 **ACCOUNT HISTORY**
 
 Whenever your metaNODE is running your account history is being logged to file.  accountHISTORY.py can read this file and plot your changes in account balances over time. 
 
-
 **BRIEF DESCRIPTION OF TOOLS**
 
+**extinctionEVENT.py**
 
-extinctionEVENT.py 
-------------
-
-moving average crossover algo trading bot framework for trading on the Bitshares DEX
-
-microDEX.py 
-------------
+moving average crossover algorithmic trading bot framework for trading on the Bitshares DEX
+**microDEX.py**
 
 lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
 
-metaNODE.py
-------------
+**metaNODE.py**
 
 statistical curation of market data from multiple public DEX nodes into a streaming text file
 
-latencyTEST.py
-------------
+**latencyTEST.py**
 
 search for low latency Bitshares nodes in your region
 
-proxyDEX.py
-------------
+**proxyDEX.py**
 
-correctly interpolated HLOCV Bitshares DEX candles for backtesting and live session
+correctly interpolated HLOCV Bitshares DEX candles for back testing and live session
 
-proxyCEX.py
-------------
+**proxyCEX.py**
 
-HLOCV altcoin:altcoin daily candles for backtesting from cryptocompare.com
+HLOCV altcoin:altcoin daily candles for back testing from www.cryptocompare.com
 
-proxyMIX.py
-------------
+**proxyMIX.py**
 
-HLOCV crypto exchange specific daily candles for backtesting from nomics.com
+HLOCV crypto exchange specific daily candles for back testing from www.nomics.com
 
-proxyALPHA.py
-------------
+**proxyALPHA.py**
 
-HLOCV stocks, forex, and crypto:forex daily candles for backtesting from alphavantage.com
+HLOCV stocks, forex, and crypto:forex daily candles for back testing from www.alphavantage.com
 
-apiKEYS.py
-------------
+**apiKEYS.py**
 
-dictionary to store your cryptocompare, alphavantage, and nomics api keys
+dictionary to store your cryptocompare, alphavantage, and nomics application programming interface keys
 
-proxyTEST.py
-------------
+**proxyTEST.py**
 
 utility to gather and plot data from proxyDEX, CEX, MIX, and ALPHA
 
-accountHISTORY.py
-------------
+**accountHISTORY.py**
 
 metaNODE.py takes a balances snapshot hourly whenever it is running, use accountHISTORY to visualize
 
-Visit litepresence.com for machine optimized algorithms
-========================================================
+**Visit www.litepresence.com for machine optimized algorithms**
 
-using elitist bred quantum particle swarms I run hundreds of thousands of backtests to optimize algorithms
+using elitist bred quantum particle swarms I run hundreds of thousands of back tests to optimize algorithms
 you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
 
-litepresence.com
+www.litepresence.com
+
