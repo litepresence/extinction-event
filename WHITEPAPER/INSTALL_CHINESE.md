@@ -143,9 +143,9 @@ http://bitshares.org/download/
 
 去获取钥匙：
 
-    www.cryptocompare.com
-    www.alphavantage.com
-    www.nomics.com
+www.cryptocompare.com
+www.alphavantage.com
+www.nomics.com
 
 打开apiKEYS.py并将密钥安装在字典中，保存文件并关闭
 
