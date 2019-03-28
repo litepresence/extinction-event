@@ -124,8 +124,6 @@ Te permite asegurarte de que tienes todas las dependencias para firmar las trans
 
 Te dará la OPCIÓN de ingresar tu WIF. Puedes pulsar ENTER para omitirlo.  NO necesitas dar tu WIF en este momento para asegurar una configuración completa. 
 
-
-
 *microDEX TIENE ACCESO COMPLETO A TUS FONDOS SI FACILITAS TU WIF*
 
 DEBES familiarizarte y familiarizar a sus amigos con el código fuente antes de ingresar tu WIF.  Tu WIF es lo que firma transacciones de cualquier tipo.  NO DEBES autentificar a menos que entiendas y confíes plenamente en los scripts que te he dado.
@@ -177,12 +175,12 @@ En una nueva terminal, con metaNODE todavía ejecutándose en la primera termina
 
 Se te ofrecerán algunas opciones:
 
-    **BACKTEST** permite probar y ajustar estrategias usando la definición `tune_install()` dentro de extictionEVENT.py
-    **PAPER** permite ejecutar una sesión en tiempo real sin darle al bot sus claves, no se realizarán operaciones reales.
-    **LIVE** es el comercio en vivo con fondos según su configuración de `control_panel()` y `tune_install()`.
-    **SALES** permite vender ajuestes de estrategias de extinctionEVENT, publicando imágenes de los puntos operados, pero sin mostrar tus umbrales para la media móvil.
-    **ORDER_TEST** sesión de operaciones en vivo con dinero real.  Sin embargo, coloca las ordenes lejos de los márgenes,  para probar sólo la autenticación.
-    **OPTIMIZER** ajuste automático para los parametros del backtest. Actualmente NO es  código abierto; de hecho estoy considerando un trabajador para esto y algo más.
+**BACKTEST** permite probar y ajustar estrategias usando la definición `tune_install()` dentro de extictionEVENT.py
+**PAPER** permite ejecutar una sesión en tiempo real sin darle al bot sus claves, no se realizarán operaciones reales.
+**LIVE** es el comercio en vivo con fondos según su configuración de `control_panel()` y `tune_install()`.
+**SALES** permite vender ajuestes de estrategias de extinctionEVENT, publicando imágenes de los puntos operados, pero sin mostrar tus umbrales para la media móvil.
+**ORDER_TEST** sesión de operaciones en vivo con dinero real.  Sin embargo, coloca las ordenes lejos de los márgenes,  para probar sólo la autenticación.
+**OPTIMIZER** ajuste automático para los parametros del backtest. Actualmente NO es  código abierto; de hecho estoy considerando un trabajador para esto y algo más.
 
 
 **HISTORIAL DE LA CUENTA**
@@ -195,55 +193,66 @@ Cada vez que tu metaNODO se está ejecutando, el historial de tu cuenta se regis
 
 extinciónEVENT.py 
 ------------
-    Framework para el bot de trading algoritmico basado en el cruce de medias para operar en el DEX de Bitshares.  Permite realizar tanto backtest como trading real.
+
+Framework para el bot de trading algoritmico basado en el cruce de medias para operar en el DEX de Bitshares.  Permite realizar tanto backtest como trading real.
 
 microDEX.py 
 ------------
-    Interfaz de usuario ligera para realizar operaciones manuales de compra/venta/cancelación en el DEX de Bitshares
+
+Interfaz de usuario ligera para realizar operaciones manuales de compra/venta/cancelación en el DEX de Bitshares
 
 metaNODE.py
 ------------
-    Conservación estadística de datos de mercado de múltiples nodos DEX públicos en un archivo de texto en streaming
+
+Conservación estadística de datos de mercado de múltiples nodos DEX públicos en un archivo de texto en streaming
 
 latencyTEST.py
 ------------
-    Busca nodos Bitshares de baja latencia en tu zona
+
+Busca nodos Bitshares de baja latencia en tu zona
 
 proxyDEX.py
 ------------
-    Velas en formato HLOCV del DEX de Bitshares, correctamente interpoladas para backtest y trading real
+
+Velas en formato HLOCV del DEX de Bitshares, correctamente interpoladas para backtest y trading real
 
 proxyCEX.py
 ------------
-    Velas diarias altcoin de cryptocompare.com en formato HLOCV para backtest
+
+Velas diarias altcoin de cryptocompare.com en formato HLOCV para backtest
 
 proxyMIX.py
 ------------
-     Velas diarias de crypto exchanges de nomics.com en formato HLOCV para backtest
+
+Velas diarias de crypto exchanges de nomics.com en formato HLOCV para backtest
 
 proxyALPHA.py
 ------------
-    Velas diarias de acciones, forex y crypto:forex de alphavantage.com en formato HLOCV para backtest
+
+Velas diarias de acciones, forex y crypto:forex de alphavantage.com en formato HLOCV para backtest
 
 apiKEYS.py
 ------------
-    Diccionario para almacenar sus claves API de cryptocompare, alphavantage y nomics
+
+Diccionario para almacenar sus claves API de cryptocompare, alphavantage y nomics
 
 proxyTEST.py
 ------------
-    Utilidad para recopilar y graficar datos de proxyDEX.py, proxyCEX.py, proxyMIX.py y proxyALPHA.py
+
+Utilidad para recopilar y graficar datos de proxyDEX.py, proxyCEX.py, proxyMIX.py y proxyALPHA.py
 
 accountHISTORY.py
 -----------------
-    metaNODE.py registra los balances cada hora mientras se está ejecutando, utiliza accountHISTORY para visualizarlas.
+
+metaNODE.py registra los balances cada hora mientras se está ejecutando, utiliza accountHISTORY para visualizarlas.
 
 Visite litepresence.com para obtener algoritmos optimizados para máquinas
 ========================================================
 
-	Ejecuto cientos de miles de pruebas usando enjambres de partículas cuánticas cultivadas elitistamente,  para optimizar los algoritmos.
-	Tu mismo puedes optimizar los algoritmos por ensayo y error, pero ¿por qué no dejar que mi IA se encargue de ello?
+Ejecuto cientos de miles de pruebas usando enjambres de partículas cuánticas cultivadas elitistamente,  para optimizar los algoritmos.
+Tu mismo puedes optimizar los algoritmos por ensayo y error, pero ¿por qué no dejar que mi IA se encargue de ello?
 
-	litepresence.com
+litepresence.com
 
 
 *Traducción versión 0.1,  por Paduel.*
