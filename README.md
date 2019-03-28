@@ -78,8 +78,6 @@ Enter the extinction-event folder:
 
 **ENTER VIRTUAL ENVIRONMENT**
 
-
-
     $ source env/bin/activate
 
 **INSTALL REQUIREMENTS**
@@ -180,12 +178,12 @@ In a new terminal tab, with metaNODE still running in first tab, navigate to:
 
 You will be presented with some options:
 
-    **BACKTEST** allows you to backtest and tune strategies using the `tune_install()` definition within extictionEVENT.py
-    **PAPER** allows you to run a live session without giving the bot your keys, no live trades will be made
-    **LIVE** is live trading with funds per your `control_panel()` and `tune_install()` settings
-    **SALES** allows you to sell extinctionEVENT strategy tunes by posting images of trade points without showing your moving average thresholds
-    **ORDER_TEST** is a live trading session WITH FUNDS but places orders far from the margins to test authentication
-    **OPTIMIZE** autotunes backtests, this is NOT currently open source; I'm currently considering a worker for this and more.
+**BACKTEST** allows you to backtest and tune strategies using the `tune_install()` definition within extictionEVENT.py
+**PAPER** allows you to run a live session without giving the bot your keys, no live trades will be made
+**LIVE** is live trading with funds per your `control_panel()` and `tune_install()` settings
+**SALES** allows you to sell extinctionEVENT strategy tunes by posting images of trade points without showing your moving average thresholds
+**ORDER_TEST** is a live trading session WITH FUNDS but places orders far from the margins to test authentication
+**OPTIMIZE** autotunes backtests, this is NOT currently open source; I'm currently considering a worker for this and more.
 
 **ACCOUNT HISTORY**
 
@@ -197,41 +195,41 @@ Whenever your metaNODE is running your account history is being logged to file. 
 
 extinctionEVENT.py 
 ------------
-    moving average crossover algo trading bot framework for trading on the Bitshares DEX
+moving average crossover algo trading bot framework for trading on the Bitshares DEX
 microDEX.py 
 ------------
-    lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
+lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
 metaNODE.py
 ------------
-    statistical curation of market data from multiple public DEX nodes into a streaming text file
+statistical curation of market data from multiple public DEX nodes into a streaming text file
 latencyTEST.py
 ------------
-    search for low latency Bitshares nodes in your region
+search for low latency Bitshares nodes in your region
 proxyDEX.py
 ------------
-    correctly interpolated HLOCV Bitshares DEX candles for backtesting and live session
+correctly interpolated HLOCV Bitshares DEX candles for backtesting and live session
 proxyCEX.py
 ------------
-    HLOCV altcoin:altcoin daily candles for backtesting from cryptocompare.com
+HLOCV altcoin:altcoin daily candles for backtesting from cryptocompare.com
 proxyMIX.py
 ------------
-    HLOCV crypto exchange specific daily candles for backtesting from nomics.com
+HLOCV crypto exchange specific daily candles for backtesting from nomics.com
 proxyALPHA.py
 ------------
-    HLOCV stocks, forex, and crypto:forex daily candles for backtesting from alphavantage.com
+HLOCV stocks, forex, and crypto:forex daily candles for backtesting from alphavantage.com
 apiKEYS.py
 ------------
-    dictionary to store your cryptocompare, alphavantage, and nomics api keys
+dictionary to store your cryptocompare, alphavantage, and nomics api keys
 proxyTEST.py
 ------------
-    utility to gather and plot data from proxyDEX, CEX, MIX, and ALPHA
+utility to gather and plot data from proxyDEX, CEX, MIX, and ALPHA
 accountHISTORY.py
 ------------
-    metaNODE.py takes a balances snapshot hourly whenever it is running, use accountHISTORY to visualize
+metaNODE.py takes a balances snapshot hourly whenever it is running, use accountHISTORY to visualize
 Visit litepresence.com for machine optimized algorithms
 ========================================================
 
-	using elitist bred quantum particle swarms I run hundreds of thousands of backtests to optimize algorithms
-	you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
+using elitist bred quantum particle swarms I run hundreds of thousands of backtests to optimize algorithms
+you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
 
-	litepresence.com
+litepresence.com
