@@ -1,11 +1,11 @@
 INSTALLATION
 =======================
+
 **EXTINCTION EVENT - CEX MUST DIE**
 
 NOTE: this tool set is currently in alpha state of development; more new toys coming soon!
 
-(BTS) litpresence1 
-----------------------
+**(BTS) litpresence1**
 
 ```
 def WTFPL_v0_March_1765():
@@ -16,11 +16,9 @@ def WTFPL_v0_March_1765():
             return [tar, feathers]
 ```
 
-BitShares DEX Algo Trading Tools
---------------------------------
+**BitShares DEX Algo Trading Tools**
 
 The repository name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algorithmic trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algorithmic trading services.
-
 
 **GATHER HARDWARE**
 
@@ -148,9 +146,11 @@ The latest version of the back testing engine allows you to back testing against
 
 Go get API keys from: 
 
-    www.cryptocompare.com
-    www.alphavantage.com
-    www.nomics.com
+www.cryptocompare.com
+
+www.alphavantage.com
+
+www.nomics.com
 
 open apiKEYS.py and install your keys where they go in the dictionary, save file and close
 
@@ -179,59 +179,83 @@ In a new terminal tab, with metaNODE still running in first tab, navigate to:
 
 You will be presented with some options:
 
-    **BACKTEST** allows you to back testing and tune strategies using the `tune_install()` definition within extictionEVENT.py
-    **PAPER** allows you to run a live session without giving the bot your keys, no live trades will be made
-    **LIVE** is live trading with funds per your `control_panel()` and `tune_install()` settings
-    **SALES** allows you to sell extinctionEVENT strategy tunes by posting images of trade points without showing your moving average thresholds
-    **ORDER_TEST** is a live trading session WITH FUNDS but places orders far from the margins to test authentication
-    **OPTIMIZE** auto tunes back tests, this is NOT currently open source; I'm currently considering a worker for this and more.
+**BACKTEST** 
+
+allows you to back testing and tune strategies using the `tune_install()` definition within extictionEVENT.py
+
+**PAPER**
+
+allows you to run a live session without giving the bot your keys, no live trades will be made
+
+**LIVE** 
+
+is live trading with funds per your `control_panel()` and `tune_install()` settings
+
+**SALES**
+
+allows you to sell extinctionEVENT strategy tunes by posting images of trade points without showing your moving average thresholds
+
+**ORDER_TEST** 
+
+is a live trading session WITH FUNDS but places orders far from the margins to test authentication
+
+**OPTIMIZE**
+
+auto tunes back tests, this is NOT currently open source; I'm currently considering a worker for this and more.
 
 **ACCOUNT HISTORY**
 
 Whenever your metaNODE is running your account history is being logged to file.  accountHISTORY.py can read this file and plot your changes in account balances over time. 
 
-
 **BRIEF DESCRIPTION OF TOOLS**
 
+**extinctionEVENT.py**
 
-extinctionEVENT.py 
-------------
-    moving average crossover algorithmic trading bot framework for trading on the Bitshares DEX
-microDEX.py 
-------------
-    lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
-metaNODE.py
-------------
-    statistical curation of market data from multiple public DEX nodes into a streaming text file
-latencyTEST.py
-------------
-    search for low latency Bitshares nodes in your region
-proxyDEX.py
-------------
-    correctly interpolated HLOCV Bitshares DEX candles for back testing and live session
-proxyCEX.py
-------------
-    HLOCV altcoin:altcoin daily candles for back testing from cryptocompare.com
-proxyMIX.py
-------------
-    HLOCV crypto exchange specific daily candles for back testing from nomics.com
-proxyALPHA.py
-------------
-    HLOCV stocks, forex, and crypto:forex daily candles for back testing from alphavantage.com
-apiKEYS.py
-------------
-    dictionary to store your cryptocompare, alphavantage, and nomics application programming interface keys
-proxyTEST.py
-------------
-    utility to gather and plot data from proxyDEX, CEX, MIX, and ALPHA
-accountHISTORY.py
-------------
-    metaNODE.py takes a balances snapshot hourly whenever it is running, use accountHISTORY to visualize
-Visit litepresence.com for machine optimized algorithms
-========================================================
+moving average crossover algorithmic trading bot framework for trading on the Bitshares DEX
+**microDEX.py**
 
-	using elitist bred quantum particle swarms I run hundreds of thousands of back tests to optimize algorithms
-	you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
+lightweight user interface to perform manual buy/sell/cancel operations on the Bitshares DEX
 
-	litepresence.com
+**metaNODE.py**
+
+statistical curation of market data from multiple public DEX nodes into a streaming text file
+
+**latencyTEST.py**
+
+search for low latency Bitshares nodes in your region
+
+**proxyDEX.py**
+
+correctly interpolated HLOCV Bitshares DEX candles for back testing and live session
+
+**proxyCEX.py**
+
+HLOCV altcoin:altcoin daily candles for back testing from www.cryptocompare.com
+
+**proxyMIX.py**
+
+HLOCV crypto exchange specific daily candles for back testing from www.nomics.com
+
+**proxyALPHA.py**
+
+HLOCV stocks, forex, and crypto:forex daily candles for back testing from www.alphavantage.com
+
+**apiKEYS.py**
+
+dictionary to store your cryptocompare, alphavantage, and nomics application programming interface keys
+
+**proxyTEST.py**
+
+utility to gather and plot data from proxyDEX, CEX, MIX, and ALPHA
+
+**accountHISTORY.py**
+
+metaNODE.py takes a balances snapshot hourly whenever it is running, use accountHISTORY to visualize
+
+**Visit www.litepresence.com for machine optimized algorithms**
+
+using elitist bred quantum particle swarms I run hundreds of thousands of back tests to optimize algorithms
+you can optimize algorithms yourself by trial and error, but why not let my AI handle it?
+
+www.litepresence.com
 
