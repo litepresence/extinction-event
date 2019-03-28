@@ -12,6 +12,8 @@ NOTE: this tool set is currently in alpha state of development; more new toys co
 	看中文安装的白皮书文件夹
 	см. белую папку для русской
 
+**LICENSE?!?**
+
 ```
 def WTFPL_v0_March_1765():
     if any([stamps, licenses, taxation, regulation, fiat, etat]):
