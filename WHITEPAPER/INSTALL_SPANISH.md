@@ -141,9 +141,11 @@ La última versión permite hacer backtests con datos del DEX de bitshares así 
 
 Puedes conseguir claves para las API de: 
 
-    www.cryptocompare.com
-    www.alphavantage.com
-    www.nomics.com
+www.cryptocompare.com
+
+www.alphavantage.com
+
+www.nomics.com
 
 Edita apiKEYS.py e completa el diccionario con las claves, guarda el archivo y cierralo.
 
@@ -246,12 +248,12 @@ Utilidad para recopilar y graficar datos de proxyDEX.py, proxyCEX.py, proxyMIX.p
 
 metaNODE.py registra los balances cada hora mientras se está ejecutando, utiliza accountHISTORY para visualizarlas.
 
-**Visite litepresence.com para obtener algoritmos optimizados para máquinas**
+**Visite www.litepresence.com para obtener algoritmos optimizados para máquinas**
 
 Ejecuto cientos de miles de pruebas usando enjambres de partículas cuánticas cultivadas elitistamente,  para optimizar los algoritmos.
 Tu mismo puedes optimizar los algoritmos por ensayo y error, pero ¿por qué no dejar que mi IA se encargue de ello?
 
-**litepresence.com**
+**www.litepresence.com**
 
 
 *Traducción versión 0.1,  por Paduel.*
