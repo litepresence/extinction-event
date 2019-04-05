@@ -1,11 +1,20 @@
 
 TALIB & TULIP
--------------------
+====================
 
-**TECHNICAL ANALYSIS LIBRARY INSTALLATION**
+These packages will allow you to backtest and deploy live session botscript using traditional technical analysis indictors like EMA, SAR, RSI, STOCH, MACD, etc.
+
+**FULL INDICATOR LISTS FOUND HERE:**
+        
+    https://tulipindicators.org/list
+    https://ta-lib.org/function.html
 
 
-**WITH VIRTUAL ENVIRONMENT ALREADY CREATED**
+INSTALLATION
+---------------------
+
+
+WITH VIRTUAL ENVIRONMENT ALREADY CREATED,
 
 OPEN A NEW TERMINAL, CHANGE DIRECTORY TO:
 
@@ -60,10 +69,3 @@ RUN proxyTEST.py
     source env/bin/activate
     cd EV
     python3 proxyTEST.py
-
-**BITSHARE DEX FINANCIAL TECHNICAL ANALYSIS**
-
-FULL INDICATOR LISTS FOUND HERE:
-        
-    https://tulipindicators.org/list
-    https://ta-lib.org/function.html
