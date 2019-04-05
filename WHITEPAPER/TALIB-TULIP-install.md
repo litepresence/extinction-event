@@ -3,8 +3,8 @@
 # litepresence 2019
 
 # ##############################################
-# WITH VIRTUAL ENVIRONMENT ALREADY CREATED,
-# OPEN A NEW TERMINAL, CHANGE DIRECTORY TO:
+**WITH VIRTUAL ENVIRONMENT ALREADY CREATED**
+**OPEN A NEW TERMINAL, CHANGE DIRECTORY TO:**
 # ##############################################
 
     (...)/extinction-event
