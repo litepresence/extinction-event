@@ -24,9 +24,9 @@ litepresence 2019
 # blacklist.txt
 # nodes.txt
 # account_history.txt
-# to storage['access'] metaNODE data from any python scirpt:
+# to access metaNODE data from any python scirpt:
 # metaNODE = Bitshares_Trustless_Client()
-# storage['access'] time with SSD is about 0.0003 seconds
+# access time with SSD is about 0.0003 seconds
 
 # STANDARD PYTHON MODULES
 from time import time, sleep, ctime, strptime
