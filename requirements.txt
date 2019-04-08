@@ -7,3 +7,6 @@ pympler
 psutil
 ecdsa
 wsaccel
+pylint3
+autopep8
+black
