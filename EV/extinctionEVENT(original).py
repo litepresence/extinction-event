@@ -6,6 +6,8 @@ VERSION = "Bitshares extinctionEVENT v0.00000014"
 
 " litepresence 2019 "
 
+raise ValueError('this version is no longer supported')
+
 
 def WTFPL_v0_March_1765():
     if any([stamps, licenses, taxation, regulation, fiat, etat]):
