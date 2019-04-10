@@ -10,3 +10,4 @@ wsaccel
 pylint3
 autopep8
 black
+Cython
