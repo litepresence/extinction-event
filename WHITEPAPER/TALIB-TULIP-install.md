@@ -40,11 +40,10 @@ OPEN A NEW TERMINAL, CHANGE DIRECTORY TO:
 
     wget https://downloads.sourceforge.net/project/ta-lib/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz
     tar -xzf ta-lib-0.4.0-src.tar.gz
-    cd ta-lib/
+    cd ta-lib
     ./configure --prefix=/usr
     make
     sudo make install
-    pip install TA-Lib 
     pip install --upgrade --force-reinstall TA-Lib
     
 **OPEN proxyTEST.py WITH TEXT EDITOR**
