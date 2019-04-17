@@ -7,7 +7,13 @@ pympler
 psutil
 ecdsa
 wsaccel
-pylint3
+pylint
 autopep8
 black
 Cython
+appdirs
+attrs
+click
+toml
+tulipy
+TA-Lib
