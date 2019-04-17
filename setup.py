@@ -1,22 +1,34 @@
 #!/usr/bin/env python
-
+"""
+pip3 installations
+tulip and talib installations
+"""
+import os
+from subprocess import call
 from setuptools import setup, find_packages
-from sys import platform, version_info
-from os import system, sysconf, popen
-from time import time, sleep
 
-def welcome():
 
-    print('\033c')
-    print('')
-    print('')
-    print(it('blue', '      litepresence presents'))
-    print('')
-    print(it('yellow', '      BITSHARES EXTINCTION EVENT'), it('red','   CEX MUST DIE'))
-    print('')
+class ChangeDirectory:
+    """
+    Context manager for changing the current working directory
+    h/t @ brianmhunt
+    """
+
+    def __init__(self, new_path):
+        self.new_path = os.path.expanduser(new_path)
+        self.saved_path = os.getcwd()
+
+    def __enter__(self):
+        os.chdir(self.new_path)
+
+    def __exit__(self, etype, value, traceback):
+        os.chdir(self.saved_path)
+
 
 def it(style, text):
-    # colored text in terminal
+    """
+    Colored text in terminal
+    """
     emphasis = {
         "red": 91,
         "green": 92,
@@ -28,164 +40,123 @@ def it(style, text):
     return ("\033[%sm" % emphasis[style]) + str(text) + "\033[0m"
 
 
-def linux_test():
 
-    assert "linux" in platform.lower(), it('red', "not linux OS, format drive and try again")  
-    print(it('green','Linux Found'))
+def talib_tulip():
+    """
+    Intall Tulip and Talib quantiative indicators packages
+    """
+    # talib and tulip tarballs are included in extinction-event
+    # if you prefer original copies use:
+    # https://github.com/TulipCharts/
+    #       tulipindicators/archive/v0.8.0.tar.gz
+    # https://downloads.sourceforge.net/project/ta-lib/
+    #       ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz
+    print("\n\n")
+    print("Installing TALIB and TULIP")
+    print("\n\n")
+    # un tarball, create two folders
+    call(["tar", "-xzf", "ta-lib-0.4.0-src.tar.gz"])
+    call(["tar", "-xzf", "tulipindicators-0.8.0.tar.gz"])
+    # enter the folders individually, make, and ChangeDirectory ..
+    folder = str(os.path.dirname(os.path.abspath(__file__))) + "/"
+    with ChangeDirectory(folder + "ta-lib"):
+        call(["./configure", "--prefix=/usr"])
+        call(["make"])
+        call(["sudo", "make", "install"])
+    with ChangeDirectory(folder + "tulipindicators-0.8.0"):
+        call("make")
+    print("\n\n")
+    print("TALIB and TULIP indicator package installs complete\n\n")
 
-def python_test():
 
-    version = int(version_info[0])+int(version_info[1])/10.0
-    version_id = str(version_info[0])+'.'+str(version_info[1])+'.'+str(version_info[2])
-    print('Version', version_id)
-    assert version >= 3.6, it('red', 'Python Version must be 3.6 or greater')
-    print(it('green', 'Python 3.6+ Found'))
+def upgrade_pylint():
+    """
+    Upgrade pylint to pylint3
+    """
+    call(["sudo", "-H", "pip3", "install", "pylint", "--upgrade"])
 
-def ram_test():
 
-    mem_bytes = sysconf('SC_PAGE_SIZE') * sysconf('SC_PHYS_PAGES')
-    mem_gib = mem_bytes/(1024.**3)
-    print('%.1f GB RAM' % mem_gib)
-    assert mem_gib > 3, it('red', 'you will need at least 3GB RAM to run this suite')
-    print(it('green', 'minimum adequate RAM found'))
-
-def cat_scsi_test():
-
-    print('confirming you have an SSD on this machine with "cat /proc/scsi/scsi"')
-    system("cat /proc/scsi/scsi")
-    scsi = str(popen("cat /proc/scsi/scsi").read()).lower()
-    if 'ssd' not in scsi:
-        print(it('red','***WARN*** no SSD no drive LABEL on this machine'))
-        null = input('press ENTER to continue or ctrl+shft+\ to EXIT') 
-    else:
-        print(it('green', 'SSD drive LABEL found on this machine'))
-
-def drive_speed_test():
-
-    doc = 'ssd_test.txt'
-    start = time()
-    for i in range(10000):
-        with open(doc, 'w+') as f:
-            f.write('ssd test')
-            f.close()
-        with open(doc, 'r') as f:
-            ret = f.read()
-            f.close()
-    stop = time()
-    elapsed = stop - start
-    ios = int(10000/elapsed)
-    hd = 'HDD'
-    if ios > 6000: # ssd>8000; hdd <4000
-        hd = 'SSD'
-
-    print('detecting hard drive type by read/write speed')
-    print('ios', ios, 'hard drive type', hd)
-    if hd == 'HDD':
-        print(it('red','***WARN*** it does not appear you are INSTALLING on an SSD'))
-        null = input('press ENTER to continue or ctrl+shft+\ to EXIT') 
-    print(it('green','it appears you are installing on an SSD drive'))
-
-def accounts_held():
-
-    print('please NOTE!')
-    print('')
-    print('I AM CURRENTLY:')
-    print('')
-    print('owner of litepresence.com')
-    print('@litepresence telegram - quick to respond')
-    print('finitestate@tutamail.com - slow to respond')
-    print('litepresence stackoverflow')
-    print('litepresence github')
-    print('litepresence tradingview')
-    print('@oraclepresence twitter')
-    print('presence ronpaulforums.com')
-    print('')
-    print('I WAS FORMERLY:')
-    print('')
-    print('rpfpresence@gmail.com')
-    print('litepresence freenode')
-    print('litepresence btce trollbox')
-    print('litepresence poloniex trollbox')
-    print('litepresence cryptotrader')
-    print('litepresence tradewave')
-    print('litepresence quantopian')
-    print('litepresence metatrader')
-    print('')
-    print('I AM NOT IN CONTROL OF THESE HACKED ACCTS:')
-    print('')
-    print('litepresence twitter, local bitcoins, or bitcointalk')
-    print('')
-    null = input('press ENTER to continue')    
-
-def system_compatibility():
-
-    print('\033c')
-    print('')
-    print('')
-    print(it('blue', '      litepresence presents'))
-    print('')
-    print(it('yellow', '      BITSHARES EXTINCTION EVENT'), it('red','   CEX MUST DIE'))
-    print('')
-    print('')
-    print('ENSURING LINUX OS')
-    sleep(0.1)
-    linux_test()
-    print('ENSURING PYTHON 3')
-    sleep(0.1)
-    python_test()
-    print('CHECKING YOUR SYSTEM RAM')
-    sleep(0.1)
-    ram_test()
-    print('SOLID STATE DRIVE IS REQUIRED')
-    print('RUNNING SOME TESTS WHICH MAY THROW FALSE NEGATIVE')
-    print('SKIP IF YOU ARE SURE YOU ARE INSTALLING ON AN SSD')
-    sleep(0.1)
-    cat_scsi_test()
-    drive_speed_test()
-    print('SSD TEST COMPLETE')
-    print('')
-
-welcome()
-system_compatibility()
-
-__VERSION__ = '0.13'
-
+print("\n\nInstalling requirements.txt...\n\n")
+__VERSION__ = "0.13"
+talib_tulip()
 setup(
-    name='extinction-event',
+    name="extinction-event",
     version=__VERSION__,
     description=(
-        'Extinction Event'
-        'Bitshares Distributed Exchange Algo Trading Tools'
+        "Extinction Event" "Bitshares Distributed Exchange Algo Trading Tools"
     ),
-    long_description=open('README.md').read(),
-    download_url='https://github.com/litepresence/extinction-event/tarball/' + __VERSION__,
-    author='litepresence',
-    author_email='finitestate@tutamail.com',
-    url='http://www.litepresence.com',
-    keywords=['bts', 'bitshares',
-              'btc', 'bitcoin',
-              'crypto', 'altcoin', 'cryptocurrency',
-              'distributed', 'exchange', 'dex', 
-              'microdex', 'micro dex','micro',
-              'metanode', 'meta node','meta',
-              'latencytest', 'latency test', 'latency', 
-              'back test', 'backtest', 'test', 
-              'trading', 'bot', 'botscript', 'bot script', 
-              'extinction event', 'extinction-event', 'extinctionevent'],
+    long_description=open("README.md").read(),
+    download_url="https://github.com/litepresence/extinction-event/tarball/"
+    + __VERSION__,
+    author="litepresence",
+    author_email="finitestate@tutamail.com",
+    url="http://www.litepresence.com",
+    keywords=[
+        "bts",
+        "bitshares",
+        "bitsharesquant",
+        "quant",
+        "quantitative",
+        "palmpay",
+        "beet",
+        "dexbot",
+        "crypto-bridge",
+        "rudex",
+        "easydex",
+        "cryptobridge",
+        "btc",
+        "bitcoin",
+        "openledger",
+        "open-ledger",
+        "crypto",
+        "altcoin",
+        "cryptocurrency",
+        "smart",
+        "contract",
+        "distributed",
+        "exchange",
+        "dex",
+        "honey badger",
+        "microdex",
+        "micro dex",
+        "micro",
+        "honeybadger",
+        "metanode",
+        "meta node",
+        "meta",
+        "litepresence",
+        "latencytest",
+        "latency test",
+        "latency",
+        "back test",
+        "backtest",
+        "backtesting",
+        "algo",
+        "algorithmic",
+        "test",
+        "quant",
+        "trading",
+        "bot",
+        "botscript",
+        "bot script",
+        "extinction event",
+        "extinction-event",
+        "extinctionevent",
+    ],
     packages=find_packages(),
     classifiers=[
-        'Operating System :: POSIX :: Linux',
-        'Programming Language :: Python :: 3',
-        'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Topic :: Scientific/Engineering :: Information Analysis',
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "Topic :: Scientific/Engineering :: Information Analysis",
     ],
-    install_requires=open('requirements.txt').read().split(),
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    install_requires=open("requirements.txt").read().split(),
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"],
     include_package_data=True,
 )
-
-accounts_held()
-
-
+upgrade_pylint()
+print(it("green", "bitsharesQUANT installation complete\n\n"))
+print("For your future convenience, ENTER this alias command:\n")
+print(it("yellow", "    alias pylint=pylint3\n"))
