@@ -55,6 +55,7 @@ if that didn't work for some reason:
 **SUPPORT**
 
 FAST: https://t.me/bitshares_extinction_event
+
 SLOW: finitestate@tutamail.com
 
 or try:
@@ -89,7 +90,7 @@ extinction-event should be compliant with other linux distrobutions, installatio
 
 **INSTALL PYTHON 3.6+**
 
-I used this instructions:
+I used these instructions:
 
     https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/
 
