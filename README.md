@@ -51,6 +51,13 @@ DONE
 
 if that didn't work for some reason:
 
+**SUPPORT**
+
+FAST: https://t.me/bitshares_extinction_event
+SLOW: finitestate@tutamail.com
+
+or try:
+
 LINE BY LINE INSTALL
 ----------------------
 
