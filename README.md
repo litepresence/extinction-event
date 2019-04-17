@@ -1,7 +1,8 @@
+<center>
 ![Imgur Image](https://imgur.com/wibKTOb.png)
 
 ![Imgur Image](https://imgur.com/kcJ3E20.jpg)
-
+</center>
 
 INSTALLATION
 =======================
