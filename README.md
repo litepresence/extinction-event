@@ -45,7 +45,7 @@ navigate to the location you want to put your extinction-event folder, then:
 
     cd extinction-event; python3 environment.py
 
-follow instructions on screen
+follow the instructions in the terminal
 
 DONE
 ===================
