@@ -32,6 +32,28 @@ def WTFPL_v0_March_1765():
 
 The repository name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algorithmic trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algorithmic trading services.
 
+
+THREE LINE INSTALL
+----------------------
+
+navigate to the location you want to put your extinction-event folder, then:
+
+    sudo apt-get install git
+
+    git clone https://github.com/litepresence/extinction-event.git
+
+    cd extinction-event; python3 environment.py
+
+follow instructions on screen
+
+DONE
+===================
+
+if that didn't work for some reason:
+
+LINE BY LINE INSTALL
+----------------------
+
 **GATHER HARDWARE**
 
 This stack is heavy on solid state drive read/write, needs 4 gig ram, and central processing unit speed = back testing speed; recommendations:
@@ -98,6 +120,12 @@ Enter the extinction-event folder:
 *NOTE* The virtual environment and setup.py are in `extinction-event`
 *NOTE* The scripts are all in `extinction-event/EV`
 *NOTE* you will need to activate your virtual environment from extinction-event folder EVERY TIME you start a new terminal tab when running these scripts.
+
+**INSTALL TULIP and TALIB**
+
+tulip and talib provide indicators like EMA, MACD, Parabolic SAR, Aroon, RSI, STOCH, etc. 
+see installation instructions in WHITEPAPER folder
+without tulip and talib you will be limited to simple moving averages
 
 **LATENCY TEST**
 
