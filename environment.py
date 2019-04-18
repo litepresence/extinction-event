@@ -45,21 +45,23 @@ def it(style, text):
     }
     return ("\033[%sm" % emphasis[style]) + str(text) + "\033[0m"
 
-
 def proceed():
     """
     Y/N Prompt to Continue or Exit
     """
-    select = ""
-    while select not in ["y", "n"]:
+    select = False
+    while select not in ["y", "n", ""]:
         print("\n")
         select = input("Do you want to continue? [Y/n] ")
-        select = select.lower()[0]
-        if select not in ["y", "n"]:
+        try:
+            select = select.lower()[0]
+        except BaseException:
+            continue
+        if select not in ["y", "n", ""]:
             print("Invalid Entry")
     if select == "n":
         exit()
-    print("\n")
+    print("\n")    
 
 
 def get_latest_python():
