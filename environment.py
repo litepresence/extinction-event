@@ -1,11 +1,13 @@
 """
-Confirm SSD Drive
-Confirm Adequate RAM
-Confirm Linux OS
-Apt-Get Packages
+Confirm SSD Drive, Adequate RAM, Linux OS
+apt-get Packages
 Python Version Update
+More apt-get Packages
+Pre setup.py pip3 Requirements
 Create Virtual Environment
+Prompt setup.py install
 """
+
 from sys import platform, version_info
 from time import time, sleep
 from subprocess import call
@@ -45,6 +47,7 @@ def it(style, text):
     }
     return ("\033[%sm" % emphasis[style]) + str(text) + "\033[0m"
 
+
 def proceed():
     """
     Y/N Prompt to Continue or Exit
@@ -52,7 +55,7 @@ def proceed():
     select = False
     while select not in ["y", "n", ""]:
         print("\n")
-        select = input("Do you want to continue? [Y/n] ")
+        select = input(it("blue", "Do you want to continue? [Y/n] "))
         try:
             select = select.lower()[0]
         except BaseException:
@@ -61,154 +64,35 @@ def proceed():
             print("Invalid Entry")
     if select == "n":
         exit()
-    print("\n")    
-
-
-def get_latest_python():
-    """
-    Web scrape docs.python.org for latest version number
-    STANDARD libarary ONLY (sys / urllib / re)
-    """
-    url = "https://www.python.org/downloads/"
-    req = urllib.request.Request(url)
-    resp = urllib.request.urlopen(req)
-    text = str(resp.read())
-    # text = requests.get(url).text
-    # make list of all A.B.C version numbers
-    versions = re.findall(r"\d+\.\d+\.\d+", text)
-    versions += re.findall(r"\d+\.\d+", text)
-    versions = sorted(list(set(versions)), reverse=True)
-    # include only versions with A=3
-    version_3s = [i for i in versions if int(i[0]) == 3][:10]
-    version_id = (str(version_info[0]) +
-                  "." +
-                  str(version_info[1]) +
-                  "." +
-                  str(version_info[2]))
-    print(it("yellow", "Python Version Update \n\n"))
-    print("Version numbers found at", url, "\n")
-    print(version_3s, "\n")
-    print("It APPEARS that the current stable release is:", "\n")
-    print(version_3s[0], "\n")
-    print("It APPERS that the current version on this system is:", "\n")
-    print(version_id, "\n")
-    print("bitsharesQUANT requires:", "\n")
-    print("3.6 or greater", "\n")
-    print("As of April 2019 bitsharesQUANT recommends:", "\n")
-    print("3.7.3", "\n")
-    print("WARN: The highest version available may be a development fork")
-    print("WARN: Please visit", url)
-    print("WARN: to determine the latest STABLE release version\n\n")
-    version = ""
-    version = input("Input version number to UPGRADE or ENTER to skip: ")
     print("\n")
-    return version
 
 
-def install_latest_python(version):
+def system_compatibility():
     """
-    Prepare system for Python version update
-    Optionally download tarball and update Python
+    Process for linux, python, ram, and ssd checks
     """
-    # h/t https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/
-    tarball_url = "https://www.python.org/ftp/python/%s/Python-%s.tgz" % (
-        version,
-        version,
-    )
-    tarball_name = "Python-%s.tgz" % version
-    file_location = "Python-%s" % version
-    step0 = ["sudo", "apt-get", "update"]
-    step1 = ["sudo", "apt-get", "install", "build-essential", "checkinstall"]
-    step2 = [
-        "sudo",
-        "apt-get",
-        "install",
-        "libreadline-gplv2-dev",
-        "libncursesw5-dev",
-        "libssl-dev",
-        "libsqlite3-dev",
-        "tk-dev",
-        "libgdbm-dev",
-        "libc6-dev",
-        "libbz2-dev",
-        "libffi-dev",
-    ]
-    step3 = ["sudo", "wget", tarball_url]
-    step4 = ["sudo", "tar", "xzf", tarball_name]
-    step5 = ["sudo", "./configure", "--enable-optimizations"]
-    step6 = ["sudo", "-H", "make", "altinstall"]
-    print(it("yellow", "Check Install and Update Apt Get \n"))
-    print(" ".join(step0))
-    print(" ".join(step1), "\n")
-    print(it("yellow", "Install base libraries \n"))
-    print(" ".join(step2), "\n")
-    if version:
-        print(it("yellow", "Get tarball \n"))
-        print(" ".join(step3), "\n")
-        print(it("yellow", "Extract tarball \n"))
-        print(" ".join(step4), "\n")
-        print(it("yellow", "Compile \n"))
-        print(" ".join(step5))
-        print(" ".join(step6), "\n")
-    proceed()
-    call(step0)
-    call(step1)
-    call(step2)
-    if version:
-        with ChangeDirectory("/usr/src"):
-            call(step3)
-            call(step4)
-        with ChangeDirectory("/usr/src/" + file_location):
-            call(step5)
-            call(step6)
-        print("\nThe latest verion of python has been installed\n")
-        print("Checking Version\n")
-        print("python%s -V\n" % version[:3])
-        call(["python%s" % version[:3], "-V"])
-
-
-def dependency_manager():
-    """
-    apt-get dependency intallation
-    """
-    dependencies = [
-        "python3-pip",
-        "python3-tk",
-        "python3-dev",
-        "libsecp256k1-dev",
-        "virtualenv",
-    ]
-    # update the apt-get utility
-    step1 = ["sudo", "apt-get", "update"]
-    # pip, tk, dev, 256k1
-    step2 = ["sudo", "apt-get", "install", "-y", "python3-pip"]
-    step3 = ["sudo", "apt-get", "install", "python3-tk"]
-    step4 = ["sudo", "apt-get", "install", "python3-dev"]
-    step5 = ["sudo", "apt-get", "install", "libsecp256k1-dev"]
-    # install and create a virtual environment
-    step6 = ["sudo", "-H", "pip3", "install", "virtualenv"]
-    steps = [step1, step2, step3, step4, step5, step6]
-    print("Installing the following dependencies: \n")
-    for dependency in dependencies:
-        print(dependency)
-    for step in steps:
-        print(" ".join(step))
-        call(step)
-
-
-def create_virtual_env(version):
-    """
-    Create virtual environment
-    Prompt to finish setup
-    """
-    print("Creating virtual environment\n")
-    call(["virtualenv", "-p", "python3", "env"])
-    print(it("green", "Environment created!\n"))
-    print("To complete installation ENTER these commands:\n")
-    if version:
-        print(it("yellow", "    alias python3=python%s" % version[:3]), "\n")
-    print(it("yellow", "    source env/bin/activate"))
-    print(it("yellow", "    sudo python3 setup.py install\n"))
+    print("\033c", "\n\n\n")
+    print(it("blue", "litepresence presents"))
+    print(it("green", "Ubuntu, Debian, and LinuxMint"))
+    print(it("blue", "bitshareQUANT Environment Manager\n\n"))
+    print(it("yellow", "checking your system for compatibility...\n"))
+    print("ENSURING LINUX OS")
+    sleep(0.1)
+    linux_test()
+    print("ENSURING PYTHON 3")
+    sleep(0.1)
+    python_test()
+    print("CHECKING YOUR SYSTEM RAM")
+    sleep(0.1)
+    ram_test()
+    print("SOLID STATE DRIVE IS REQUIRED")
+    print("RUNNING SOME TESTS WHICH MAY THROW FALSE NEGATIVE")
+    print("IGNORE IF YOU ARE SURE YOU ARE INSTALLING ON AN SSD")
+    sleep(0.1)
+    cat_scsi_test()
+    drive_speed_test()
+    print("SSD TEST COMPLETE")
+    print("")
 
 
 def linux_test():
@@ -226,16 +110,18 @@ def python_test():
     check python version number is greater than 3.6, else warn
     """
     version = int(version_info[0]) + int(version_info[1]) / 10.0
-    version_id = (str(version_info[0]) +
-                  "." +
-                  str(version_info[1]) +
-                  "." +
-                  str(version_info[2]))
+    version_id = (
+        str(version_info[0]) + "." + str(version_info[1]) + "." + str(version_info[2])
+    )
     print("Version", version_id)
     if version < 3.6:
         print(it("red", "WARN: Python Version must be 3.6 or greater"))
-        print(it("yellow", "You will be prompted to upgrade, " +
-                 "follow the instructions.", ))
+        print(
+            it(
+                "yellow",
+                "You will be prompted to upgrade, " + "follow the instructions.",
+            )
+        )
     else:
         print(it("green", "Python 3.6+ Found"))
 
@@ -247,8 +133,7 @@ def ram_test():
     mem_bytes = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
     mem_gib = mem_bytes / (1024.0 ** 3)
     print("%.1f GB RAM" % mem_gib)
-    assert mem_gib > 3, it(
-        "red", "you will need at least 3GB RAM to run this suite")
+    assert mem_gib > 3, it("red", "you will need at least 3GB RAM to run this suite")
     print(it("green", "minimum adequate RAM found"))
 
 
@@ -288,54 +173,171 @@ def drive_speed_test():
     print("detecting hard drive type by read and write speed")
     print("ios", ios, "hard drive type", drive)
     if drive == "HDD":
-        print(it("red", "***WARN*** it does not APPEAR" +
-                 " you are INSTALLING on an SSD"))
+        print(
+            it("red", "***WARN*** it does not APPEAR" + " you are INSTALLING on an SSD")
+        )
         _ = input(r"press ENTER to continue or ctrl+shft+\ to EXIT")
     print(it("green", "it appears you are installing on an SSD drive"))
 
 
-def system_compatibility():
+def get_latest_python():
     """
-    Process for linux, python, ram, and ssd checks
+    Web scrape docs.python.org for latest version number
+    STANDARD libarary ONLY (sys / urllib / re)
     """
-    print("\033c")
-    print("")
-    print("")
-    print(it("yellow", "litepresence presents"))
-    print("")
-    print(it("blue", "bitsharesQUANT"))
-    print("")
-    print("")
-    print("ENSURING LINUX OS")
-    sleep(0.1)
-    linux_test()
-    print("ENSURING PYTHON 3")
-    sleep(0.1)
-    python_test()
-    print("CHECKING YOUR SYSTEM RAM")
-    sleep(0.1)
-    ram_test()
-    print("SOLID STATE DRIVE IS REQUIRED")
-    print("RUNNING SOME TESTS WHICH MAY THROW FALSE NEGATIVE")
-    print("SKIP IF YOU ARE SURE YOU ARE INSTALLING ON AN SSD")
-    sleep(0.1)
-    cat_scsi_test()
-    drive_speed_test()
-    print("SSD TEST COMPLETE")
-    print("")
+    url = "https://www.python.org/downloads/"
+    req = urllib.request.Request(url)
+    resp = urllib.request.urlopen(req)
+    text = str(resp.read())
+    # text = requests.get(url).text
+    # make list of all A.B.C version numbers
+    versions = re.findall(r"\d+\.\d+\.\d+", text)
+    versions += re.findall(r"\d+\.\d+", text)
+    versions = sorted(list(set(versions)), reverse=True)
+    # include only versions with A=3
+    version_3s = [i for i in versions if int(i[0]) == 3][:10]
+    version_id = (
+        str(version_info[0]) + "." + str(version_info[1]) + "." + str(version_info[2])
+    )
+    print(it("yellow", "Python Version Update \n\n"))
+    print("Version numbers found at", url, "\n")
+    print(version_3s, "\n")
+    print("It APPEARS that the current stable release is:", "\n")
+    print(version_3s[0], "\n")
+    print("It APPERS that the current version on this system is:", "\n")
+    print(version_id, "\n")
+    print("bitsharesQUANT requires:", "\n")
+    print("3.6 or greater", "\n")
+    print("As of April 2019 bitsharesQUANT recommends:", "\n")
+    print("3.7.3", "\n")
+    print("WARN: The highest version available may be a development fork")
+    print("WARN: Please visit", url)
+    print("WARN: to determine the latest STABLE release version\n\n")
+    version = ""
+    version = input(it("blue", "Input version number to UPGRADE or ENTER to skip: "))
+    print("\n")
+    return version
+
+
+def pre_python_aptget():
+    """
+    Prepare system for Python version update
+    sudo apt-get install -y
+    """
+    dependencies = [
+        "build-essential",
+        "checkinstall",
+        "libreadline-gplv2-dev",
+        "libncursesw5-dev",
+        "libsecp256k1-dev",
+        "libsqlite3-dev",
+        "libgdbm-dev",
+        "libssl-dev",
+        "libbz2-dev",
+        "libffi-dev",
+        "libc6-dev",
+        "tk-dev",
+    ]
+    print(it("yellow", "\napt-get update\n"))
+    call(["sudo", "apt-get", "update"])
+    print(it("yellow", "\nInstall base libraries\n"))
+    print(dependencies)
+    for _, dependency in enumerate(dependencies):
+        print(it("yellow", ("\n%s\n" % dependency)))
+        call(["sudo", "apt-get", "install", "-y", dependency])
+    print(it("green", "initial apt-get dependencies complete\n"))
+
+
+def install_latest_python(version):
+    """
+    Download tarball, extract, and compile to update Python
+    """
+    uri = "https://www.python.org/ftp/python/"
+    tarball_name = "Python-%s.tgz" % version
+    file_location = "Python-%s" % version
+    tarball_url = uri + "%s/%s" % (version, tarball_name)
+    step1 = ["sudo", "wget", tarball_url]
+    step2 = ["sudo", "tar", "xzf", tarball_name]
+    step3 = ["sudo", "./configure", "--enable-optimizations"]
+    step4 = ["sudo", "-H", "make", "altinstall"]
+    print(it("yellow", "Get tarball \n"))
+    print(" ".join(step1), "\n")
+    print(it("yellow", "Extract tarball \n"))
+    print(" ".join(step2), "\n")
+    print(it("yellow", "Compile \n"))
+    print(" ".join(step3))
+    print(" ".join(step4), "\n")
+    proceed()
+    with ChangeDirectory("/usr/src"):
+        call(step1)
+        call(step2)
+    with ChangeDirectory("/usr/src/" + file_location):
+        call(step3)
+        call(step4)
+    print("\nThe latest verion of python has been installed\n")
+    print("Checking Version\n")
+    print(it("green", ("python%s -V\n" % version[:3])))
+    call(["python%s" % version[:3], "-V"])
+
+
+def post_python_aptget():
+    """
+    sudo apt-get install
+    """
+    dependencies = ["python-pip", "python3-pip", "python3-tk", "python3-dev", "flake8"]
+    print("Installing the following apt-get requirements: \n")
+    print(dependencies, "\n")
+    proceed()
+    for _, dependency in enumerate(dependencies):
+        print(it("yellow", ("\n%s\n" % dependency)))
+        call(["sudo", "apt-get", "install", "-y", dependency])
+    print(it("green", "final apt-get dependencies complete\n"))
+
+
+def pre_setup_pip3(version):
+    """
+    setup.py will require virtualenv and setuptools
+    talib and tulip will require numpy and Cython
+    sudo -H pip3 install
+    """
+    dependencies = ["virtualenv", "setuptools", "numpy", "Cython"]
+    print("Installing the following pip3 requirements: \n")
+    print(dependencies, "\n")
+    proceed()
+    version = "python%s" % version[:3]
+    for _, dependency in enumerate(dependencies):
+        print(it("yellow", ("\n%s\n" % dependency)))
+        call(["sudo", "-H", "pip3", "install", dependency, "--upgrade"])
+        call(["sudo", "-H", version, "-m", "pip", "install", dependency, "--upgrade"])
+    print(it("green", "pre setup pip3 dependencies complete\n"))
+
+
+def create_virtual_env(version):
+    """
+    Create virtual environment
+    Prompt to finish setup
+    """
+    print("Creating virtual environment\n")
+    call(["virtualenv", "-p", "python3", "env"])
+    print(it("green", "Virtual environment created!\n"))
+    print(it("blue", "To complete installation ENTER these commands:\n"))
+    if version:
+        print(it("yellow", "    alias python3=python%s" % version[:3]), "\n")
+    print(it("yellow", "    source env/bin/activate\n"))
+    print(it("yellow", "    sudo python3 setup.py install\n"))
 
 
 def main():
     """
     Primary environment creation backbone
     """
-    print("\033c", "\n\n\n")
-    print("Ubuntu, Debian, and LinuxMint", "\n")
-    print("bitshareQUANT Environment Manager", "\n")
     system_compatibility()
     version = get_latest_python()
-    install_latest_python(version)
-    dependency_manager()
+    pre_python_aptget()
+    if version:
+        install_latest_python(version)
+    post_python_aptget()
+    pre_setup_pip3(version)
     create_virtual_env(version)
 
 
