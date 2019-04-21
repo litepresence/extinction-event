@@ -3,6 +3,7 @@
 pip3 installations
 tulip and talib installations
 """
+
 import os
 from subprocess import call
 from setuptools import setup, find_packages
@@ -40,7 +41,6 @@ def it(style, text):
     return ("\033[%sm" % emphasis[style]) + str(text) + "\033[0m"
 
 
-
 def talib_tulip():
     """
     Intall Tulip and Talib quantiative indicators packages
@@ -76,9 +76,9 @@ def upgrade_pylint():
     call(["sudo", "-H", "pip3", "install", "pylint", "--upgrade"])
 
 
-print("\n\nInstalling requirements.txt...\n\n")
 __VERSION__ = "0.13"
 talib_tulip()
+print("\n\nInstalling requirements.txt...\n\n")
 setup(
     name="extinction-event",
     version=__VERSION__,
