@@ -19,6 +19,8 @@ def WTFPL_v0_March_1765():
 # Includes Geolocation Data from ip-api.com
 # Creates map from geolocation data and uploads to vgy.me
 # Map base image auto downloads from imgur
+# Saves map history
+# Animated map history
 """
 
 # STANDARD PYTHON MODULES
@@ -51,7 +53,7 @@ TESTNET = False  # Include nodes with word "test" in domain
 UNIVERSE = False  # Check all nodes in known Nodes.universe()
 APASIA = False  # Check Nodes.apasia() infrastructure worker
 # PING AND GEOLOCATE SEED NODES
-SEEDS = False  # NOTE: system ping & geolocation only; plots in RED
+SEEDS = True  # NOTE: system ping & geolocation only; plots in RED
 # TEXT SCRAPE GITHUB FOR LATEST NODES
 GITHUB = False  # Check all known github repos for nodes lists
 GITHUB_MASTER = False  # Check only Bitshares UI Master List
@@ -60,18 +62,20 @@ ONLY = False  # Test just Nodes.only() list (ignore all lists above)
 EXCLUDE = True  # Exclude known bad nodes in Nodes.exclude()
 # PLOT LATENCY MAP
 GEOLOCATE = "http://ip-api.com/json/"
-SAVE_HISTORY = True  # Save latency map to history folder
 IPAPI = True  # set to true to add geolocation data
 PLOT = True  # set to true to plot
+MAP_SAVE = True
+MAP_FRAMES = 10
+MAP_PAUSE = 2
 # TEST SETTINGS
 NOPRINT = False  # Reduced terminal printing
 TRACE_DETAIL = False  # websocket.enableTrace
 WRITE = False  # Write nodes.txt with unique list
-LOOP = False  # Repeat latency test indefinitely
+LOOP = True  # Repeat latency test indefinitely
 TIMEOUT = 4  # Websocket Timeout
-CROP1 = 999 # Crop initial list for quick test (999 to disable)
+CROP1 = 999  # Crop initial list for quick test (999 to disable)
 CROP2 = 999  # Crop final list to fastest responders (999 to disable)
-REPEAT = 7200 # Repeat frequency of latecy retest loop
+REPEAT = 1  # Repeat frequency of latecy retest loop
 # PROXY GITHUB RAW CONTENT
 PROXY_GITHUB = True  # Proxy Github raw content (my ISP blocks)
 PROXY = "www.textise.net/showText.aspx?strURL="
@@ -249,13 +253,15 @@ def clean(raw):
     ret = ret.replace(",", " ").replace(";", " ").replace("&", " ")
     return ret
 
+
 def parse(cleaned):
     """
     Return list of words beginning with wss
     """
     ret = [url for url in cleaned.split() if url.startswith("wss")]
-    #print (ret)
+    # print (ret)
     return ret
+
 
 def validate(nodes):
     """
@@ -457,12 +463,10 @@ def save_figure():
     Save the plotted map to hard drive as a *png file
     """
     location = path + "latency_maps/map.png"
-    plt.savefig(location, dpi=100, bbox_inches="tight", pad_inches=0)
-    if SAVE_HISTORY:
-        location = (
-            path + "latency_maps/map_" + str(int(time.time())) + ".png"
-        )
-        plt.savefig(location, dpi=100, bbox_inches="tight", pad_inches=0)
+    plt.savefig(location, dpi=120, bbox_inches="tight", pad_inches=0)
+    if MAP_SAVE:
+        location = path + "latency_maps/map_" + str(int(time.time())) + ".png"
+        plt.savefig(location, dpi=120, bbox_inches="tight", pad_inches=0)
 
 
 # TURN TERMINAL PRINTING ON AND OFF
@@ -857,9 +861,6 @@ def thresh(previous_unique):
 
     if PLOT:
         save_figure()
-        plt.pause(0.1)
-        if not LOOP:
-            plt.show()
     try:
         del timed
         del no_suffix
@@ -899,10 +900,7 @@ def loop(logo):
         try:
             previous_unique = thresh(previous_unique)
             print("elapsed: ", (time.time() - start))
-            if PLOT:
-                plt.pause(REPEAT)
-            else:
-                time.sleep(REPEAT)
+            time.sleep(REPEAT)
         # no matter what happens just keep verifying book
         except Exception as error:
             print(traceback.format_exc())
@@ -929,6 +927,56 @@ def update():
         print(type(error).__name__, error.args, error)
 
 
+def map_animate():
+    """
+    Instead of performing a latency test, show animated map history
+    """
+    # list of items in directory        
+    maps = sorted(os.listdir(path + "latency_maps/"))
+    # only those that are png and have unix timestamp
+    maps = [i for i in maps if ((len(i) > 10) and (".png" in i))]
+    # limited to the user specified number of frames
+    maps = maps[-MAP_FRAMES:]
+    print(maps)
+    # create a new figure with no ticks, black background
+    fig, axis = plt.subplots(figsize=(12, 24), facecolor="black")
+    plt.xticks([])
+    plt.yticks([])
+    fig.tight_layout()
+    # begin animation loop
+    images = []        
+    while True:
+        # cache the images in the map list
+        if not images:
+            for png in maps:
+                location = path + "latency_maps/" + png
+                images.append(plt.imread(location))
+        # get a latest map list from the directory
+        new_maps = sorted(os.listdir(path + "latency_maps/"))
+        new_maps = [i for i in new_maps if ((len(i) > 10) and (".png" in i))]
+        new_maps = new_maps[-MAP_FRAMES:]
+        # add any new images from the directory
+        if maps != new_maps:
+            print('updating live animation...')
+            maps = [i for i in new_maps if i not in maps]
+            for png in maps:
+                location = path + "latency_maps/" + png
+                images.append(plt.imread(location))
+        # limit animation frames to window of latest data
+        images = images[-MAP_FRAMES:]
+        # plot, pause, clear, new map... repeat
+        for image in images:
+            axis.imshow(image, extent=[-180, 180, -90, 90])
+            plt.pause(MAP_PAUSE)
+            axis.clear()
+        # refresh map list 
+        if maps != new_maps:
+            maps = new_maps
+            # stop animation of not a looping test
+            if not LOOP:
+                axis.imshow(images[-1], extent=[-180, 180, -90, 90])
+                plt.show()
+
 def main():
     """
     Primary Event Sequence
@@ -942,14 +990,18 @@ def main():
     # select mode
     if API_CREATE:
         create_jsonbin()
-    elif LOOP:
+    if MAP_FRAMES:
+        animation_process = Process(target=map_animate)
+        animation_process.start()
+    if LOOP:
         loop(logo)
     else:
         print("\033c")
         print(logo)
         update()
 
-path = str(os.path.dirname(os.path.abspath(__file__))) + "/"
 
 if __name__ == "__main__":
+
+    path = str(os.path.dirname(os.path.abspath(__file__))) + "/"
     main()
