@@ -69,7 +69,7 @@ TRACE_DETAIL = False  # websocket.enableTrace
 WRITE = False  # Write nodes.txt with unique list
 LOOP = False  # Repeat latency test indefinitely
 TIMEOUT = 4  # Websocket Timeout
-CROP1 = 10 # Crop initial list for quick test (999 to disable)
+CROP1 = 999 # Crop initial list for quick test (999 to disable)
 CROP2 = 999  # Crop final list to fastest responders (999 to disable)
 REPEAT = 7200 # Repeat frequency of latecy retest loop
 # PROXY GITHUB RAW CONTENT
