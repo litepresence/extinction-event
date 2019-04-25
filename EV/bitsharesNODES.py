@@ -288,6 +288,7 @@ class Nodes:
     def recent():
         """
         35 nodes seen in past few  months 
+        this list includes known working suffixes
         """
         return [
             "wss://altcap.io",
@@ -337,23 +338,19 @@ class Nodes:
 
     def github():
         """
-        29 github locations known to host lists of nodes
+        24 github locations known to host lists of nodes
         """
         return [
             "/AAAChain/w3ajs-ws/479b7c562fe216156edc2d38b3e22297428ea30b/test/Manager.js",
-            "/BTS-CM/Bitshares-HUG-REST-API/a39b3d09e65a118ad551dc0834ef9199ec618a14/hug_script.py",
+            "/BTS-CM/Bitshares-HUG-REST-API/c13ee4ae322240b17c60e42bb5c45e188fdf8d6d/work_in_progress/get_all_balances.py",
             "/BitSharesEurope/wallet.bitshares.eu/c618759e450ed645629421d6e6d063d0623652b1/app/api/apiConfig.js",
             "/Cloud-eer/cloud-ws/17f95488b444bf5ff693cd16701bad9fd4902d8b/test/Manager.js",
             "/CryptoBridge/cryptobridge-ui/e5214ad63a41bd6de1333fd98d717b37e1a52f77/app/api/apiConfig.js",
             "/InfraexDev/BTSExchange/a9de1845ceed16270e1d22752cf0a0e98841f4bd/app/api/apiConfig.js",
             "/LocalCoinIS/localcoinjs-ws/00870ec1471b69014b8076e84ba76ef8bd16f7b5/test/Manager.js",
             "/MCLXI/cb/d3842a05f052276cc0d48e5d1ece4fd4b0977dcd/app/api/apiConfig.js",
-            "/Open-Asset/Bitshares_nodes/d375fa830699131a9e334cb689a5d70578f4db4f/Bitshares%20Public%20Nodes%20Open-Assets",
-            "/TKFORKED/hx-ui/6e5282ace6e4845a4cf3db99b9688ba6b2de6c80/app/api/apiConfig.js",
-            "/alldex/alldex-ui/61323a668783aa3609eb1e77b92348f5cffcba01/app/api/apiConfig.js",
             "/bitshares/bitshares-ui/develop/app/api/apiConfig.js",
             "/bitshares/bitshares-ui/staging/app/api/apiConfig.js",
-            "/blag-potok/blgtk/c5192cedf09f9f298cf8d7d59de89cebc1f71f8c/index.html",
             "/blckchnd/rudex-ui/rudex/app/api/apiConfig.js",
             "/crexonline/crex/00fec97b4305d9105b19d723bccf93085bf55a12/app/api/apiConfig.js",
             "/dbxone/dbxui/4a39f849d203f28d8e27a78b5b70c4ae5b6e3f5a/app/api/apiConfig.js",
@@ -362,12 +359,11 @@ class Nodes:
             "/hamzoni/zcom-ui/aed6c10417e40f9b9467a891c48aba1d64a5dc18/app/api/apiConfig.js",
             "/jhtitor/citadel/92c561a23aee20189c3827e231643f6d54ed55c1/bitsharesqt/bootstrap.py",
             "/jwaiswa7/bit_shares_exknox/046a514a31d10dba38c0ea37f3dbd14b64abecad/app/api/apiConfig.js",
-            "/litepresence/extinction-event/master/bitshares-nodes.py",
+            "/litepresence/extinction-event/master/EV/bitsharesNODES.py",
             "/mhowardweb/blockchain-connector/5c99251cfcb780a04f9bb06150d76a6423a7c871/vuex-bitshares/config.js",
             "/myneworder/crex-ui/eb3f77ddb81b415c83c817c8aa980abf79ac8bb5/app/api/apiConfig.js",
             "/oooautoclub/autounite-js/51c04acd6b795ad9801b2241a01ca890ec8a535e/app/api/apiConfig.js",
             "/theserranos/bitsharesAPINode/3a9a49cc566246e95a71b49389fe1eebffcfce81/config.js",
-            "/tpkeeper/btswallet_web/master/app/api/apiConfig.js",
             "/zcom-project/zcomjs-ws/94dd0763c4ea0866dfffcaba568ac5f970c7d38a/test/Manager.js",
         ]
 
