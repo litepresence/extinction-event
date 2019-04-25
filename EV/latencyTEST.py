@@ -45,14 +45,15 @@ from bitsharesNODES import Nodes
 # ######################################################################
 VERSION = "Bitshares latencyTEST 0.00000013"
 # SELECT NODES TO TEST
-UNIVERSE = True  # Check all nodes in known Nodes.universe()
-APASIA = True  # Check Nodes.apasia() infrastructure worker
 RECENT = True  # Check Nodes.recent() seen in past few months
-TESTNET = True  # Include nodes with word "test" in domain
-SEEDS = True  # Check seed nodes (NOTE: system ping & geolocation only)
 SINCE_181127 = True  # Check all nodes seen since core version 181127
+TESTNET = False  # Include nodes with word "test" in domain
+UNIVERSE = False  # Check all nodes in known Nodes.universe()
+APASIA = False  # Check Nodes.apasia() infrastructure worker
+# PING AND GEOLOCATE SEED NODES
+SEEDS = False  # NOTE: system ping & geolocation only; plots in RED
 # TEXT SCRAPE GITHUB FOR LATEST NODES
-GITHUB = True  # Check all known github repos for nodes lists
+GITHUB = False  # Check all known github repos for nodes lists
 GITHUB_MASTER = False  # Check only Bitshares UI Master List
 # EXCLUSIONS
 ONLY = False  # Test just Nodes.only() list (ignore all lists above)
@@ -65,10 +66,10 @@ PLOT = True  # set to true to plot
 # TEST SETTINGS
 NOPRINT = False  # Reduced terminal printing
 TRACE_DETAIL = False  # websocket.enableTrace
-WRITE = True  # Write nodes.txt with unique list
+WRITE = False  # Write nodes.txt with unique list
 LOOP = False  # Repeat latency test indefinitely
 TIMEOUT = 4  # Websocket Timeout
-CROP1 = 999 # Crop initial list for quick test (999 to disable)
+CROP1 = 10 # Crop initial list for quick test (999 to disable)
 CROP2 = 999  # Crop final list to fastest responders (999 to disable)
 REPEAT = 7200 # Repeat frequency of latecy retest loop
 # PROXY GITHUB RAW CONTENT
@@ -80,7 +81,7 @@ MAP_UPLOAD = False  # Upload map to vgy.me image sharing
 # FREE WWW.JSONBIN.IO JSON API HOSTING
 API_CREATE = False  # Create a new api endpoint at jsonbin.io
 API_UPLOAD = False  # Share your latency test data via jsonbin api
-BIN = "see jsonbin() definition to for sample bin creation script"
+BIN = "set API_CREATE to True to use create_jsonbin() utility"
 KEY = "get an api key to share your data on the web from jsonbin.io"
 # BITSHARES MAINNET CHAIN ID
 ID = "4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8"
@@ -242,17 +243,19 @@ def upload_to_jsonbin(data):
 
 def clean(raw):
     """
-    Remove parenthesis and commas from strings
+    Remove quotes and commas from strings; convert to space
     """
-    return ((str(raw).replace('"', " ")).replace("'", " ")).replace(",", " ")
-
+    ret = str(raw).replace('"', " ").replace("'", " ")
+    ret = ret.replace(",", " ").replace(";", " ").replace("&", " ")
+    return ret
 
 def parse(cleaned):
     """
     Return list of words beginning with wss
     """
-    return [url for url in cleaned.split() if url.startswith("wss")]
-
+    ret = [url for url in cleaned.split() if url.startswith("wss")]
+    #print (ret)
+    return ret
 
 def validate(nodes):
     """
@@ -357,16 +360,15 @@ def get_basemap():
     Use cached copy of basemap from the script's parent folder
     otherwise download basemap from imgur
     """
-    folder = str(os.path.dirname(os.path.abspath(__file__))) + "/"
     url = "https://i.imgur.com/yIVogZH.png"
     image = "basemap.png"
-    path = folder + image
-    print(path)
+    location = path + image
+    print(location)
     try:
-        basemap = cbook.get_sample_data(path)
+        basemap = cbook.get_sample_data(location)
     except BaseException:
         download_img(url, image)
-        basemap = cbook.get_sample_data(path)
+        basemap = cbook.get_sample_data(location)
     return basemap
 
 
@@ -454,13 +456,11 @@ def save_figure():
     """
     Save the plotted map to hard drive as a *png file
     """
-    location = "/home/oracle/extinction-event/EV/nodemap.png"
+    location = path + "latency_maps/map.png"
     plt.savefig(location, dpi=100, bbox_inches="tight", pad_inches=0)
     if SAVE_HISTORY:
         location = (
-            "/home/oracle/extinction-event/EV/HISTORY/nodemap_"
-            + str(int(time.time()))
-            + ".png"
+            path + "latency_maps/map_" + str(int(time.time())) + ".png"
         )
         plt.savefig(location, dpi=100, bbox_inches="tight", pad_inches=0)
 
@@ -949,6 +949,7 @@ def main():
         print(logo)
         update()
 
+path = str(os.path.dirname(os.path.abspath(__file__))) + "/"
 
 if __name__ == "__main__":
     main()
