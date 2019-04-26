@@ -50,8 +50,8 @@ VERSION = "Bitshares latencyTEST 0.00000013"
 # SELECT NODES TO TEST
 RECENT = True  # Check Nodes.recent() seen in past few months
 SINCE_181127 = True  # Check all nodes seen since core version 181127
-TESTNET = False  # Include nodes with word "test" in domain
-UNIVERSE = False  # Check all nodes in known Nodes.universe()
+TESTNET = True  # Include nodes with word "test" in domain
+UNIVERSE = True  # Check all nodes in known Nodes.universe()
 APASIA = False  # Check Nodes.apasia() infrastructure worker
 # PING AND GEOLOCATE SEED NODES
 SEEDS = True  # NOTE: system ping & geolocation only; plots in RED
@@ -565,6 +565,7 @@ def test_seeds():
         seeds = []
         print("pinging and geolocating seed nodes...\n")
         for public_ip in ret:
+            time.sleep(0.5)
             cmd = "ping -c 1 " + public_ip
             pong = os.popen(cmd).read()
             try:
@@ -698,6 +699,7 @@ def geolocation(unique, pinged):
     hosts = []
     cities = []
     for item, _ in enumerate(unique):
+        time.sleep(0.5)
         if IPAPI:
             print("geolocating...")
             # strip wws://, /wss, /ws, and /
