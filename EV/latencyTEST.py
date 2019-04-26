@@ -13,12 +13,13 @@ def WTFPL_v0_March_1765():
 
 ************ ALPHA RELEASE TO PUBLIC DOMAIN WITH NO WARRANTY ***********
 
+# Confirms Chain ID, Blocktime, Ping, and Participation Rate
 # No pybitshares dependencies
 # Writes unique domains to file nodes.txt
 # Uploads list and other latency data to jsonbin.io
 # Includes Geolocation Data from ip-api.com
 # Creates map from geolocation data and uploads to vgy.me
-# Map base image auto downloads from imgur
+# Base map image auto downloads from imgur
 # Saves map history
 # Animated map history
 """
@@ -75,7 +76,7 @@ LOOP = True  # Repeat latency test indefinitely
 TIMEOUT = 4  # Websocket Timeout
 CROP1 = 999  # Crop initial list for quick test (999 to disable)
 CROP2 = 999  # Crop final list to fastest responders (999 to disable)
-REPEAT = 1  # Repeat frequency of latecy retest loop
+REPEAT = 3600  # Repeat frequency of latecy retest loop
 # PROXY GITHUB RAW CONTENT
 PROXY_GITHUB = True  # Proxy Github raw content (my ISP blocks)
 PROXY = "www.textise.net/showText.aspx?strURL="
@@ -89,6 +90,7 @@ BIN = "set API_CREATE to True to use create_jsonbin() utility"
 KEY = "get an api key to share your data on the web from jsonbin.io"
 # BITSHARES MAINNET CHAIN ID
 ID = "4018d7844c78f6a6c41c6a552b898022310fc5dec06da467ee7905a8dad512c8"
+PATH = str(os.path.dirname(os.path.abspath(__file__))) + "/"
 # ######################################################################
 
 
@@ -115,7 +117,7 @@ def wss_query(rpc, params):
     return ret
 
 
-def rpc_get_chain_properties(rpc):
+def rpc_chain_id(rpc):
     """
     Get the chain ID to confirm it matches mainnet ID
     """
@@ -123,20 +125,14 @@ def rpc_get_chain_properties(rpc):
     return ret["chain_id"]
 
 
-def rpc_get_dynamic_properties(rpc):
+def rpc_blocktime_participation(rpc):
     """
-    Get the latest block number
+    Determine if node is returning stale data
     """
-    ret = wss_query(rpc, ["database", "get_dynamic_global_properties", []])
-    return ret["head_block_number"]
-
-
-def rpc_get_block(rpc, block):
-    """
-    Given a block number, get its timestamp to confirm not stale
-    """
-    ret = wss_query(rpc, ["database", "get_block", [block]])
-    return from_iso_date(ret["timestamp"])
+    ret = wss_query(rpc, ["database", "get_objects", [["2.1.0"]]])[0]
+    unix = from_iso_date(ret["time"])
+    participation = bin(int(ret["recent_slots_filled"])).count("1") / 1.28
+    return unix, participation
 
 
 # TEXT PIPE INTERPROCESS COMMUNICATION
@@ -368,7 +364,7 @@ def get_basemap():
     """
     url = "https://i.imgur.com/yIVogZH.png"
     image = "basemap.png"
-    location = path + image
+    location = PATH + image
     print(location)
     try:
         basemap = cbook.get_sample_data(location)
@@ -462,11 +458,62 @@ def save_figure():
     """
     Save the plotted map to hard drive as a *png file
     """
-    location = path + "latency_maps/map.png"
+    location = PATH + "latency_maps/map.png"
     plt.savefig(location, dpi=120, bbox_inches="tight", pad_inches=0)
     if MAP_SAVE:
-        location = path + "latency_maps/map_" + str(int(time.time())) + ".png"
+        location = PATH + "latency_maps/map_" + str(int(time.time())) + ".png"
         plt.savefig(location, dpi=120, bbox_inches="tight", pad_inches=0)
+
+
+def map_animate():
+    """
+    Instead of performing a latency test, show animated map history
+    """
+    # list of items in directory
+    maps = sorted(os.listdir(PATH + "latency_maps/"))
+    # only those that are png and have unix timestamp
+    maps = [i for i in maps if ((len(i) > 10) and (".png" in i))]
+    # limited to the user specified number of frames
+    maps = maps[-MAP_FRAMES:]
+    print(maps)
+    # create a new figure with no ticks, black background
+    fig, axis = plt.subplots(figsize=(12, 24), facecolor="black")
+    plt.xticks([])
+    plt.yticks([])
+    fig.tight_layout()
+    # begin animation loop
+    images = []
+    while True:
+        # cache the images in the map list
+        if not images:
+            for png in maps:
+                location = PATH + "latency_maps/" + png
+                images.append(plt.imread(location))
+        # get a latest map list from the directory
+        new_maps = sorted(os.listdir(PATH + "latency_maps/"))
+        new_maps = [i for i in new_maps if ((len(i) > 10) and (".png" in i))]
+        new_maps = new_maps[-MAP_FRAMES:]
+        # add any new images from the directory
+        if maps != new_maps:
+            print("updating live animation...")
+            maps = [i for i in new_maps if i not in maps]
+            for png in maps:
+                location = PATH + "latency_maps/" + png
+                images.append(plt.imread(location))
+        # limit animation frames to window of latest data
+        images = images[-MAP_FRAMES:]
+        # plot, pause, clear, new map... repeat
+        for image in images:
+            axis.imshow(image, extent=[-180, 180, -90, 90])
+            plt.pause(MAP_PAUSE)
+            axis.clear()
+        # refresh map list
+        if maps != new_maps:
+            maps = new_maps
+            # stop animation of not a looping test
+            if not LOOP:
+                axis.imshow(images[-1], extent=[-180, 180, -90, 90])
+                plt.show()
 
 
 # TURN TERMINAL PRINTING ON AND OFF
@@ -568,21 +615,26 @@ def ping(node, num):
         start = time.time()
         rpc = wss_handshake(node)
         ping_latency = time.time() - start
-        block = rpc_get_dynamic_properties(rpc)
-        chain = rpc_get_chain_properties(rpc)
-        blocktimestamp = rpc_get_block(rpc, block)
-        block_latency = time.time() - blocktimestamp
+        chain = rpc_chain_id(rpc)
+        blocktime, participation = rpc_blocktime_participation(rpc)
+        block_latency = time.time() - blocktime
         if chain != ID:
             num.value = 333333
+            print("chain", chain)
+        elif participation < 100:
+            num.value = 444444
+            print("participation", participation)
         elif block_latency < (ping_latency + 10):
             num.value = ping_latency
         else:
             num.value = 111111
+            print("block latency", block_latency)
             if TESTNET:
                 num.value = ping_latency
+                print("testnet")
     except Exception as error:
-        print(str(type(error).__name__) + " " + str(error.args))
         num.value = 222222
+        print(str(type(error).__name__) + " " + str(error.args))
 
 
 def select_nodes():
@@ -699,7 +751,7 @@ def spawn(pinging, validated):
     """
     Launch timed subprocesses to test each node in validated list
     """
-    pinged, timed, stale, expired, testnet, down = [], [], [], [], [], []
+    pinged, timed, stale, expired, testnet, down, forked = [], [], [], [], [], [], []
     for node in validated:
         if len(pinged) < pinging:
             # use multiprocessing module to enforce TIMEOUT
@@ -716,6 +768,8 @@ def spawn(pinging, validated):
                     down.append(node)
                 elif num.value == 333333:  # wrong chain id
                     testnet.append(node)
+                elif num.value == 444444:
+                    forked.append(node)
                 elif num.value == 999999:  # TIMEOUT reached
                     expired.append(node)
             else:
@@ -725,7 +779,7 @@ def spawn(pinging, validated):
     # sort websockets by latency
     pinged = [x for _, x in sorted(zip(timed, pinged))]
     timed = sorted(timed)
-    return pinged, timed, stale, expired, testnet, down
+    return pinged, timed, stale, expired, testnet, down, forked
 
 
 def thresh(previous_unique):
@@ -751,7 +805,7 @@ def thresh(previous_unique):
         )
         block_print()
         print("=====================================")
-        pinged, timed, stale, expired, testnet, down = spawn(pinging, validated)
+        pinged, timed, stale, expired, testnet, down, forked = spawn(pinging, validated)
         unknown = sorted(
             list(set(validated).difference(pinged + down + stale + expired + testnet))
         )
@@ -799,6 +853,9 @@ def thresh(previous_unique):
         if down:
             for item, _ in enumerate(down):
                 print(((item + 1), "DOWN", down[item]))
+        if forked:
+            for item, _ in enumerate(forked):
+                print(((item + 1), "FORKED", forked[item]))
         if pinged:
             for item, _ in enumerate(pinged):
                 print(((item + 1), "GOOD PING", "%.2f" % timed[item], pinged[item]))
@@ -818,6 +875,7 @@ def thresh(previous_unique):
         del expired
         del stale
         del down
+        del forked
         del pinged
     except UnboundLocalError as error:
         print(error.args)
@@ -927,56 +985,6 @@ def update():
         print(type(error).__name__, error.args, error)
 
 
-def map_animate():
-    """
-    Instead of performing a latency test, show animated map history
-    """
-    # list of items in directory        
-    maps = sorted(os.listdir(path + "latency_maps/"))
-    # only those that are png and have unix timestamp
-    maps = [i for i in maps if ((len(i) > 10) and (".png" in i))]
-    # limited to the user specified number of frames
-    maps = maps[-MAP_FRAMES:]
-    print(maps)
-    # create a new figure with no ticks, black background
-    fig, axis = plt.subplots(figsize=(12, 24), facecolor="black")
-    plt.xticks([])
-    plt.yticks([])
-    fig.tight_layout()
-    # begin animation loop
-    images = []        
-    while True:
-        # cache the images in the map list
-        if not images:
-            for png in maps:
-                location = path + "latency_maps/" + png
-                images.append(plt.imread(location))
-        # get a latest map list from the directory
-        new_maps = sorted(os.listdir(path + "latency_maps/"))
-        new_maps = [i for i in new_maps if ((len(i) > 10) and (".png" in i))]
-        new_maps = new_maps[-MAP_FRAMES:]
-        # add any new images from the directory
-        if maps != new_maps:
-            print('updating live animation...')
-            maps = [i for i in new_maps if i not in maps]
-            for png in maps:
-                location = path + "latency_maps/" + png
-                images.append(plt.imread(location))
-        # limit animation frames to window of latest data
-        images = images[-MAP_FRAMES:]
-        # plot, pause, clear, new map... repeat
-        for image in images:
-            axis.imshow(image, extent=[-180, 180, -90, 90])
-            plt.pause(MAP_PAUSE)
-            axis.clear()
-        # refresh map list 
-        if maps != new_maps:
-            maps = new_maps
-            # stop animation of not a looping test
-            if not LOOP:
-                axis.imshow(images[-1], extent=[-180, 180, -90, 90])
-                plt.show()
-
 def main():
     """
     Primary Event Sequence
@@ -1003,5 +1011,4 @@ def main():
 
 if __name__ == "__main__":
 
-    path = str(os.path.dirname(os.path.abspath(__file__))) + "/"
     main()
