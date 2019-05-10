@@ -1,5 +1,5 @@
 # =======================================================================
-VERSION = "Bitshares manualSIGNING 0.00000005"
+VERSION = 0.00000005
 # =======================================================================
 
 # Authenticated BUY/SELL/CANCEL without Pybitshares(MIT) Architecture
@@ -103,6 +103,8 @@ def WTFPL_v0_March_1765():
 # h/t @vvk123 @sschiessl @harukaff_bot
 # remainder WTFPL March 1765
 
+login = ''
+
 DEV = False
 COLOR = True
 
@@ -152,6 +154,8 @@ from ecdsa import SigningKey as ecdsa_SigningKey  # class
 from ecdsa import SECP256k1 as ecdsa_SECP256k1  # curve
 from ecdsa import util as ecdsa_util  # module
 from ecdsa import der as ecdsa_der  # module
+
+from bitsharesNODES import Nodes
 
 print("\033c")  # clear screen if they are all installed
 
@@ -222,13 +226,7 @@ def sample_orders():
             "account_name": "",
             "wif": "",
         },
-        "nodes": [
-            "wss://chicago.bitshares.apasia.tech/ws",
-            "wss://new-york.bitshares.apasia.tech/ws",
-            "wss://seattle.bitshares.apasia.tech/ws",
-            "wss://us-ny.bitshares.apasia.tech/ws",
-            "wss://us-la.bitshares.apasia.tech/ws",
-        ],
+        "nodes": Nodes.recent(),
     }
     # cancel all
     order2 = {
@@ -247,13 +245,7 @@ def sample_orders():
             "account_name": "",
             "wif": "",
         },
-        "nodes": [
-            "wss://chicago.bitshares.apasia.tech/ws",
-            "wss://new-york.bitshares.apasia.tech/ws",
-            "wss://seattle.bitshares.apasia.tech/ws",
-            "wss://us-ny.bitshares.apasia.tech/ws",
-            "wss://us-la.bitshares.apasia.tech/ws",
-        ],
+        "nodes": Nodes.recent(),
     }
 
     order3 = {
@@ -267,13 +259,7 @@ def sample_orders():
             "account_name": "",
             "wif": "",
         },
-        "nodes": [
-            "wss://chicago.bitshares.apasia.tech/ws",
-            "wss://new-york.bitshares.apasia.tech/ws",
-            "wss://seattle.bitshares.apasia.tech/ws",
-            "wss://us-ny.bitshares.apasia.tech/ws",
-            "wss://us-la.bitshares.apasia.tech/ws",
-        ],
+        "nodes": Nodes.recent(),
     }
 
 
@@ -753,7 +739,7 @@ class Base58(object):
     def __init__(self, data, prefix="BTS"):
 
         print(it('green',"Base58"))
-        print(it('blue',data))
+        print(it('blue',data[:10] ))
         self._prefix = prefix
         if all(c in HEXDIGITS for c in data):
             self._hex = data
@@ -869,7 +855,7 @@ def gphBase58CheckEncode(s):
 
 def base58CheckDecode(s):
     print(it('green',"base58CheckDecode"))
-    print(s)
+    print(s[:10])
     s = unhexlify(base58decode(s))
     dec = hexlify(s[:-4]).decode("ascii")
     checksum = doublesha256(dec)[:4]
@@ -2279,6 +2265,6 @@ def main():
     demo()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__"
 
     main()
