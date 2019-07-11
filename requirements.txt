@@ -1,4 +1,3 @@
-numpy
 requests
 matplotlib
 websocket-client
@@ -6,3 +5,13 @@ secp256k1
 pympler
 psutil
 ecdsa
+wsaccel
+pylint
+autopep8
+black
+appdirs
+attrs
+click
+toml
+tulipy
+TA-Lib

@@ -1,9 +1,3 @@
-<p align="center"> 
-<img src="https://imgur.com/wibKTOb.jpg">	
-<img src="https://imgur.com/kcJ3E20.jpg">
-</p>
-
-
 INSTALLATION
 =======================
 
@@ -12,13 +6,6 @@ INSTALLATION
 NOTE: this tool set is currently in alpha state of development; more new toys coming soon!
 
 **(BTS) litpresence1**
-
-	see WHITEPAPER folder for spanish, chinese, and russian language installation
-	ver carpeta de papel blanco para instalación en español
-	看中文安装的白皮书文件夹
-	см. белую папку для русской
-
-**LICENSE?!?**
 
 ```
 def WTFPL_v0_March_1765():
@@ -32,36 +19,6 @@ def WTFPL_v0_March_1765():
 **BitShares DEX Algo Trading Tools**
 
 The repository name "Extinction Event" was born of the notion that DEX tech combined with AI controlled algorithmic trading tech reaching the common user, in unison, would be an extinction level event for both centralized web-based exchanges and "monthly fee" algorithmic trading services.
-
-
-THREE LINE INSTALL
-----------------------
-
-navigate to the location you want to put your extinction-event folder, then:
-
-    sudo apt-get install git
-
-    git clone https://github.com/litepresence/extinction-event.git
-
-    cd extinction-event; python3 environment.py
-
-follow the instructions in the terminal
-
-DONE
-===================
-
-if that didn't work for some reason:
-
-**SUPPORT**
-
-FAST: https://t.me/bitshares_extinction_event
-
-SLOW: finitestate@tutamail.com
-
-or try:
-
-LINE BY LINE INSTALL
-----------------------
 
 **GATHER HARDWARE**
 
@@ -90,7 +47,7 @@ extinction-event should be compliant with other linux distrobutions, installatio
 
 **INSTALL PYTHON 3.6+**
 
-I used these instructions:
+I used this instructions:
 
     https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/
 
@@ -129,12 +86,6 @@ Enter the extinction-event folder:
 *NOTE* The virtual environment and setup.py are in `extinction-event`
 *NOTE* The scripts are all in `extinction-event/EV`
 *NOTE* you will need to activate your virtual environment from extinction-event folder EVERY TIME you start a new terminal tab when running these scripts.
-
-**INSTALL TULIP and TALIB**
-
-tulip and talib provide indicators like EMA, MACD, Parabolic SAR, Aroon, RSI, STOCH, etc. 
-see installation instructions in WHITEPAPER folder
-without tulip and talib you will be limited to simple moving averages
 
 **LATENCY TEST**
 
