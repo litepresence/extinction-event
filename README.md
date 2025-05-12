@@ -4,6 +4,17 @@
 </p>
 
 
+## ***This repository is no longer being maintained!***
+
+This codebase has become unflexible and, in a sense, "over-fit" to the Extinction Event algorithm.  Because of this, @squidKid-deluxe and I have taken the core functionality and re-formed it into a new platform, [QTradeX](https://github.com/squidKid-deluxe/QTradeX-Algo-Trading-SDK).  The Extinction Event algorithm itself is now part of QTradeX's companion repository, [QTradeX AI Agents](https://github.com/squidKid-deluxe/qtradex-ai-agents).  Thank you for your support during this transition. We invite you to explore QTradeX and its companion repository, for a more flexible and robust algotrading experience. If you have any questions, feel free to reach out.
+
+@litepresence Telegram
+@oraclepresence X com
+
+Happy trading!
+
+---
+
 INSTALLATION
 =======================
 
